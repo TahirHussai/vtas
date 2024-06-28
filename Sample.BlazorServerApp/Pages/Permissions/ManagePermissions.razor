@@ -1,0 +1,140 @@
+﻿@page "/ManagePermission"
+@using static MudBlazor.Icons
+@inject NavigationManager Navigation
+@* <MudItem xs="12" sm="8" md="12">
+    <MudCard>
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudText>Manage Permissions</MudText>
+            </CardHeaderContent>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudGrid>
+                <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+
+                    <MudItem xs="12" md="6">
+                        <MudTextField T="string" Label="ScreenName" Required="true" RequiredError="Screen Name is required!" />
+                    </MudItem>
+                    <MudItem xs="12" md="6" >
+                        <MudSelect T="string" Label="Select Role" Variant="Variant.Outlined" @bind-Value="SelectedRole" AnchorOrigin="Origin.BottomCenter">
+                            @foreach (var item in RolesList)
+                            {
+                                <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+
+                    <MudItem xs="12" md="12">
+                        <MudCardTitle>Permissions</MudCardTitle>
+                        <MudCheckBox T="bool" Label="Can Add" />
+                        <MudCheckBox T="bool" Label="Can Edit" />
+                        <MudCheckBox T="bool" Label="Can Read" />
+                        <MudCheckBox T="bool" Label="Can Delete" />
+                    </MudItem>
+                    <MudCardActions Class="pb-4 pl-4">
+                        <MudButton Variant="Variant.Filled" Color="Color.Dark" Disabled="@(!success)" Class="ml-auto">Save</MudButton>
+                    </MudCardActions>
+
+
+                </MudForm>
+
+
+            </MudGrid>
+        </MudCardContent>
+    </MudCard>
+</MudItem> *@
+<MudItem xs="12" sm="8" md="12">
+    <MudCard>
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudText>Manage User Permissions</MudText>
+            </CardHeaderContent>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudGrid>
+                <MudItem xs="12" md="6">
+                    <MudTextField T="string" Label="ScreenName" Variant="Variant.Outlined" Required="true" RequiredError="Screen Name is required!" />
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <MudSelect T="string" Label="Select Role" Variant="Variant.Outlined" @bind-Value="SelectedRole" AnchorOrigin="Origin.BottomCenter">
+                        @foreach (var item in RolesList)
+                        {
+                            <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+              <MudItem xs="12" md="12">
+                    <MudText Typo="Typo.body2">
+                       Manage Permissions
+                    </MudText>
+                  </MudItem>
+                @foreach (var item in Permissions)
+                            {
+                <MudItem xs="12" md="3">
+                    <MudCheckBox T="bool" @bind-Checked="@item.HasAccess" Label="Can Add" Color="Color.Primary" Variant="Variant.Outlined" />
+                </MudItem>
+                            }
+               @*  <MudItem xs="12" md="3">
+                    <MudCheckBox T="bool" Label="Can Edit" Color="Color.Info" Variant="Variant.Outlined" />
+                </MudItem>
+                <MudItem xs="12" md="3">
+                    <MudCheckBox T="bool" Label="Can View" Color="Color.Dark" Variant="Variant.Outlined" />
+                </MudItem>
+                <MudItem xs="12" md="3">
+                    <MudCheckBox T="bool" Label="Can Delete" Color="Color.Secondary" Variant="Variant.Outlined" />
+                </MudItem> *@
+
+            </MudGrid>
+        </MudCardContent>
+        <MudCardActions Class="pb-4 pl-4">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Save Changes</MudButton>
+        </MudCardActions>
+    </MudCard>
+</MudItem>
+
+@code {
+    bool success;
+    string[] errors = { };
+
+
+    public string SelectedRole { get; set; } = "User";
+    public string SelectedScreenName { get; set; } = "";
+    public List<Permission> Permissions { get; set; } = new List<Permission>()
+    {
+        new Permission("Add", false),
+        new Permission("Edit", false),
+        new Permission("View", false),
+    };
+    public List<Roles> RolesList { get; set; } = new List<Roles>()
+    {
+        new Roles("Admin", "1"),
+        new Roles("User", "2"),
+    };
+    public void SavePermissions()
+    {
+        // Save selected role, screen name, and permissions to database or perform desired action
+        Navigation.NavigateTo("/success");
+    }
+    public class Roles
+    {
+        public string Name { get; set; }
+        public string Id { get; set; }
+
+        public Roles(string name, string Id)
+        {
+            Name = name;
+            Id = Id;
+        }
+    }
+    public class Permission
+    {
+        public string Name { get; set; }
+        public bool HasAccess { get; set; }
+
+        public Permission(string name, bool hasAccess)
+        {
+            Name = name;
+            HasAccess = hasAccess;
+        }
+    }
+}

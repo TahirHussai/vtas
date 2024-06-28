@@ -1,0 +1,115 @@
+﻿@page "/Authentication/SignUp"
+@layout LogInLayout
+@using Sample.BlazorServerAPP.DTO;
+@using Sample.BlazorServerAPP.Service;
+@inject NavigationManager _nav
+@inject IAuthRepository _authRepo
+<style>
+    .card-body.p-5.text-center {
+        padding:0rem !important;
+    }
+
+    .form-control{
+        width:75% !important;
+        margin-left:56px !important;
+
+    }
+
+
+    .btn.btn-success{
+        margin-top: 5% !important;
+    }
+    .container a{
+        margin-top: 5% !important;
+    }
+    
+</style>
+@if (IsFields == true)
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>Someting went wrong!</strong>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+<body style="background: linear-gradient(to right, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1));">
+    <div>
+    <EditForm Model="userDto" OnValidSubmit="HandleRegistration">
+       
+
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <section class="vh-100 gradient-custom">
+            
+            <div class="container py-16 h-40">
+                <!-- Changed height to h-50 -->
+                <div class="row d-flex justify-content-center align-items-center ">
+                    <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+                        <div class="card bg-dark text-white" style="border-radius: 1rem;height:40%!important">
+                            <div class="card-body p-5 text-center">
+                                <div class="mb-md-5 mt-md-4">
+
+                                    <h2 class="fw-bold mb-2 text-uppercase">Register Now</h2>
+                                    <p class="text-white-50 mb-2">Please enter your SignUp!</p>
+
+                                    <div class="form-outline form-white mb-2">
+                                        <label class="form-label" for="typeEmailX">First Name</label>
+                                        <InputText @bind-Value="userDto.FirstName" class="form-control" />
+                                    </div>
+                                    <div class="form-outline form-white mb-2">
+                                        <label class="form-label" for="typeEmailX">Last Name</label>
+                                        <InputText @bind-Value="userDto.LastName" class="form-control" />
+                                    </div>
+                                    <div class="form-outline form-white mb-2">
+                                        <label class="form-label" for="typeEmailX">Email</label>
+                                        <InputText @bind-Value="userDto.Email" class="form-control" />
+                                    </div>
+
+                                    <div class="form-outline form-white mb-2">
+                                        <label class="form-label" for="typePasswordX">Password</label>
+                                        <InputText @bind-Value="userDto.Password" class="form-control" />
+                                    </div>
+
+                                  
+                                    <button type="submit" class="btn btn-success">Submit</button>
+                                    <br />
+                                    <br />
+
+
+                                        <a href="~/login">Already Have A Account </a>
+                                
+                                </div>
+
+                               
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </EditForm>
+    </div>
+</body>
+
+
+@code {
+    UserDto userDto = new UserDto();
+    bool IsFields = false;
+    protected async Task HandleRegistration()
+    {
+        var responce = await _authRepo.Register(userDto);
+        if (responce)
+        {
+            _nav.NavigateTo("/login");
+        }
+        else
+        {
+            IsFields = true;
+        }
+    }
+}
+

@@ -1,0 +1,217 @@
+﻿@page "/"
+
+@page "/login"
+
+@layout LogInLayout
+
+
+@using Microsoft.AspNetCore.Authentication;
+@using Microsoft.AspNetCore.Identity;
+@using Sample.BlazorServerAPP.DTO;
+@using Sample.BlazorServerAPP.EndPoint;
+@using Sample.BlazorServerAPP.Service;
+@inject NavigationManager _nav
+@inject IAuthRepository _authRepo
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+
+@if (IsFields == true)
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>Something went wrong!</strong>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<body style="background: linear-gradient(to right, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1));">
+    <div>
+        <EditForm Model="userDto" OnValidSubmit="HandleRegistration">
+
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <section class="vh-20 gradient-custom">
+                <div class="container py-16 h-40 " style="height:auto">
+                    <!-- Changed height to h-50 -->
+                    <div class="row d-flex justify-content-center align-items-center ">
+                        <div class="col-12 col-md-8 col-lg-6 col-md-5">
+                            <div class="card bg-dark text-white" style="border-radius: 1rem;height:40%!important">
+                                <div class="card-body p-5 text-center">
+                                    <div class="mb-md-5 mt-md-4">
+
+                                        <h2 class="fw-bold mb-2 text-uppercase">Login</h2>
+                                        <p class="text-white-50 mb-2">Please enter your Email and password!</p>
+
+                                        <div class="form-outline form-white mb-2">
+                                            <label class="form-label" for="typeEmailX">Email</label>
+                                            <InputText @bind-Value="userDto.Email" class="form-control" />
+                                        </div>
+
+                                        <div class="form-outline form-white mb-2">
+                                            <label class="form-label" for="typePasswordX">Password</label>
+                                            <InputText @bind-Value="userDto.Password" class="form-control" />
+                                        </div>
+
+                                       
+
+                                        <br />
+                                        <br />
+                                        <div class="d-flex justify-content-center text-center mt-2 pt-1">
+                                            <a @onclick="LoginWithFacebook" @onclick:preventDefault class="text-white"><i class="fab fa-facebook-f fa-lg"></i></a>
+                                            <a @onclick="LoginWithLinkedId" @onclick:preventDefault class="text-white"><i class="fab fa-linkedin fa-lg mx-4 px-2"></i></a>
+                                            <a @onclick="LoginWithGoogle" @onclick:preventDefault class="text-white"><i class="fab fa-google fa-lg"></i></a>
+                                            <a @onclick="LoginWithGithub" @onclick:preventDefault class="text-white"><i class="fab fa-github fa-lg"></i></a>
+                                            <a @onclick="LoginWithYahoo" @onclick:preventDefault class="text-white"><i class="fab fa-yahoo fa-lg"></i></a>
+                                            <a @onclick="LoginWithMicrosoft" @onclick:preventDefault class="text-white"><i class="fab fa-microsoft fa-lg"></i></a>
+                                        </div>
+
+                                    </div>
+
+
+                                    <br />
+                                        <MudButton Variant="Variant.Filled" Color="Color.Success" Link="/Accounts/LogIn" Size="Size.Large" FullWidth="true">Sign In</MudButton>
+
+                                    <br />
+                                    <br />
+                                    <div class="d-flex justify-content-center text-center mt-2 pt-1">
+                                       
+
+                                    <div>
+                                        <p class="mb-0">
+                                            Don't have an account? <a href="#!" class="text-white-50 fw-bold">Sign Up</a>
+                                        </p>
+
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+           </div>
+            </section>
+
+        </EditForm>
+    </div>
+</body>
+@code {
+    LoginDTO userDto = new LoginDTO();
+    bool IsFields = false;
+    private List<ExterLogin> exterLogins;
+    //protected override async Task OnInitializedAsync()
+    //{
+    //    var responce = await _authRepo.ExternalLogins(");
+    //    if (responce.Count()>0)
+    //    {
+    //        exterLogins = responce;
+    //    }
+    //}
+    private async Task LoginWithLinkedId()
+    {
+        var RedirectEndPoint = StaticEndPoint.ExternalRedirectEndpoint;
+        var url = StaticEndPoint.AuthExternalLinedIdLoginEndpoint;
+        _nav.NavigateTo($"{url}?redirectUrl=" + RedirectEndPoint);
+    }
+    private async Task LoginWithGoogle()
+    {
+        var RedirectEndPoint = StaticEndPoint.ExternalRedirectEndpoint;
+        var url = StaticEndPoint.AuthExternalGoogleLoginEndpoint;
+        _nav.NavigateTo($"{url}?redirectUrl=" + RedirectEndPoint);
+    }
+    private async Task LoginWithFacebook()
+    {
+        var RedirectEndPoint = StaticEndPoint.ExternalRedirectEndpoint;
+        var url = StaticEndPoint.AuthExternalFacebookLoginEndpoint;
+        _nav.NavigateTo($"{url}?redirectUrl=" + RedirectEndPoint);
+    }
+    private async Task LoginWithGithub()
+    {
+        var RedirectEndPoint = StaticEndPoint.ExternalRedirectEndpoint;
+        var url = StaticEndPoint.AuthExternalGithubLoginEndpoint;
+        _nav.NavigateTo($"{url}?redirectUrl=" + RedirectEndPoint);
+    }
+    private async Task LoginWithYahoo()
+    {
+        var RedirectEndPoint = StaticEndPoint.ExternalRedirectEndpoint;
+        var url = StaticEndPoint.AuthExternalYahooLoginEndpoint;
+        _nav.NavigateTo($"{url}?redirectUrl=" + RedirectEndPoint);
+    }
+    private async Task LoginWithMicrosoft()
+    {
+        var RedirectEndPoint = StaticEndPoint.ExternalRedirectEndpoint;
+        var url = StaticEndPoint.AuthExternalMicrosoftLoginEndpoint;
+        _nav.NavigateTo($"{url}?redirectUrl=" + RedirectEndPoint);
+    }
+    protected async Task HandleRegistration()
+    {
+        var responce = await _authRepo.Login(userDto);
+        if (responce)
+        {
+
+            _nav.NavigateTo("/personal/dashboard");
+
+        }
+        else
+        {
+            IsFields = true;
+        }
+    }
+
+    //private async Task LoginWithGoogle()
+    //{
+    //    //   var logins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+    //    //var authenticationState = await authenticationStateTask;
+    //    //var user = authenticationState.User;
+
+    //    //if (!user.Identity.IsAuthenticated)
+    //    //{
+    //    //    var authenticationProperties = new AuthenticationProperties
+    //    //        {
+    //    _nav.NavigateTo("https://localhost:7206/signin-google");
+    //    //RedirectUri = "https://localhost:7206/signin-google"; // Redirect after successful login
+    //    //};
+
+    //        //await HttpContext.SignInAsync("Google", authenticationProperties);
+    //    //}
+    //}
+
+
+}
+
+<script>
+    window.fbAsyncInit = function () {
+        FB.init({
+            appId: '683741366531403',
+            cookie: true,
+            xfbml: true,
+            version: '{api-version}'
+        });
+
+        FB.AppEvents.logPageView();
+
+    };
+
+    (function (d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) { return; }
+        js = d.createElement(s); js.id = id;
+        js.src = "https://connect.facebook.net/en_US/sdk.js";
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+
+    FB.getLoginStatus(function (response) {
+        statusChangeCallback(response);
+
+        {
+            status: 'connected',
+                authResponse: {
+                accessToken: '...',
+                    expiresIn: '...',
+                        signedRequest: '...',
+                            userID: '...'
+            }
+        }
+    });
+</script>
