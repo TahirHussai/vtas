@@ -32,70 +32,33 @@
         </button>
     </div>
 }
-<body style="background: linear-gradient(to right, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1));">
-    <div>
-    <EditForm Model="userDto" OnValidSubmit="HandleRegistration">
-       
-
-        <DataAnnotationsValidator />
-        <ValidationSummary />
-
-        <section class="vh-100 gradient-custom">
-            
-            <div class="container py-16 h-40">
-                <!-- Changed height to h-50 -->
-                <div class="row d-flex justify-content-center align-items-center ">
-                    <div class="col-12 col-md-8 col-lg-6 col-xl-5">
-                        <div class="card bg-dark text-white" style="border-radius: 1rem;height:40%!important">
-                            <div class="card-body p-5 text-center">
-                                <div class="mb-md-5 mt-md-4">
-
-                                    <h2 class="fw-bold mb-2 text-uppercase">Register Now</h2>
-                                    <p class="text-white-50 mb-2">Please enter your SignUp!</p>
-
-                                    <div class="form-outline form-white mb-2">
-                                        <label class="form-label" for="typeEmailX">First Name</label>
-                                        <InputText @bind-Value="userDto.FirstName" class="form-control" />
-                                    </div>
-                                    <div class="form-outline form-white mb-2">
-                                        <label class="form-label" for="typeEmailX">Last Name</label>
-                                        <InputText @bind-Value="userDto.LastName" class="form-control" />
-                                    </div>
-                                    <div class="form-outline form-white mb-2">
-                                        <label class="form-label" for="typeEmailX">Email</label>
-                                        <InputText @bind-Value="userDto.Email" class="form-control" />
-                                    </div>
-
-                                    <div class="form-outline form-white mb-2">
-                                        <label class="form-label" for="typePasswordX">Password</label>
-                                        <InputText @bind-Value="userDto.Password" class="form-control" />
-                                    </div>
-
-                                  
-                                    <button type="submit" class="btn btn-success">Submit</button>
-                                    <br />
-                                    <br />
 
 
-                                        <a href="~/login">Already Have A Account </a>
-                                
-                                </div>
 
-                               
+<MudForm Model="@userDto" @ref="@form" ValidationDelay="0">
 
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+    <MudText Typo="Typo.h4" GutterBottom="true">Sign Up</MudText>
 
-    </EditForm>
+    <MudText>Already have account? <MudLink Href="/login">Sign In</MudLink></MudText>
+
+    <MudTextField T="string" @bind-Value="@userDto.FirstName" Label="E-FirsName" Variant="Variant.Outlined" Class="my-6"></MudTextField>
+    <MudTextField T="string" @bind-Value="@userDto.LastName" Label="E-LastName" Variant="Variant.Outlined" Class="my-6"></MudTextField>
+    <MudTextField T="string" @bind-Value="@userDto.Email" Label="E-mail" Variant="Variant.Outlined" Class="my-6"></MudTextField>
+
+    <MudTextField @bind-Value="@userDto.Password" Label="Password" Variant="Variant.Outlined" Adornment="Adornment.End" />
+
+    <div Class="d-flex justify-space-between align-center">
+      
     </div>
-</body>
+
+    <MudText></MudText>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@( () =>  HandleRegistration())" Size="Size.Large" FullWidth="true">Sign Up</MudButton>
+</MudForm>
+
 
 
 @code {
+    MudForm form;
     UserDto userDto = new UserDto();
     bool IsFields = false;
     protected async Task HandleRegistration()
@@ -108,6 +71,29 @@
         else
         {
             IsFields = true;
+        }
+    }
+
+    string Password { get; set; }
+    public bool AgreeToTerms { get; set; }
+
+    bool PasswordVisibility;
+    InputType PasswordInput = InputType.Password;
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+
+    void TogglePasswordVisibility()
+    {
+        @if (PasswordVisibility)
+        {
+            PasswordVisibility = false;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
+        }
+        else
+        {
+            PasswordVisibility = true;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
         }
     }
 }
