@@ -36,16 +36,34 @@ namespace Sample.WebApi.Models
 
                 new IdentityRole
                 {
-                    Name = "Administrator",
-                    NormalizedName = "ADMINISTRATOR",
+                    Name = "SuperAdministrator",
+                    NormalizedName = "SUPERADMINISTRATOR",
                     Id = "bda30051-c030-467c-93e8-ae3e0b5bee4e"
                 },
                  new IdentityRole
                  {
-                     Name = "User",
-                     NormalizedName = "USER",
+                     Name = "CustomerAdministrator",
+                     NormalizedName = "CUSTOMERADMINISTRATOR",
                      Id = "e15c12c3-5582-4711-9306-984e0df1dcdd"
-                 }
+                 },
+                   new IdentityRole
+                   {
+                       Name = "VendorAdministrator",
+                       NormalizedName = "VENDORADMINISTRATOR",
+                       Id = "04552f0c-1204-454f-88fe-dd5346ec5faf"
+                   } ,
+                   new IdentityRole
+                   {
+                       Name = "SubVendor",
+                       NormalizedName = "SUBVENDOR",
+                       Id = "322c2338-b9cd-45db-8f3b-1bcf5cb2ab01"
+                   },
+                   new IdentityRole
+                   {
+                       Name = "Client",
+                       NormalizedName = "CLIENT",
+                       Id = "70f9b212-6cda-4b09-8b9d-b48a138ad518"
+                   }
            );
 
             var hash = new PasswordHasher<UserPofile>();
@@ -54,25 +72,25 @@ namespace Sample.WebApi.Models
                new UserPofile
                {
                    Id = "2314094f-0974-4783-ae24-97b801faf01d",
-                   Email = "admin@admin.com",
-                   NormalizedEmail = "ADMIN@ADMIN.COM",
-                   PasswordHash = hash.HashPassword(null, "admin@123#Admin"),
-                   UserName = "admin@admin.com",
-                   NormalizedUserName = "ADMIN@ADMIN.COM",
-                   FirstName = "System",
+                   Email = "superadmin@admin.com",
+                   NormalizedEmail = "SUPERADMINADMIN@ADMIN.COM",
+                   PasswordHash = hash.HashPassword(null, "superadmin@123#Admin"),
+                   UserName = "superadmin@admin.com",
+                   NormalizedUserName = "SUPERADMIN@ADMIN.COM",
+                   FirstName = "Super",
                    Lastname = "Admin",
                    ProfilePicture="noimage.png"
                },
                 new UserPofile
                 {
                     Id = "fe750ed8-92fd-484e-a3fa-dc5f4b62c0d1",
-                    Email = "user@user.com",
-                    NormalizedEmail = "USER@USER.COM",
-                    PasswordHash = hash.HashPassword(null, "user@123#User"),
-                    UserName = "user@user.com",
-                    NormalizedUserName = "USER@USER.COM",
-                    FirstName = "System",
-                    Lastname = "User",
+                    Email = "customer@admin.com",
+                    NormalizedEmail = "CUSTOMER@ADMIN.COM",
+                    PasswordHash = hash.HashPassword(null, "customer@123#Admin"),
+                    UserName = "customer@admin.com",
+                    NormalizedUserName = "CUSTOMER@ADMIN.COM",
+                    FirstName = "Customer",
+                    Lastname = "Admin",
                     ProfilePicture = "noimage.png"
                 }
           );
@@ -95,99 +113,7 @@ namespace Sample.WebApi.Models
 
 
         }
-        public DbSet<Products> Products { get; set; }
-        public DbSet<ProductCategory> ProductCategories { get; set; }
-        public DbSet<PaymentDetails> Payments { get; set; }
-        public DbSet<ScreensPermission>  ScreensPermissions { get; set; }
-        public IEnumerable<Products> GetSortedProducts(int pageNumber, int pageSize, string sortBy)
-        {
-            List<Products> result = new List<Products>();
-
-            using (var connection = Database.GetDbConnection() as SqlConnection)
-            {
-                connection.Open();
-
-                using (var command = connection.CreateCommand())
-                {
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = "GetSortedProducts";
-
-                    var pageNumberParam = new SqlParameter("@pageNumber", SqlDbType.Int);
-                    pageNumberParam.Value = pageNumber;
-
-                    var pageSizeParam = new SqlParameter("@pageSize", SqlDbType.Int);
-                    pageSizeParam.Value = pageSize;
-
-                    var sortByParam = new SqlParameter("@sortBy", SqlDbType.NVarChar, 50);
-                    sortByParam.Value = sortBy;
-
-                    command.Parameters.AddRange(new[] { pageNumberParam, pageSizeParam, sortByParam });
-
-                    using (var reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            var product = new Products
-                            {
-                                ProductId = (int)reader["ProductId"],
-                                ProductName = reader["ProductName"].ToString(),
-                                ProductPrice = (decimal)reader["ProductPrice"],
-                                ProductCategory = reader["ProductCategory"].ToString(),
-                                ProductImage = reader["ProductImage"].ToString(),
-                                ProductDescription = reader["ProductDescription"].ToString(),
-                                EntryDate = (DateTime)reader["EntryDate"]
-                            };
-                            result.Add(product);
-                        }
-                    }
-                }
-            }
-
-            return result;
-        }
-        public IEnumerable<ProductCategory> GetSortedProductCategories(int pageNumber, int pageSize, string sortBy)
-        {
-            List<ProductCategory> result = new List<ProductCategory>();
-
-            using (var connection = Database.GetDbConnection() as SqlConnection)
-            {
-                connection.Open();
-
-                using (var command = connection.CreateCommand())
-                {
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = "GetSortedProductCategories";
-
-                    var pageNumberParam = new SqlParameter("@pageNumber", SqlDbType.Int);
-                    pageNumberParam.Value = pageNumber;
-
-                    var pageSizeParam = new SqlParameter("@pageSize", SqlDbType.Int);
-                    pageSizeParam.Value = pageSize;
-
-                    var sortByParam = new SqlParameter("@sortBy", SqlDbType.NVarChar, 50);
-                    sortByParam.Value = sortBy;
-
-                    command.Parameters.AddRange(new[] { pageNumberParam, pageSizeParam, sortByParam });
-
-                    using (var reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            var category = new ProductCategory
-                            {
-                                CategoryId = (int)reader["CategoryId"],
-                                CategoryName = reader["CategoryName"].ToString(),
-                                CategoryDescription = reader["CategoryDescription"].ToString(),
-                                CreationDate = (DateTime)reader["CreationDate"]
-                            };
-                            result.Add(category);
-                        }
-                    }
-                }
-            }
-
-            return result;
-        }
-        partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+     
+     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
     }
 }

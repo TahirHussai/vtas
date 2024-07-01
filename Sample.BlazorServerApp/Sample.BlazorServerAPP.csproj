@@ -25,10 +25,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Pages\Personal\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Sample.WebApi\Sample.WebApi.csproj" />
   </ItemGroup>
 

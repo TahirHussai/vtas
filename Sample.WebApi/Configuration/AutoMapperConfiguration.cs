@@ -13,10 +13,8 @@ namespace Sample.WebApi.Configuration
         {
             var mapperConfig = new MapperConfiguration(a =>
             {
-                a.AddProfile(new ProductMapper());
-                a.AddProfile(new ScreensPermissionMapper());
+              
                 a.AddProfile(new IdentityRoleMapper());
-                a.AddProfile(new ProductCategoryMapper());
                 a.AddProfile(new UserPofileMapper());
             });
             IMapper mapper = mapperConfig.CreateMapper();

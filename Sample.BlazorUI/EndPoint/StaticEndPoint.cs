@@ -1,4 +1,4 @@
-﻿namespace Sample.BlazorServerAPP.EndPoint
+﻿namespace Sample.BlazorUI.EndPoint
 {
     public class StaticEndPoint
     {

@@ -7,9 +7,8 @@
 
 @using Microsoft.AspNetCore.Authentication;
 @using Microsoft.AspNetCore.Identity;
-@using Sample.BlazorServerAPP.DTO;
-@using Sample.BlazorServerAPP.EndPoint;
-@using Sample.BlazorServerAPP.Service;
+@using Sample.BlazorUI.DTO;
+@using Sample.BlazorUI.EndPoint;
 @inject NavigationManager _nav
 @inject IAuthRepository _authRepo
 @inject AuthenticationStateProvider AuthenticationStateProvider
@@ -90,15 +89,7 @@
     LoginDTO userDto = new LoginDTO();
     bool IsFields = false;
     private List<ExterLogin> exterLogins;
-    //protected override async Task OnInitializedAsync()
-    //{
-    //    var responce = await _authRepo.ExternalLogins(");
-    //    if (responce.Count()>0)
-    //    {
-    //        exterLogins = responce;
-    //    }
-    //}
-    
+   
     protected async Task HandleRegistration()
     {
         var responce = await _authRepo.Login(userDto);
