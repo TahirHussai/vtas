@@ -1,21 +1,43 @@
 ﻿@page "/cardlist"
-@using MudBlazor
+@inject IAuthRepository _authRepo
+@inject NavigationManager _navManager
+@inject ISnackbar Snackbar
+<style>
+    .card-header {
+        background-color: rgba(173, 216, 230, 0.8); /* Light blue with opacity */
+        border-bottom: 2px solid #5F9EA0; /* Light blue border */
+        color: #FF69B4; /* Hot pink for the text */
+        padding: 10px;
+        font-weight: bold;
+        text-align: center;
+    }
 
+    .card-content {
+        padding: 20px;
+        border: 1px solid #D3D3D3; /* Light grey border */
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    }
+
+    .card {
+        margin: 15px;
+    }
+</style>
 <MudContainer>
     <MudGrid>
-        @foreach (var item in Items)
+        @foreach (var item in usersList)
         {
-            <MudItem xs="12" sm="6" md="4" lg="4">
-                <MudCard Style="margin: 16px;">
-                    <MudCardHeader>
-                        <MudText Typo="Typo.h6" Color="Color.Secondary">@item.UserRole</MudText>
+            <MudItem xs="12" sm="6" md="4" lg="4" class="card">
+                <MudCard >
+                    <MudCardHeader class="card-header">
+                        <MudText Typo="Typo.h6" Color="Color.Secondary">@item.Role</MudText>
                         </MudCardHeader>
-                        <MudCardContent>
-                            <MudText Typo="Typo.h5">@item.Name</MudText>
-                            <MudText>@item.Description</MudText>
+                        <MudCardContent class="card-content">
+                            <MudText Typo="Typo.h5">@item.UserName</MudText>
+                           @*  <MudText>@item.Description</MudText> *@
                         </MudCardContent>
                         <MudCardActions>
-                            <MudButton Variant="Variant.Filled" Color="Color.Primary">Action</MudButton>
+                            @* <MudButton Variant="Variant.Filled" Color="Color.Primary">Action</MudButton> *@
                         </MudCardActions>
                     </MudCard>
                 </MudItem>
@@ -24,19 +46,24 @@
 </MudContainer>
 
 @code {
-    private List<Item> Items = new List<Item>
+    List<UserWithRolesDto> usersList = new List<UserWithRolesDto>();
+    protected override async Task OnInitializedAsync()
     {
-        new Item { UserRole = "SuperAdmin", Name = "Alice", Description = "Administrator with full access" },
-        new Item { UserRole = "Client", Name = "Bob", Description = "Client with limited access" },
-        new Item { UserRole = "Customer", Name = "Charlie", Description = "Customer with basic access" },
-        new Item { UserRole = "SuperAdmin", Name = "David", Description = "Administrator with full access" },
-        new Item { UserRole = "Client", Name = "Eve", Description = "Client with limited access" },
-    };
-
-    private class Item
-    {
-        public string UserRole { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
+        usersList = await _authRepo.GetUsersListWithRoles();
     }
+    // private List<Item> Items = new List<Item>
+    // {
+    //     new Item { UserRole = "SuperAdmin", Name = "Alice", Description = "Administrator with full access" },
+    //     new Item { UserRole = "Client", Name = "Bob", Description = "Client with limited access" },
+    //     new Item { UserRole = "Customer", Name = "Charlie", Description = "Customer with basic access" },
+    //     new Item { UserRole = "SuperAdmin", Name = "David", Description = "Administrator with full access" },
+    //     new Item { UserRole = "Client", Name = "Eve", Description = "Client with limited access" },
+    // };
+
+    // private class Item
+    // {
+    //     public string UserRole { get; set; }
+    //     public string Name { get; set; }
+    //     public string Description { get; set; }
+    // }
 }

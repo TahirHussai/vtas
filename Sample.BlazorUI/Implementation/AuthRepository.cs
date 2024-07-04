@@ -18,7 +18,7 @@ namespace Sample.BlazorUI.Implementation
         private readonly ILocalStorageService _localStorageService;
         private readonly AuthenticationProvider _authenticationProvider;
         private readonly string _baseUrl;
-        public AuthRepository(AuthenticationProvider authenticationProvider, ILocalStorageService localStorageService, 
+        public AuthRepository(AuthenticationProvider authenticationProvider, ILocalStorageService localStorageService,
             IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             _httpClientFactory = httpClientFactory;
@@ -29,7 +29,7 @@ namespace Sample.BlazorUI.Implementation
 
         public async Task<bool> Login(LoginDTO dto)
         {
-           
+
             var request = new HttpRequestMessage(HttpMethod.Post, _baseUrl + StaticEndPoint.AuthLoginEndpoint)
             {
                 Content = new StringContent(JsonConvert.SerializeObject(dto), Encoding.UTF8, "application/json")
@@ -74,7 +74,38 @@ namespace Sample.BlazorUI.Implementation
             await _localStorageService.RemoveItemAsync("Email");
             await ((AuthenticationProvider)_authenticationProvider).LoggedOut();
         }
-       
+        public async Task<List<UserWithRolesDto>> GetUsersListWithRoles()
+        {
+            var list = new List<UserWithRolesDto>();
+
+            try
+            {
+                var request = new HttpRequestMessage(HttpMethod.Get, $"{_baseUrl}{StaticEndPoint.GetUsersEndpoint}");
+                var client = _httpClientFactory.CreateClient();
+                var response = await client.SendAsync(request);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+
+                    var jsonObject = JObject.Parse(content);
+                    var usersList = jsonObject["result"].ToObject<List<UserWithRolesDto>>();
+
+                    if (usersList?.Any() == true)
+                    {
+                        list = usersList;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // Optionally log the exception or handle it as needed.
+            }
+
+            return list;
+        }
+
+
         private string GetBaseUrl(IHttpClientFactory httpClientFactory)
         {
             // Assuming you have a client named "LocalApi" configured with the base address

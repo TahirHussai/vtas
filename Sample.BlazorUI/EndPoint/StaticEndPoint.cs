@@ -8,7 +8,7 @@
         #region Account Api
         public static string AuthRegisterEndpoint = "$api/Account/UserRegister";
         public static string AuthLoginEndpoint = $"api/Account/UserLogin";
-        public static string AuthRefreshEndpoint = $"api/Account/refresh-token";
+        public static string GetUsersEndpoint = $"api/Account/AllUsersWithRoles";
         #endregion
 
 

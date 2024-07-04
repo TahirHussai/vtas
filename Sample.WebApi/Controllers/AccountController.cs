@@ -86,7 +86,7 @@ namespace Sample.WebApi.Controllers
                 userRoles.Add(new UserWithRolesDto
                 {
                     Id = user.Id,
-                    UserName = user.UserName,
+                    UserName = user.FirstName + (string.IsNullOrEmpty(user.Lastname) ? "" : " " + user.Lastname),
                     Email = user.Email,
                     Role = roles.FirstOrDefault(),
                     CustomerId=user.CustomerId,
