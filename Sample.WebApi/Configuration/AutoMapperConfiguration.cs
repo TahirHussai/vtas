@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
-using Sample.WebApi.DTO;
+using Sample.DTOS;
 using Sample.WebApi.Mapper;
 using Sample.WebApi.Models;
 using System.Runtime.CompilerServices;

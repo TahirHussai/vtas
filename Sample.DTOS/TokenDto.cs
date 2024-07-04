@@ -1,4 +1,4 @@
-﻿namespace Sample.BlazorUI.DTO
+﻿namespace Sample.DTOS
 {
     public class TokenDto
     {

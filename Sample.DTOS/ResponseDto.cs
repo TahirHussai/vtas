@@ -1,13 +1,11 @@
-﻿namespace Sample.BlazorUI.DTO
+﻿namespace Sample.DTOS
 {
     public class ResponseDto
     {
         public string Email { get; set; }
-       
+
         public string TokenString { get; set; }
-        public string RefreshToken { get; set; }
-        public DateTime Expiration { get; set; }
-        
+        public string UserId { get; set; }
 
     }
     public class ExterLogin
@@ -16,4 +14,5 @@
         public string loginName { get; set; }
         public string RedirectUrl { get; set; }
     }
+
 }

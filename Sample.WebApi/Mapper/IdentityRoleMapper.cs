@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
-using Sample.WebApi.DTO;
+using Sample.DTOS;
 
 namespace Sample.WebApi.Mapper
 {

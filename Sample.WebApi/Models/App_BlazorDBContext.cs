@@ -36,26 +36,26 @@ namespace Sample.WebApi.Models
 
                 new IdentityRole
                 {
-                    Name = "SuperAdministrator",
-                    NormalizedName = "SUPERADMINISTRATOR",
+                    Name = "SuperAdmin",
+                    NormalizedName = "SUPERADMIN",
                     Id = "bda30051-c030-467c-93e8-ae3e0b5bee4e"
                 },
                  new IdentityRole
                  {
-                     Name = "CustomerAdministrator",
-                     NormalizedName = "CUSTOMERADMINISTRATOR",
+                     Name = "Customer",
+                     NormalizedName = "CUSTOMER",
                      Id = "e15c12c3-5582-4711-9306-984e0df1dcdd"
                  },
                    new IdentityRole
                    {
-                       Name = "VendorAdministrator",
-                       NormalizedName = "VENDORADMINISTRATOR",
+                       Name = "Vendor",
+                       NormalizedName = "VENDOR",
                        Id = "04552f0c-1204-454f-88fe-dd5346ec5faf"
                    } ,
                    new IdentityRole
                    {
-                       Name = "SubVendor",
-                       NormalizedName = "SUBVENDOR",
+                       Name = "Applicant",
+                       NormalizedName = "APPLICANT",
                        Id = "322c2338-b9cd-45db-8f3b-1bcf5cb2ab01"
                    },
                    new IdentityRole
@@ -63,6 +63,13 @@ namespace Sample.WebApi.Models
                        Name = "Client",
                        NormalizedName = "CLIENT",
                        Id = "70f9b212-6cda-4b09-8b9d-b48a138ad518"
+                   }
+                   ,
+                   new IdentityRole
+                   {
+                       Name = "Recruiter",
+                       NormalizedName = "Recruiter",
+                       Id = "a1a446d6-5b18-41ee-adc4-f18eb5f5b8e2"
                    }
            );
 
@@ -79,11 +86,15 @@ namespace Sample.WebApi.Models
                    NormalizedUserName = "SUPERADMIN@ADMIN.COM",
                    FirstName = "Super",
                    Lastname = "Admin",
-                   ProfilePicture="noimage.png"
+                   ParentId = "",
+                   CreatedById = "",
+                   CreatedDate = DateTime.Now,
+                   ProfilePicture ="noimage.png",
+                   CustomerId=""
                },
                 new UserPofile
                 {
-                    Id = "fe750ed8-92fd-484e-a3fa-dc5f4b62c0d1",
+                    Id = "7375512a-4e4b-4178-babc-1de292b177b4",
                     Email = "customer@admin.com",
                     NormalizedEmail = "CUSTOMER@ADMIN.COM",
                     PasswordHash = hash.HashPassword(null, "customer@123#Admin"),
@@ -91,7 +102,11 @@ namespace Sample.WebApi.Models
                     NormalizedUserName = "CUSTOMER@ADMIN.COM",
                     FirstName = "Customer",
                     Lastname = "Admin",
-                    ProfilePicture = "noimage.png"
+                    CreatedDate = DateTime.Now,
+                    ParentId = "2314094f-0974-4783-ae24-97b801faf01d",
+                    CreatedById = "2314094f-0974-4783-ae24-97b801faf01d",
+                    ProfilePicture = "noimage.png",
+                    CustomerId = ""
                 }
           );
             modelBuilder.Entity<IdentityUserRole<string>>().HasData(
@@ -103,7 +118,7 @@ namespace Sample.WebApi.Models
                },
                 new IdentityUserRole<string>
                 {
-                    UserId = "fe750ed8-92fd-484e-a3fa-dc5f4b62c0d1",
+                    UserId = "7375512a-4e4b-4178-babc-1de292b177b4",
                     RoleId = "e15c12c3-5582-4711-9306-984e0df1dcdd"
 
                 }

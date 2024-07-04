@@ -1,7 +1,7 @@
 ﻿using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
 using Newtonsoft.Json;
-using Sample.BlazorUI.DTO;
+using Sample.DTOS;
 using Sample.BlazorUI.EndPoint;
 using System;
 using System.IdentityModel.Tokens.Jwt;

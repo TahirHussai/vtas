@@ -1,72 +1,73 @@
 ﻿@page "/Authentication/SignUp"
 @layout LogInLayout
-@using Sample.BlazorUI.DTO;
+@using Sample.DTOS
 @inject NavigationManager _nav
 @inject IAuthRepository _authRepo
+
 <style>
     .card-body.p-5.text-center {
-        padding:0rem !important;
+        padding: 0rem !important;
     }
 
-    .form-control{
-        width:75% !important;
-        margin-left:56px !important;
-
+    .form-control {
+        width: 75% !important;
+        margin-left: 56px !important;
     }
 
-
-    .btn.btn-success{
+    .btn.btn-success {
         margin-top: 5% !important;
     }
-    .container a{
+
+    .container a {
         margin-top: 5% !important;
     }
-    
 </style>
-@if (IsFields == true)
+
+@if (IsFields)
 {
     <div class="alert alert-warning alert-dismissible fade show" role="alert">
-        <strong>Someting went wrong!</strong>
+        <strong>Something went wrong!</strong>
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
 }
 
-
-
-<MudForm Model="@userDto" @ref="@form" ValidationDelay="0">
-
+<MudForm Model="@userDto" @ref="form" ValidationDelay="0">
     <MudText Typo="Typo.h4" GutterBottom="true">Sign Up</MudText>
 
-    <MudText>Already have account? <MudLink Href="/login">Sign In</MudLink></MudText>
+    <MudText>Already have an account? <MudLink Href="/login">Sign In</MudLink></MudText>
 
-    <MudTextField T="string" @bind-Value="@userDto.FirstName" Label="E-FirsName" Variant="Variant.Outlined" Class="my-6"></MudTextField>
-    <MudTextField T="string" @bind-Value="@userDto.LastName" Label="E-LastName" Variant="Variant.Outlined" Class="my-6"></MudTextField>
-    <MudTextField T="string" @bind-Value="@userDto.Email" Label="E-mail" Variant="Variant.Outlined" Class="my-6"></MudTextField>
+    <MudTextField T="string" @bind-Value="userDto.FirstName" Label="First Name" Variant="Variant.Outlined" Class="my-6" For="@(() => userDto.FirstName)" Required="true" />
 
-    <MudTextField @bind-Value="@userDto.Password" Label="Password" Variant="Variant.Outlined" Adornment="Adornment.End" />
+    <MudTextField T="string" @bind-Value="userDto.LastName" Label="Last Name" Variant="Variant.Outlined" Class="my-6" For="@(() => userDto.LastName)"  />
 
-    <div Class="d-flex justify-space-between align-center">
-      
-    </div>
+    <MudTextField T="string" @bind-Value="userDto.Email" Label="E-mail" Variant="Variant.Outlined" Class="my-6" For="@(() => userDto.Email)" Required="true" />
 
-    <MudText></MudText>
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@( () =>  HandleRegistration())" Size="Size.Large" FullWidth="true">Sign Up</MudButton>
+    <MudTextField T="string" @bind-Value="userDto.Password" Label="Password" Variant="Variant.Outlined" Adornment="Adornment.End" For="@(() => userDto.Password)" Required="true" />
+
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="HandleRegistration" Size="Size.Large" FullWidth="true">Sign Up</MudButton>
 </MudForm>
 
-
-
 @code {
-    MudForm form;
-    UserDto userDto = new UserDto();
-    bool IsFields = false;
-    protected async Task HandleRegistration()
+    private MudForm form;
+    private UserDto userDto = new UserDto();
+    private bool IsFields = false;
+
+    private async Task HandleRegistration()
     {
-        var responce = await _authRepo.Register(userDto);
-        if (responce)
+        await form.Validate();
+        if (form.IsValid)
         {
-            _nav.NavigateTo("/login");
+            var response = await _authRepo.Register(userDto);
+            if (response)
+            {
+                _nav.NavigateTo("/login");
+            }
+            else
+            {
+                IsFields = true;
+            }
         }
         else
         {
@@ -74,16 +75,13 @@
         }
     }
 
-    string Password { get; set; }
-    public bool AgreeToTerms { get; set; }
+    private bool PasswordVisibility;
+    private InputType PasswordInput = InputType.Password;
+    private string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
 
-    bool PasswordVisibility;
-    InputType PasswordInput = InputType.Password;
-    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
-
-    void TogglePasswordVisibility()
+    private void TogglePasswordVisibility()
     {
-        @if (PasswordVisibility)
+        if (PasswordVisibility)
         {
             PasswordVisibility = false;
             PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
@@ -97,4 +95,3 @@
         }
     }
 }
-

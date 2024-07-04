@@ -1,48 +1,55 @@
 ﻿@page "/"
 @page "/login"
-@using Sample.BlazorUI.DTO
+@using Sample.DTOS
 @layout LogInLayout
 @inject IAuthRepository _authRepo
 @inject NavigationManager _navMan
 
 @inject ISnackbar Snackbar
 @inject NavigationManager _navManager
-<MudForm Model="@model" @ref="@form" ValidationDelay="0" >
+
+<MudForm Model="@model" @ref="form" ValidationDelay="0">
 
     <MudText Typo="Typo.h4" GutterBottom="true">Sign In</MudText>
 
     <MudText>Don't have an account? <MudLink Href="/Authentication/SignUp">Sign Up</MudLink></MudText>
 
-    <MudTextField T="string" @bind-Value="@model.Email" Label="E-mail" Variant="Variant.Outlined" Class="my-6"></MudTextField>
+    <MudTextField T="string" @bind-Value="model.Email" Label="E-mail" Variant="Variant.Outlined" Class="my-6" For="@(() => model.Email)" Required="true" />
 
-    <MudTextField @bind-Value="@model.Password" Label="Password" Variant="Variant.Outlined" Adornment="Adornment.End" />
+    <MudTextField T="string" @bind-Value="model.Password" Label="Password" Variant="Variant.Outlined" Adornment="Adornment.End" For="@(() => model.Password)" Required="true" />
 
     <div Class="d-flex justify-space-between align-center">
-        @*  <MudCheckBox T="bool" Label="Remember me?" Color="Color.Primary" Class="ml-n1 my-3"></MudCheckBox>
-        <MudLink Href="/pages/authentication/forgot-password">Forgot pwd?</MudLink>*@
+      @*   <MudLink Href="/pages/authentication/forgot-password">Forgot pwd?</MudLink> *@
     </div>
 
-    <MudText></MudText>
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@( () =>  HandleLogin())" Size="Size.Large" FullWidth="true">Sign In</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="HandleLogin" Size="Size.Large" FullWidth="true">Sign In</MudButton>
 </MudForm>
-@code {
-    MudForm form;
-    LoginDTO model = new LoginDTO();
 
-    bool response = true;
+@code {
+    private MudForm form;
+    private LoginDTO model = new LoginDTO();
+    private bool response = true;
+
     private async Task HandleLogin()
     {
-        response = await _authRepo.Login(model);
-
-        if (response)
+        await form.Validate();
+        if (form.IsValid)
         {
-            Snackbar.Add("Login successfully!.", MudBlazor.Severity.Success);
-            _navManager.NavigateTo("/personal/dashboard");
+            response = await _authRepo.Login(model);
+
+            if (response)
+            {
+                Snackbar.Add("Login successfully!.", MudBlazor.Severity.Success);
+                _navManager.NavigateTo("/personal/dashboard");
+            }
+            else
+            {
+                Snackbar.Add("Please provide a valid email and password!.", MudBlazor.Severity.Warning);
+            }
         }
         else
         {
-            Snackbar.Add("Please Provide Valid  Email and Password!.", MudBlazor.Severity.Warning);
+            Snackbar.Add("Validation errors occurred. Please check your input.", MudBlazor.Severity.Error);
         }
     }
-
 }

@@ -6,10 +6,16 @@ namespace Sample.WebApi.Models
     {
         public string FirstName { get; set; }
         public string Lastname { get; set; }
-        public string ProfilePicture { get; set; }
+        public bool IsActive { get; set; }
+        public string ProfilePicture { get; set; } 
         public string? UserPassword { get; set; }
-        public string? RefreshToken { get; set; }
-        public DateTime RefreshTokenExpiryTime { get; set; }
+        public string CreatedById { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public DateTime? ModifyDate { get; set; }
+        public string? ModifyById { get; set; }
+        public string ParentId { get; set; }// ParentId is SuperAdminId
+        public string CustomerId { get; set; }
+        
 
     }
 }

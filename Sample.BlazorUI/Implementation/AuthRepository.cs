@@ -1,9 +1,12 @@
 ﻿using Blazored.LocalStorage;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Sample.BlazorUI.AuthProvider;
-using Sample.BlazorUI.DTO;
+using Sample.DTOS;
 using Sample.BlazorUI.EndPoint;
 using Sample.BlazorUI.Service;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using System.Text;
 
@@ -14,16 +17,20 @@ namespace Sample.BlazorUI.Implementation
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILocalStorageService _localStorageService;
         private readonly AuthenticationProvider _authenticationProvider;
-        public AuthRepository(AuthenticationProvider authenticationProvider, ILocalStorageService localStorageService, IHttpClientFactory httpClientFactory)
+        private readonly string _baseUrl;
+        public AuthRepository(AuthenticationProvider authenticationProvider, ILocalStorageService localStorageService, 
+            IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             _httpClientFactory = httpClientFactory;
             _localStorageService = localStorageService;
             _authenticationProvider = authenticationProvider;
+            _baseUrl = GetBaseUrl(httpClientFactory);
         }
 
         public async Task<bool> Login(LoginDTO dto)
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, StaticEndPoint.AuthLoginEndpoint)
+           
+            var request = new HttpRequestMessage(HttpMethod.Post, _baseUrl + StaticEndPoint.AuthLoginEndpoint)
             {
                 Content = new StringContent(JsonConvert.SerializeObject(dto), Encoding.UTF8, "application/json")
             };
@@ -36,9 +43,7 @@ namespace Sample.BlazorUI.Implementation
             }
             var content = await response.Content.ReadAsStringAsync();
             var Apiresponse = JsonConvert.DeserializeObject<ResponseDto>(content);
-            await _localStorageService.SetItemAsync("AuthJwtToken", Apiresponse.TokenString);
-            await _localStorageService.SetItemAsync("AuthRefreshJwtToken", Apiresponse.RefreshToken);
-            await _localStorageService.SetItemAsync("Email", Apiresponse.Email);
+            await StoreTokensAndUserData(Apiresponse);
 
             // Change auth state of app
             await ((AuthenticationProvider)_authenticationProvider).LoggedIn(Apiresponse.Email);
@@ -50,7 +55,7 @@ namespace Sample.BlazorUI.Implementation
 
         public async Task<bool> Register(UserDto dto)
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, StaticEndPoint.AuthRegisterEndpoint)
+            var request = new HttpRequestMessage(HttpMethod.Post, _baseUrl + StaticEndPoint.AuthRegisterEndpoint)
             {
                 Content = new StringContent(JsonConvert.SerializeObject(dto), Encoding.UTF8, "application/json")
             };
@@ -62,38 +67,42 @@ namespace Sample.BlazorUI.Implementation
         }
         public async Task Logout()
         {
+            await _localStorageService.RemoveItemAsync("CustomerId");
+            await _localStorageService.RemoveItemAsync("LoginUserId");
+            await _localStorageService.RemoveItemAsync("ParentId");
             await _localStorageService.RemoveItemAsync("AuthJwtToken");
-            await _localStorageService.RemoveItemAsync("AuthRefreshJwtToken");
             await _localStorageService.RemoveItemAsync("Email");
             await ((AuthenticationProvider)_authenticationProvider).LoggedOut();
         }
-        public async Task<string> RefreshToken()
+       
+        private string GetBaseUrl(IHttpClientFactory httpClientFactory)
         {
-            var token = await _localStorageService.GetItemAsync<string>("AuthJwtToken");
-            var refreshToken = await _localStorageService.GetItemAsync<string>("AuthRefreshJwtToken");
-            var dto = new TokenDto()
-            {
-                AccessToken = token,
-                RefreshToken = refreshToken,
-            };
-            var request = new HttpRequestMessage(HttpMethod.Post, StaticEndPoint.AuthRefreshEndpoint)
-            {
-                Content = new StringContent(JsonConvert.SerializeObject(dto), Encoding.UTF8, "application/json")
-            };
-            var client = _httpClientFactory.CreateClient();
+            // Assuming you have a client named "LocalApi" configured with the base address
+            var client = httpClientFactory.CreateClient("LocalApi");
+            return client.BaseAddress.ToString();
+        }
+        private async Task StoreTokensAndUserData(ResponseDto apiResponse)
+        {
+            await _localStorageService.SetItemAsync("AuthJwtToken", apiResponse.TokenString);
+            await _localStorageService.SetItemAsync("Email", apiResponse.Email);
 
-            HttpResponseMessage response = await client.SendAsync(request);
+            var tokenClaims = ParseJwtToken(apiResponse.TokenString);
 
-            if (!response.IsSuccessStatusCode)
-                throw new ApplicationException("Something went wrong during the refresh token action");
-            var content = await response.Content.ReadAsStringAsync();
-            var Apiresponse = JsonConvert.DeserializeObject<ResponseDto>(content);
-            await _localStorageService.SetItemAsync("AuthJwtToken", Apiresponse.TokenString);
-            await _localStorageService.SetItemAsync("AuthRefreshJwtToken", Apiresponse.RefreshToken);
+            await _localStorageService.SetItemAsync("CustomerId", tokenClaims.CustomerId);
+            await _localStorageService.SetItemAsync("ParentId", tokenClaims.ParentId);
+            await _localStorageService.SetItemAsync("LoginUserId", tokenClaims.LoginUserId);
+        }
 
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", Apiresponse.TokenString);
+        private (string CustomerId, string ParentId, string LoginUserId) ParseJwtToken(string token)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadToken(token) as JwtSecurityToken;
 
-            return Apiresponse.TokenString;
+            var customerId = jwtToken.Claims.FirstOrDefault(claim => claim.Type == "CustomerId")?.Value;
+            var parentId = jwtToken.Claims.FirstOrDefault(claim => claim.Type == "ParentId")?.Value;
+            var loginUserId = jwtToken.Claims.FirstOrDefault(claim => claim.Type == "LoginUserId")?.Value;
+
+            return (customerId, parentId, loginUserId);
         }
     }
 }

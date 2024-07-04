@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using Sample.WebApi.DTO;
+using Sample.DTOS;
+using Sample.WebApi;
 using Sample.WebApi.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -71,8 +73,31 @@ namespace Sample.WebApi.Controllers
             }
             return Ok();
         }
-     
-        private async Task<IActionResult> RegisterUser(UserDto userDto)
+        [HttpGet("AllUsersWithRoles")]
+        //[Authorize(Roles = "SuperAdmin")] // Optional: Require Admin role to access this endpoint
+        public async Task<IActionResult> GetAllUsersWithRoles()
+        {
+            var users = userManager.Users.ToList();
+            var userRoles = new List<UserWithRolesDto>();
+
+            foreach (var user in users)
+            {
+                var roles = await userManager.GetRolesAsync(user);
+                userRoles.Add(new UserWithRolesDto
+                {
+                    Id = user.Id,
+                    UserName = user.UserName,
+                    Email = user.Email,
+                    Role = roles.FirstOrDefault(),
+                    CustomerId=user.CustomerId,
+                    ParentId=user.ParentId
+                });
+            }
+
+            return Ok(userRoles);
+        }
+    
+    private async Task<IActionResult> RegisterUser(UserDto userDto)
         {
 
             logger.LogInformation($"Attempt User Register via {userDto.Email}");
@@ -80,6 +105,10 @@ namespace Sample.WebApi.Controllers
             user.UserName = userDto.Email;
             user.ProfilePicture = " ";
             user.UserPassword = userDto.Password;
+            user.CreatedById = userDto.CreatedById;
+            user.ParentId = userDto.SuperAdminId;
+            user.CustomerId = userDto.CustomerId;
+            user.CreatedDate = DateTime.Now;
             var suceess = await userManager.CreateAsync(user, userDto.Password);
             if (suceess.Succeeded == false)
             {
@@ -89,7 +118,7 @@ namespace Sample.WebApi.Controllers
                     return BadRequest(ModelState);
                 }
             }
-            await userManager.AddToRoleAsync(user, "User");
+            await userManager.AddToRoleAsync(user, userDto.RoleName);
             return Ok();
         }
         private async Task<ActionResult<ResponseDto>> LoginUser(LoginDTO userDto)
@@ -122,7 +151,7 @@ namespace Sample.WebApi.Controllers
             {
                 Email = user.Email,
                 TokenString = tokenString,
-                Userid = user.Id,
+                UserId = user.Id,
             };
             return response;
         }
@@ -145,9 +174,33 @@ namespace Sample.WebApi.Controllers
                 //            userClaims.Add(new Claim(ClaimTypes.Role, role));
                 //        }
 
-
+                string ParentId = "0";
+                string CustomerId = "0";
 
                 var roles = await userManager.GetRolesAsync(user);
+                if (roles.Any())
+                {
+                    var role = roles.FirstOrDefault();
+                    if (role.Contains("SuperAdmin"))
+                    {
+                        ParentId = user.Id;
+                    }
+                    if (role.Contains("Customer"))
+                    {
+                        ParentId = user.ParentId;
+                        CustomerId = user.Id;
+                    }
+                    if (role.Contains("Vendor"))
+                    {
+                        ParentId = user.ParentId;
+                        CustomerId = user.CustomerId;
+                    }
+                    if (role.Contains("Client"))
+                    {
+                        ParentId = user.ParentId;
+                        CustomerId = user.CustomerId;
+                    }
+                }
                 var roleClaims = roles.Select(q => new Claim(ClaimTypes.Role, q)).ToList();
 
                 var userClaims = await userManager.GetClaimsAsync(user);
@@ -159,6 +212,9 @@ namespace Sample.WebApi.Controllers
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
                  new Claim(ClaimTypes.Name, user.FirstName+" "+ user.Lastname),
                  new Claim("ProfileImage", user.ProfilePicture),
+                 new Claim("LoginUserId", user.Id),
+                 new Claim("ParentId", user.Id),
+                 new Claim("CustomerId", CustomerId),
             }
                .Union(userClaims)
                .Union(roleClaims);
@@ -179,7 +235,7 @@ namespace Sample.WebApi.Controllers
             }
 
         }
-      
+
         private ClaimsPrincipal? GetPrincipalFromExpiredToken(string? token)
         {
             var tokenValidationParameters = new TokenValidationParameters

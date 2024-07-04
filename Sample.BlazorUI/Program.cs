@@ -1,4 +1,3 @@
-
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using MudBlazor.Services;
@@ -7,6 +6,7 @@ using Sample.BlazorUI.Data;
 using Sample.BlazorUI.Implementation;
 using Sample.BlazorUI.Service;
 using System.IdentityModel.Tokens.Jwt;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +22,7 @@ builder.Services.AddScoped<AuthenticationProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(p =>
 p.GetRequiredService<AuthenticationProvider>());
 builder.Services.AddScoped<JwtSecurityTokenHandler>();
+builder.Services.AddHttpClient("LocalApi", client => client.BaseAddress = new Uri("https://localhost:7182"));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

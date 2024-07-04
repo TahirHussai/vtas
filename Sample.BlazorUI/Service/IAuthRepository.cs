@@ -1,4 +1,4 @@
-﻿using Sample.BlazorUI.DTO;
+﻿using Sample.DTOS;
 
 namespace Sample.BlazorUI.Service
 {
@@ -7,6 +7,5 @@ namespace Sample.BlazorUI.Service
       Task<bool> Login(LoginDTO dto);
         public Task<bool> Register(UserDto dto);
         public Task Logout();
-        Task<string> RefreshToken();
     }
 }

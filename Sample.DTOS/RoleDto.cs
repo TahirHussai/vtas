@@ -1,4 +1,4 @@
-﻿namespace Sample.WebApi.DTO
+﻿namespace Sample.DTOS
 {
     public class RoleDTO
     {

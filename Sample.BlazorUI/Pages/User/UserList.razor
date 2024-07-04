@@ -1,0 +1,42 @@
+﻿@page "/cardlist"
+@using MudBlazor
+
+<MudContainer>
+    <MudGrid>
+        @foreach (var item in Items)
+        {
+            <MudItem xs="12" sm="6" md="4" lg="4">
+                <MudCard Style="margin: 16px;">
+                    <MudCardHeader>
+                        <MudText Typo="Typo.h6" Color="Color.Secondary">@item.UserRole</MudText>
+                        </MudCardHeader>
+                        <MudCardContent>
+                            <MudText Typo="Typo.h5">@item.Name</MudText>
+                            <MudText>@item.Description</MudText>
+                        </MudCardContent>
+                        <MudCardActions>
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary">Action</MudButton>
+                        </MudCardActions>
+                    </MudCard>
+                </MudItem>
+        }
+    </MudGrid>
+</MudContainer>
+
+@code {
+    private List<Item> Items = new List<Item>
+    {
+        new Item { UserRole = "SuperAdmin", Name = "Alice", Description = "Administrator with full access" },
+        new Item { UserRole = "Client", Name = "Bob", Description = "Client with limited access" },
+        new Item { UserRole = "Customer", Name = "Charlie", Description = "Customer with basic access" },
+        new Item { UserRole = "SuperAdmin", Name = "David", Description = "Administrator with full access" },
+        new Item { UserRole = "Client", Name = "Eve", Description = "Client with limited access" },
+    };
+
+    private class Item
+    {
+        public string UserRole { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+    }
+}
