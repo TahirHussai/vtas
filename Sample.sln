@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample.Database", "Sample.D
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample.BlazorUI", "Sample.BlazorUI\Sample.BlazorUI.csproj", "{11A1A0B0-1120-4132-BA85-68A163FAC728}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.DTOS", "Sample.DTOS\Sample.DTOS.csproj", "{A14EF936-4836-4C7B-ABF0-A9313BAF7CBF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample.DTOS", "Sample.DTOS\Sample.DTOS.csproj", "{A14EF936-4836-4C7B-ABF0-A9313BAF7CBF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.Common", "Sample.Common\Sample.Common.csproj", "{973EEC48-3E60-4C6B-ACDD-4CB786A10C0A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{A14EF936-4836-4C7B-ABF0-A9313BAF7CBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A14EF936-4836-4C7B-ABF0-A9313BAF7CBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A14EF936-4836-4C7B-ABF0-A9313BAF7CBF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{973EEC48-3E60-4C6B-ACDD-4CB786A10C0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{973EEC48-3E60-4C6B-ACDD-4CB786A10C0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{973EEC48-3E60-4C6B-ACDD-4CB786A10C0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{973EEC48-3E60-4C6B-ACDD-4CB786A10C0A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

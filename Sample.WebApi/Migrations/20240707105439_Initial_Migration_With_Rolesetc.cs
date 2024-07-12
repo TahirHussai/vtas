@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Sample.WebApi.Migrations
 {
     /// <inheritdoc />
-    public partial class initial_migration : Migration
+    public partial class Initial_Migration_With_Rolesetc : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -187,8 +187,8 @@ namespace Sample.WebApi.Migrations
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "CreatedById", "CreatedDate", "CustomerId", "Email", "EmailConfirmed", "FirstName", "IsActive", "Lastname", "LockoutEnabled", "LockoutEnd", "ModifyById", "ModifyDate", "NormalizedEmail", "NormalizedUserName", "ParentId", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "ProfilePicture", "SecurityStamp", "TwoFactorEnabled", "UserName", "UserPassword" },
                 values: new object[,]
                 {
-                    { "2314094f-0974-4783-ae24-97b801faf01d", 0, "72a4faf1-e521-448e-94c1-0b9ecdaa2fb3", "", new DateTime(2024, 7, 3, 23, 26, 54, 862, DateTimeKind.Local).AddTicks(3763), "", "superadmin@admin.com", false, "Super", false, "Admin", false, null, null, null, "SUPERADMINADMIN@ADMIN.COM", "SUPERADMIN@ADMIN.COM", "", "AQAAAAIAAYagAAAAEFLT2SsQz2FVmvEGOywPmlPdFRKbtUyqcPw3TUs0kndBabAviaeY/10t/uWGEgK11A==", null, false, "noimage.png", "3d9a98b8-f054-41e3-8bc5-e1331f84ab2c", false, "superadmin@admin.com", null },
-                    { "7375512a-4e4b-4178-babc-1de292b177b4", 0, "fb55ee10-3609-4445-8e5e-a7fbd84e404b", "2314094f-0974-4783-ae24-97b801faf01d", new DateTime(2024, 7, 3, 23, 26, 55, 131, DateTimeKind.Local).AddTicks(6341), "", "customer@admin.com", false, "Customer", false, "Admin", false, null, null, null, "CUSTOMER@ADMIN.COM", "CUSTOMER@ADMIN.COM", "2314094f-0974-4783-ae24-97b801faf01d", "AQAAAAIAAYagAAAAEIUaXzFgWoLB0o/4x4H7FXt/WmwEDI5C0J86zC+pZWjUoKE2pjv8DpabYKwJ21/NMQ==", null, false, "noimage.png", "5a13d9cf-4cf7-42a5-92d9-b19d5d61eebf", false, "customer@admin.com", null }
+                    { "2314094f-0974-4783-ae24-97b801faf01d", 0, "5dc92ddb-94a2-4738-8994-a08725e599da", "", new DateTime(2024, 7, 7, 15, 54, 38, 467, DateTimeKind.Local).AddTicks(2328), "", "superadmin@admin.com", true, "Super", true, "Admin", false, null, "", new DateTime(2024, 7, 7, 15, 54, 38, 467, DateTimeKind.Local).AddTicks(2342), "SUPERADMINADMIN@ADMIN.COM", "SUPERADMIN@ADMIN.COM", "", "AQAAAAIAAYagAAAAEAu/pcx524s7YwJj6IutB8OzunyvTBTe6yk8O/7gS24gF9/aJ90xf3/DQIOZ2bWwsw==", null, false, "noimage.png", "5528a643-61d1-4474-b130-cb5051222555", false, "superadmin@admin.com", "superadmin@123#Admin" },
+                    { "7375512a-4e4b-4178-babc-1de292b177b4", 0, "247a299e-1da1-43d9-b403-7f88e3ced2da", "2314094f-0974-4783-ae24-97b801faf01d", new DateTime(2024, 7, 7, 15, 54, 38, 598, DateTimeKind.Local).AddTicks(6720), "", "customer@admin.com", true, "Customer", true, "Admin", false, null, "2314094f-0974-4783-ae24-97b801faf01d", new DateTime(2024, 7, 7, 15, 54, 38, 598, DateTimeKind.Local).AddTicks(6736), "CUSTOMER@ADMIN.COM", "CUSTOMER@ADMIN.COM", "2314094f-0974-4783-ae24-97b801faf01d", "AQAAAAIAAYagAAAAEDAs+SRl9IP+uq/ohA2BztLUc9f4Cvap6gsx9V7aYkdHTqbhbX5Z/0s8vEcZJc4/tg==", null, false, "noimage.png", "1dcb8b7c-ae54-462d-bb36-53ec8f696500", false, "customer@admin.com", "superadmin@123#Admin" }
                 });
 
             migrationBuilder.InsertData(

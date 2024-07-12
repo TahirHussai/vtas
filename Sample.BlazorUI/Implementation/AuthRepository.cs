@@ -42,37 +42,28 @@ namespace Sample.BlazorUI.Implementation
                 return false;
             }
             var content = await response.Content.ReadAsStringAsync();
-            var Apiresponse = JsonConvert.DeserializeObject<ResponseDto>(content);
-            await StoreTokensAndUserData(Apiresponse);
+            await SetUserData(content);
+            //await StoreTokensAndUserData(Apiresponse);
 
-            // Change auth state of app
-            await ((AuthenticationProvider)_authenticationProvider).LoggedIn(Apiresponse.Email);
-            client.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("bearer", Apiresponse.TokenString);
+            //// Change auth state of app
+            //await ((AuthenticationProvider)_authenticationProvider).LoggedIn(Apiresponse.Email);
+            //client.DefaultRequestHeaders.Authorization =
+            //    new AuthenticationHeaderValue("bearer", Apiresponse.TokenString);
             return true;
 
         }
 
-        public async Task<bool> Register(UserDto dto)
+        public async Task<bool> GetUserById(string UserId)
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, _baseUrl + StaticEndPoint.AuthRegisterEndpoint)
-            {
-                Content = new StringContent(JsonConvert.SerializeObject(dto), Encoding.UTF8, "application/json")
-            };
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{_baseUrl}{StaticEndPoint.GetUserByIdEndpoint}{UserId}");
             var client = _httpClientFactory.CreateClient();
-
-            HttpResponseMessage response = await client.SendAsync(request);
-            return response.IsSuccessStatusCode;
-
-        }
-        public async Task Logout()
-        {
-            await _localStorageService.RemoveItemAsync("CustomerId");
-            await _localStorageService.RemoveItemAsync("LoginUserId");
-            await _localStorageService.RemoveItemAsync("ParentId");
-            await _localStorageService.RemoveItemAsync("AuthJwtToken");
-            await _localStorageService.RemoveItemAsync("Email");
-            await ((AuthenticationProvider)_authenticationProvider).LoggedOut();
+            var response = await client.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                await SetUserData(content);
+            }
+            return true;
         }
         public async Task<List<UserWithRolesDto>> GetUsersListWithRoles()
         {
@@ -104,7 +95,152 @@ namespace Sample.BlazorUI.Implementation
 
             return list;
         }
+        public async Task<List<UserWithRolesDto>> GetCustomerUsersListWithRoles(string CustomerId)
+        {
+            var list = new List<UserWithRolesDto>();
 
+            try
+            {
+                var request = new HttpRequestMessage(HttpMethod.Get, $"{_baseUrl}{StaticEndPoint.GetCustomerUsersEndpoint}{CustomerId}");
+                var client = _httpClientFactory.CreateClient();
+                var response = await client.SendAsync(request);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+
+                    var jsonObject = JObject.Parse(content);
+                    var usersList = jsonObject["result"].ToObject<List<UserWithRolesDto>>();
+
+                    if (usersList?.Any() == true)
+                    {
+                        list = usersList;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // Optionally log the exception or handle it as needed.
+            }
+
+            return list;
+        }
+
+        public async Task<List<UserWithRolesDto>> GetClientUsersWithRoles(string ClientId, string CustomerId)
+        {
+            var list = new List<UserWithRolesDto>();
+
+            try
+            {
+                var request = new HttpRequestMessage(HttpMethod.Get, $"{_baseUrl}{StaticEndPoint.GetClientUsersEndpoint}{ClientId}&&CustomerId={CustomerId}");
+                var client = _httpClientFactory.CreateClient();
+                var response = await client.SendAsync(request);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+
+                    var jsonObject = JObject.Parse(content);
+                    var usersList = jsonObject["result"].ToObject<List<UserWithRolesDto>>();
+
+                    if (usersList?.Any() == true)
+                    {
+                        list = usersList;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // Optionally log the exception or handle it as needed.
+            }
+
+            return list;
+        }
+
+        public async Task<List<UserWithRolesDto>> GetVendorsUsersWithRoles(string VendorId, string CustomerId)
+        {
+            var list = new List<UserWithRolesDto>();
+
+            try
+            {
+                var request = new HttpRequestMessage(HttpMethod.Get, $"{_baseUrl}{StaticEndPoint.GetClientUsersEndpoint}{VendorId}&&CustomerId={CustomerId}");
+                var client = _httpClientFactory.CreateClient();
+                var response = await client.SendAsync(request);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var jsonObject = JObject.Parse(content);
+                    var usersList = jsonObject["result"].ToObject<List<UserWithRolesDto>>();
+
+                    if (usersList?.Any() == true)
+                    {
+                        list = usersList;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // Optionally log the exception or handle it as needed.
+            }
+
+            return list;
+        }
+
+        public Task<List<UserWithRolesDto>> GetRecruiterUsersWithRoles(string RecruiterId, string CustomerId)
+        {
+            throw new NotImplementedException();
+        }
+
+        private async Task SetUserData(string content)
+        {
+            //var Apiresponse = JsonConvert.DeserializeObject<ResponseDto>(content);
+            var jsonObject = JObject.Parse(content);
+            var Apiresponse = jsonObject["result"].ToObject<ResponseDto>();
+            await _localStorageService.SetItemAsync("CreatedById", Apiresponse.CreatedById);
+            await _localStorageService.SetItemAsync("CustomerId", Apiresponse.CustomerId);
+            await _localStorageService.SetItemAsync("ParentId", Apiresponse.SuperAdminId);
+            await _localStorageService.SetItemAsync("LoginUserId", Apiresponse.UserId);
+            await _localStorageService.SetItemAsync("Email", Apiresponse.Email);
+            await _localStorageService.SetItemAsync("UserName", Apiresponse.UserName);
+            await _localStorageService.SetItemAsync("Role", Apiresponse.Role);
+        }
+
+        public async Task<bool> Register(UserDto dto)
+        {
+            try
+            {
+
+
+                var request = new HttpRequestMessage(HttpMethod.Post, _baseUrl + StaticEndPoint.AuthRegisterEndpoint)
+                {
+                    Content = new StringContent(JsonConvert.SerializeObject(dto), Encoding.UTF8, "application/json")
+                };
+                var client = _httpClientFactory.CreateClient();
+
+                HttpResponseMessage response = await client.SendAsync(request);
+
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+
+        }
+        public async Task Logout()
+        {
+            await _localStorageService.RemoveItemAsync("CustomerId");
+            await _localStorageService.RemoveItemAsync("LoginUserId");
+            await _localStorageService.RemoveItemAsync("ParentId");
+            await _localStorageService.RemoveItemAsync("Role");
+            await _localStorageService.RemoveItemAsync("UserName");
+            await _localStorageService.RemoveItemAsync("CreatedById");
+            //await _localStorageService.RemoveItemAsync("AuthJwtToken");
+            await _localStorageService.RemoveItemAsync("Email");
+            await ((AuthenticationProvider)_authenticationProvider).LoggedOut();
+        }
 
         private string GetBaseUrl(IHttpClientFactory httpClientFactory)
         {
@@ -112,28 +248,31 @@ namespace Sample.BlazorUI.Implementation
             var client = httpClientFactory.CreateClient("LocalApi");
             return client.BaseAddress.ToString();
         }
-        private async Task StoreTokensAndUserData(ResponseDto apiResponse)
-        {
-            await _localStorageService.SetItemAsync("AuthJwtToken", apiResponse.TokenString);
-            await _localStorageService.SetItemAsync("Email", apiResponse.Email);
 
-            var tokenClaims = ParseJwtToken(apiResponse.TokenString);
 
-            await _localStorageService.SetItemAsync("CustomerId", tokenClaims.CustomerId);
-            await _localStorageService.SetItemAsync("ParentId", tokenClaims.ParentId);
-            await _localStorageService.SetItemAsync("LoginUserId", tokenClaims.LoginUserId);
-        }
 
-        private (string CustomerId, string ParentId, string LoginUserId) ParseJwtToken(string token)
-        {
-            var handler = new JwtSecurityTokenHandler();
-            var jwtToken = handler.ReadToken(token) as JwtSecurityToken;
+        //private async Task StoreTokensAndUserData(ResponseDto apiResponse)
+        //{
+        //    //await _localStorageService.SetItemAsync("AuthJwtToken", apiResponse.TokenString);
+        //    await _localStorageService.SetItemAsync("Email", apiResponse.Email);
 
-            var customerId = jwtToken.Claims.FirstOrDefault(claim => claim.Type == "CustomerId")?.Value;
-            var parentId = jwtToken.Claims.FirstOrDefault(claim => claim.Type == "ParentId")?.Value;
-            var loginUserId = jwtToken.Claims.FirstOrDefault(claim => claim.Type == "LoginUserId")?.Value;
+        //    var tokenClaims = ParseJwtToken(apiResponse.TokenString);
 
-            return (customerId, parentId, loginUserId);
-        }
+        //    await _localStorageService.SetItemAsync("CustomerId", tokenClaims.CustomerId);
+        //    await _localStorageService.SetItemAsync("ParentId", tokenClaims.ParentId);
+        //    await _localStorageService.SetItemAsync("LoginUserId", tokenClaims.LoginUserId);
+        //}
+
+        //private (string CustomerId, string ParentId, string LoginUserId) ParseJwtToken(string token)
+        //{
+        //    var handler = new JwtSecurityTokenHandler();
+        //    var jwtToken = handler.ReadToken(token) as JwtSecurityToken;
+
+        //    var customerId = jwtToken.Claims.FirstOrDefault(claim => claim.Type == "CustomerId")?.Value;
+        //    var parentId = jwtToken.Claims.FirstOrDefault(claim => claim.Type == "ParentId")?.Value;
+        //    var loginUserId = jwtToken.Claims.FirstOrDefault(claim => claim.Type == "LoginUserId")?.Value;
+
+        //    return (customerId, parentId, loginUserId);
+        //}
     }
 }

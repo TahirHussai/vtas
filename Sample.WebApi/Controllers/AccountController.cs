@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Sample.DTOS;
 using Sample.WebApi;
@@ -73,14 +74,26 @@ namespace Sample.WebApi.Controllers
             }
             return Ok();
         }
+
+        [HttpGet("GetUserById")]
+        //[Authorize(Roles = "SuperAdmin")] // Optional: Require Admin role to access this endpoint
+        public async Task<IActionResult> GetUserById(string UserId)
+        {
+            var user = new UserPofile();
+
+            user = await userManager.FindByIdAsync(UserId);
+            var response =await GetUser(user);
+
+            return Ok(response);
+        }
         [HttpGet("AllUsersWithRoles")]
         //[Authorize(Roles = "SuperAdmin")] // Optional: Require Admin role to access this endpoint
         public async Task<IActionResult> GetAllUsersWithRoles()
         {
-            var users = userManager.Users.ToList();
+            var usersList = userManager.Users.ToList();
             var userRoles = new List<UserWithRolesDto>();
 
-            foreach (var user in users)
+            foreach (var user in usersList)
             {
                 var roles = await userManager.GetRolesAsync(user);
                 userRoles.Add(new UserWithRolesDto
@@ -89,15 +102,114 @@ namespace Sample.WebApi.Controllers
                     UserName = user.FirstName + (string.IsNullOrEmpty(user.Lastname) ? "" : " " + user.Lastname),
                     Email = user.Email,
                     Role = roles.FirstOrDefault(),
-                    CustomerId=user.CustomerId,
-                    ParentId=user.ParentId
+                    CustomerId = user.CustomerId,
+                    ParentId = user.ParentId
                 });
             }
 
             return Ok(userRoles);
         }
-    
-    private async Task<IActionResult> RegisterUser(UserDto userDto)
+
+        [HttpGet("GetCustomerUsersWithRoles")]
+        //[Authorize(Roles = "Customer")] // Optional: Require Customer role to access this endpoint
+        public async Task<IActionResult> GetCustomerUsersWithRoles(string CustomerId)
+        {
+            var userRoles = new List<UserWithRolesDto>();
+            if (!string.IsNullOrEmpty(CustomerId))
+            {
+                var usersList = await userManager.Users.Where(a => a.CustomerId == CustomerId).ToListAsync();
+                foreach (var user in usersList)
+                {
+                    var roles = await userManager.GetRolesAsync(user);
+                    userRoles.Add(new UserWithRolesDto
+                    {
+                        Id = user.Id,
+                        UserName = user.FirstName + (string.IsNullOrEmpty(user.Lastname) ? "" : " " + user.Lastname),
+                        Email = user.Email,
+                        Role = roles.FirstOrDefault(),
+                        CustomerId = user.CustomerId,
+                        ParentId = user.ParentId
+                    });
+                }
+
+            }
+            return Ok(userRoles);
+        }
+
+        [HttpGet("GetClientUsersWithRoles")]
+        //[Authorize(Roles = "Client")] // Optional: Require Client role to access this endpoint
+        public async Task<IActionResult> GetClientUsersWithRoles(string ClientId, string CustomerId)
+        {
+            var userRoles = new List<UserWithRolesDto>();
+            if (!string.IsNullOrEmpty(ClientId))
+            {
+                var usersList = await userManager.Users.Where(a => a.CustomerId == CustomerId && a.CreatedById== ClientId).ToListAsync();
+                foreach (var user in usersList)
+                {
+                    var roles = await userManager.GetRolesAsync(user);
+                    userRoles.Add(new UserWithRolesDto
+                    {
+                        Id = user.Id,
+                        UserName = user.FirstName + (string.IsNullOrEmpty(user.Lastname) ? "" : " " + user.Lastname),
+                        Email = user.Email,
+                        Role = roles.FirstOrDefault(),
+                        CustomerId = user.CustomerId,
+                        ParentId = user.ParentId
+                    });
+                }
+            }
+            return Ok(userRoles);
+        }
+        [HttpGet("GetVendorsUsersWithRoles")]
+        //[Authorize(Roles = "Vendor")] // Optional: Require Vendor role to access this endpoint
+        public async Task<IActionResult> GetVendorsUsersWithRoles(string VendorId, string CustomerId)
+        {
+            var UserRoles = new UserWithRolesDto();
+            if (!string.IsNullOrEmpty(VendorId))
+            {
+                var user = userManager.Users.FirstOrDefault(a => a.CreatedById == VendorId  && a.CustomerId == CustomerId);
+                if (user != null)
+                {
+
+                    var roles = await userManager.GetRolesAsync(user);
+
+                    UserRoles.Id = user.Id;
+                    UserRoles.UserName = user.FirstName + (string.IsNullOrEmpty(user.Lastname) ? "" : " " + user.Lastname);
+                    UserRoles.Email = user.Email;
+                    UserRoles.Role = roles.FirstOrDefault();
+                    UserRoles.CustomerId = user.CustomerId;
+                    UserRoles.ParentId = user.ParentId;
+                }
+
+            }
+            return Ok(UserRoles);
+        }
+
+        [HttpGet("GetRecruiterUsersWithRoles")]
+        //[Authorize(Roles = "Vendor")] // Optional: Require Vendor role to access this endpoint
+        public async Task<IActionResult> GetRecruiterUsersWithRoles(string RecruiterId, string CustomerId)
+        {
+            var UserRoles = new UserWithRolesDto();
+            if (!string.IsNullOrEmpty(RecruiterId))
+            {
+                var user = userManager.Users.FirstOrDefault(a => a.CreatedById == RecruiterId && a.Id == RecruiterId && a.CustomerId == CustomerId);
+                if (user != null)
+                {
+
+                    var roles = await userManager.GetRolesAsync(user);
+
+                    UserRoles.Id = user.Id;
+                    UserRoles.UserName = user.FirstName + (string.IsNullOrEmpty(user.Lastname) ? "" : " " + user.Lastname);
+                    UserRoles.Email = user.Email;
+                    UserRoles.Role = roles.FirstOrDefault();
+                    UserRoles.CustomerId = user.CustomerId;
+                    UserRoles.ParentId = user.ParentId;
+                }
+
+            }
+            return Ok(UserRoles);
+        }
+        private async Task<IActionResult> RegisterUser(UserDto userDto)
         {
 
             logger.LogInformation($"Attempt User Register via {userDto.Email}");
@@ -123,7 +235,11 @@ namespace Sample.WebApi.Controllers
         }
         private async Task<ActionResult<ResponseDto>> LoginUser(LoginDTO userDto)
         {
+            ResponseDto response = new ResponseDto();
+            try
+            {
 
+            
             var user = await userManager.FindByEmailAsync(userDto.Email);
             if (user == null)
             {
@@ -132,7 +248,6 @@ namespace Sample.WebApi.Controllers
             }
 
             var validatePassword = await userManager.CheckPasswordAsync(user, userDto.Password);
-
             if (validatePassword == false)
             {
                 return Unauthorized(userDto);
@@ -141,20 +256,65 @@ namespace Sample.WebApi.Controllers
             var token = await GenerateToken(user);
 
             await userManager.UpdateAsync(user);
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var tokenString = tokenHandler.WriteToken(token);
+            //var tokenHandler = new JwtSecurityTokenHandler();
+            //var tokenString = tokenHandler.WriteToken(token);
 
+             response = await GetUser(user);
+            }
+            catch (Exception)
+            {
 
+                throw;
+            }
+            return response;
+        }
+
+        private async Task<ResponseDto> GetUser(UserPofile user)
+        {
+            string ParentId = "0";
+            string CustomerId = "0";
+
+            string Role = "";
+
+            var roles = await userManager.GetRolesAsync(user);
+            if (roles.Any())
+            {
+                Role = roles.FirstOrDefault();
+                if (Role.Contains("SuperAdmin"))
+                {
+                    ParentId = user.Id;
+                }
+                if (Role.Contains("Customer"))
+                {
+                    ParentId = user.ParentId;
+                    CustomerId = user.Id;
+                }
+                if (Role.Contains("Vendor"))
+                {
+                    ParentId = user.ParentId;
+                    CustomerId = user.CustomerId;
+                }
+                if (Role.Contains("Client"))
+                {
+                    ParentId = user.ParentId;
+                    CustomerId = user.CustomerId;
+                }
+            }
             // var encodedTokenString = Base64UrlEncoder.Encode(tokenString);
 
             var response = new ResponseDto
             {
                 Email = user.Email,
-                TokenString = tokenString,
+                CreatedById = user.CreatedById,
                 UserId = user.Id,
+                CustomerId = CustomerId,
+                SuperAdminId = ParentId,
+                Role = Role,
+                UserName = user.FirstName + (string.IsNullOrEmpty(user.Lastname) ? "" : " " + user.Lastname),
             };
             return response;
         }
+
         private async Task<JwtSecurityToken> GenerateToken(UserPofile user)
         {
             try
@@ -176,26 +336,27 @@ namespace Sample.WebApi.Controllers
 
                 string ParentId = "0";
                 string CustomerId = "0";
+                string Role = "";
 
                 var roles = await userManager.GetRolesAsync(user);
                 if (roles.Any())
                 {
-                    var role = roles.FirstOrDefault();
-                    if (role.Contains("SuperAdmin"))
+                    Role = roles.FirstOrDefault();
+                    if (Role.Contains("SuperAdmin"))
                     {
                         ParentId = user.Id;
                     }
-                    if (role.Contains("Customer"))
+                    if (Role.Contains("Customer"))
                     {
                         ParentId = user.ParentId;
                         CustomerId = user.Id;
                     }
-                    if (role.Contains("Vendor"))
+                    if (Role.Contains("Vendor"))
                     {
                         ParentId = user.ParentId;
                         CustomerId = user.CustomerId;
                     }
-                    if (role.Contains("Client"))
+                    if (Role.Contains("Client"))
                     {
                         ParentId = user.ParentId;
                         CustomerId = user.CustomerId;

@@ -12,8 +12,8 @@ using Sample.WebApi.Models;
 namespace Sample.WebApi.Migrations
 {
     [DbContext(typeof(App_BlazorDBContext))]
-    [Migration("20240703182700_initial_migration")]
-    partial class initial_migration
+    [Migration("20240707105439_Initial_Migration_With_Rolesetc")]
+    partial class Initial_Migration_With_Rolesetc
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -320,49 +320,55 @@ namespace Sample.WebApi.Migrations
                         {
                             Id = "2314094f-0974-4783-ae24-97b801faf01d",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "72a4faf1-e521-448e-94c1-0b9ecdaa2fb3",
+                            ConcurrencyStamp = "5dc92ddb-94a2-4738-8994-a08725e599da",
                             CreatedById = "",
-                            CreatedDate = new DateTime(2024, 7, 3, 23, 26, 54, 862, DateTimeKind.Local).AddTicks(3763),
+                            CreatedDate = new DateTime(2024, 7, 7, 15, 54, 38, 467, DateTimeKind.Local).AddTicks(2328),
                             CustomerId = "",
                             Email = "superadmin@admin.com",
-                            EmailConfirmed = false,
+                            EmailConfirmed = true,
                             FirstName = "Super",
-                            IsActive = false,
+                            IsActive = true,
                             Lastname = "Admin",
                             LockoutEnabled = false,
+                            ModifyById = "",
+                            ModifyDate = new DateTime(2024, 7, 7, 15, 54, 38, 467, DateTimeKind.Local).AddTicks(2342),
                             NormalizedEmail = "SUPERADMINADMIN@ADMIN.COM",
                             NormalizedUserName = "SUPERADMIN@ADMIN.COM",
                             ParentId = "",
-                            PasswordHash = "AQAAAAIAAYagAAAAEFLT2SsQz2FVmvEGOywPmlPdFRKbtUyqcPw3TUs0kndBabAviaeY/10t/uWGEgK11A==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEAu/pcx524s7YwJj6IutB8OzunyvTBTe6yk8O/7gS24gF9/aJ90xf3/DQIOZ2bWwsw==",
                             PhoneNumberConfirmed = false,
                             ProfilePicture = "noimage.png",
-                            SecurityStamp = "3d9a98b8-f054-41e3-8bc5-e1331f84ab2c",
+                            SecurityStamp = "5528a643-61d1-4474-b130-cb5051222555",
                             TwoFactorEnabled = false,
-                            UserName = "superadmin@admin.com"
+                            UserName = "superadmin@admin.com",
+                            UserPassword = "superadmin@123#Admin"
                         },
                         new
                         {
                             Id = "7375512a-4e4b-4178-babc-1de292b177b4",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "fb55ee10-3609-4445-8e5e-a7fbd84e404b",
+                            ConcurrencyStamp = "247a299e-1da1-43d9-b403-7f88e3ced2da",
                             CreatedById = "2314094f-0974-4783-ae24-97b801faf01d",
-                            CreatedDate = new DateTime(2024, 7, 3, 23, 26, 55, 131, DateTimeKind.Local).AddTicks(6341),
+                            CreatedDate = new DateTime(2024, 7, 7, 15, 54, 38, 598, DateTimeKind.Local).AddTicks(6720),
                             CustomerId = "",
                             Email = "customer@admin.com",
-                            EmailConfirmed = false,
+                            EmailConfirmed = true,
                             FirstName = "Customer",
-                            IsActive = false,
+                            IsActive = true,
                             Lastname = "Admin",
                             LockoutEnabled = false,
+                            ModifyById = "2314094f-0974-4783-ae24-97b801faf01d",
+                            ModifyDate = new DateTime(2024, 7, 7, 15, 54, 38, 598, DateTimeKind.Local).AddTicks(6736),
                             NormalizedEmail = "CUSTOMER@ADMIN.COM",
                             NormalizedUserName = "CUSTOMER@ADMIN.COM",
                             ParentId = "2314094f-0974-4783-ae24-97b801faf01d",
-                            PasswordHash = "AQAAAAIAAYagAAAAEIUaXzFgWoLB0o/4x4H7FXt/WmwEDI5C0J86zC+pZWjUoKE2pjv8DpabYKwJ21/NMQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEDAs+SRl9IP+uq/ohA2BztLUc9f4Cvap6gsx9V7aYkdHTqbhbX5Z/0s8vEcZJc4/tg==",
                             PhoneNumberConfirmed = false,
                             ProfilePicture = "noimage.png",
-                            SecurityStamp = "5a13d9cf-4cf7-42a5-92d9-b19d5d61eebf",
+                            SecurityStamp = "1dcb8b7c-ae54-462d-bb36-53ec8f696500",
                             TwoFactorEnabled = false,
-                            UserName = "customer@admin.com"
+                            UserName = "customer@admin.com",
+                            UserPassword = "superadmin@123#Admin"
                         });
                 });
 

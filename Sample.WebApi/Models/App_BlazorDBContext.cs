@@ -80,17 +80,22 @@ namespace Sample.WebApi.Models
                {
                    Id = "2314094f-0974-4783-ae24-97b801faf01d",
                    Email = "superadmin@admin.com",
-                   NormalizedEmail = "SUPERADMINADMIN@ADMIN.COM",
+                   NormalizedEmail = "SUPERADMIN@ADMIN.COM",
                    PasswordHash = hash.HashPassword(null, "superadmin@123#Admin"),
+                   UserPassword= "superadmin@123#Admin",
                    UserName = "superadmin@admin.com",
                    NormalizedUserName = "SUPERADMIN@ADMIN.COM",
                    FirstName = "Super",
                    Lastname = "Admin",
                    ParentId = "",
                    CreatedById = "",
+                   ModifyById = "",
                    CreatedDate = DateTime.Now,
+                   ModifyDate = DateTime.Now,
                    ProfilePicture ="noimage.png",
-                   CustomerId=""
+                   CustomerId="",
+                   IsActive=true,
+                   EmailConfirmed=true
                },
                 new UserPofile
                 {
@@ -103,10 +108,15 @@ namespace Sample.WebApi.Models
                     FirstName = "Customer",
                     Lastname = "Admin",
                     CreatedDate = DateTime.Now,
+                    ModifyDate=DateTime.Now,
                     ParentId = "2314094f-0974-4783-ae24-97b801faf01d",
                     CreatedById = "2314094f-0974-4783-ae24-97b801faf01d",
+                    ModifyById = "2314094f-0974-4783-ae24-97b801faf01d",
                     ProfilePicture = "noimage.png",
-                    CustomerId = ""
+                    CustomerId = "",
+                      IsActive = true,
+                    EmailConfirmed = true,
+                    UserPassword = "superadmin@123#Admin",
                 }
           );
             modelBuilder.Entity<IdentityUserRole<string>>().HasData(

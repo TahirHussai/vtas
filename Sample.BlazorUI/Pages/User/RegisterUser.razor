@@ -1,0 +1,115 @@
+﻿@page "/register"
+@using Sample.DTOS
+@using Sample.Common
+
+@inject IAuthRepository _authRepo
+@inject ISnackbar Snackbar
+@inject NavigationManager _navManager
+@inject ILocalStorageService _localStorage
+
+
+<MudForm Model="@model" @ref="form" ValidationDelay="0">
+
+    <MudText Typo="Typo.h4" GutterBottom="true">Register New User</MudText>
+
+    <MudTextField T="string" @bind-Value="model.FirstName" Label="FirstName" Variant="Variant.Outlined" Class="my-6" For="@(() => model.FirstName)" Required="true" />
+    <MudTextField T="string" @bind-Value="model.LastName" Label="LastName" Variant="Variant.Outlined" Class="my-6" For="@(() => model.LastName)" />
+    <MudTextField T="string" @bind-Value="model.Email" Label="E-mail" Variant="Variant.Outlined" Class="my-6" For="@(() => model.Email)" Required="true" />
+
+    <MudTextField T="string" @bind-Value="model.Password" Label="Password" Variant="Variant.Outlined" Adornment="Adornment.End" For="@(() => model.Password)" Required="true" />
+    <MudSelect T="string" @bind-Value="model.RoleName" Label="Select User Role" Variant="Variant.Outlined">
+    @foreach (var role in allRoles)
+    {
+            <MudSelectItem T="string" Value="@role">@role</MudSelectItem>
+    }
+    </MudSelect>
+
+   
+    <MudButton Variant="Variant.Filled" class="mt-5" Color="Color.Primary" OnClick="HandleRegister" Size="Size.Large" FullWidth="true">Reister</MudButton>
+</MudForm>
+@code {
+    private MudForm form;
+    UserDto model = new UserDto();
+    private List<string> allRoles = new List<string>();
+    private bool response = true;
+    protected override async Task OnInitializedAsync()
+    {
+        var role = await _localStorage.GetItemAsync<string>("Role");
+        allRoles = await UserRoleHelper.GetAllUserRoleNames();
+       
+        if (!string.IsNullOrEmpty(role) && role.Contains("SuperAdmin"))
+        {
+            allRoles.Remove("SuperAdmin");
+        }
+        if (!string.IsNullOrEmpty(role) && role.Contains("Customer"))
+        {
+            allRoles.Remove("SuperAdmin");
+            allRoles.Remove("Customer");
+        }
+        if (!string.IsNullOrEmpty(role) && role.Contains("Client"))
+        {
+            allRoles.Remove("SuperAdmin");
+            allRoles.Remove("Customer");
+            allRoles.Remove("Client");
+        }
+        if (!string.IsNullOrEmpty(role) && role.Contains("Vendor"))
+        {
+            allRoles.Remove("SuperAdmin");
+            allRoles.Remove("Customer");
+            allRoles.Remove("Client");
+            allRoles.Remove("Vendor");
+        }
+
+    }
+    private async Task HandleRegister()
+    {
+        await form.Validate();
+        if (form.IsValid)
+        {
+            var role = await _localStorage.GetItemAsync<string>("Role");
+            var CustomerId = await _localStorage.GetItemAsync<string>("CustomerId");
+            var ParentId = await _localStorage.GetItemAsync<string>("ParentId");
+            var LoginUserId = await _localStorage.GetItemAsync<string>("LoginUserId");
+            if (!string.IsNullOrEmpty(role) && role.Contains("SuperAdmin"))
+            {
+                model.SuperAdminId = LoginUserId;
+                model.CreatedById = LoginUserId;
+                model.CustomerId = "2314094f-0974-4783-ae24-97b801faf01d";
+            }
+            if (!string.IsNullOrEmpty(role) && role.Contains("Customer"))
+            {
+                model.SuperAdminId = ParentId;
+                model.CreatedById = LoginUserId;
+                model.CustomerId = CustomerId;
+            }
+            if (!string.IsNullOrEmpty(role) && role.Contains("Client"))
+            {
+                model.SuperAdminId = ParentId;
+                model.CreatedById = LoginUserId;
+                model.CustomerId = CustomerId;
+            }
+            if (!string.IsNullOrEmpty(role) && role.Contains("Vendor"))
+            {
+                model.SuperAdminId = ParentId;
+                model.CreatedById = LoginUserId;
+                model.CustomerId = CustomerId;
+            }
+            response = await _authRepo.Register(model);
+
+            if (response)
+            {
+                
+                Snackbar.Add("Register successfully!.", MudBlazor.Severity.Success);
+                _navManager.NavigateTo("/cardlist");
+            }
+            else
+            {
+                Snackbar.Add("Something went wrong", MudBlazor.Severity.Warning);
+            }
+        }
+        else
+        {
+            Snackbar.Add("Validation errors occurred. Please check your input.", MudBlazor.Severity.Error);
+        }
+    }
+}

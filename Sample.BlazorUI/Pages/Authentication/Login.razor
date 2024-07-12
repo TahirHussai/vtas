@@ -3,8 +3,6 @@
 @using Sample.DTOS
 @layout LogInLayout
 @inject IAuthRepository _authRepo
-@inject NavigationManager _navMan
-
 @inject ISnackbar Snackbar
 @inject NavigationManager _navManager
 
@@ -21,8 +19,7 @@
     <div Class="d-flex justify-space-between align-center">
       @*   <MudLink Href="/pages/authentication/forgot-password">Forgot pwd?</MudLink> *@
     </div>
-
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="HandleLogin" Size="Size.Large" FullWidth="true">Sign In</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" class="mt-5" OnClick="HandleLogin" Size="Size.Large" FullWidth="true">Sign In</MudButton>
 </MudForm>
 
 @code {
@@ -40,7 +37,7 @@
             if (response)
             {
                 Snackbar.Add("Login successfully!.", MudBlazor.Severity.Success);
-                _navManager.NavigateTo("/personal/dashboard");
+                _navManager.NavigateTo("/cardlist");
             }
             else
             {

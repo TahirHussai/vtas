@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Sample.Common\Sample.Common.csproj" />
     <ProjectReference Include="..\Sample.DTOS\Sample.DTOS.csproj" />
   </ItemGroup>
 

@@ -6,65 +6,69 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Sample.WebApi.Configuration;
 using Sample.WebApi.Models;
+using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
+
 //// Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<App_BlazorDBContext>(options => options.UseSqlServer(connectionString));
+var connectionString = configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<App_BlazorDBContext>(options =>
+    options.UseSqlServer(connectionString));
 builder.Services.AddScoped<JwtSecurityTokenHandler>();
-builder.Services.AddDefaultIdentity<UserPofile>().AddRoles<IdentityRole>()
-                .AddEntityFrameworkStores<App_BlazorDBContext>();
-//Register AutoMapper Service
+
+// Configure Identity options and add Identity services
+builder.Services.AddIdentity<UserPofile, IdentityRole>(options =>
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequiredLength = 8;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireLowercase = false;
+    options.Password.RequiredUniqueChars = 6;
+})
+.AddEntityFrameworkStores<App_BlazorDBContext>()
+.AddDefaultTokenProviders();
+
+// Register AutoMapper Service
 builder.Services.AddAutoMapper(typeof(AutoMapperConfiguration));
 builder.Services.AddControllers();
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-//Authentiacate Jwt Token
-builder.Services.AddAuthentication(option =>
+// Configure Authentication and JWT Bearer
+builder.Services.AddAuthentication(options =>
 {
-    //When authenticate make sure you are using
-    //beer scheme, mean anybody who is attempting
-    //to access anything that we are secured
-    //must provide jwt bearer
-    option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    //    Mean you are going to challenge according
-    //to the JWT bearer
-    option.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-
-
-
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
-    .AddJwtBearer(option =>
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
     {
-        option.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuerSigningKey = true,
-            ValidateAudience = true,
-            ValidateIssuer = true,  //ensure that issuer is valid issuer
-            ValidateLifetime = true,//ensure that token is not expire
-            ClockSkew = TimeSpan.Zero,//is timespan zero,that is used to difference in times b / w two computers
-            ValidIssuer = builder.Configuration["jWTSetting:Issuer"],
-            ValidAudience = builder.Configuration["jWTSetting:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["jWTSetting:IssuerSigningKey"]))
-        };
-    });
+        ValidateIssuerSigningKey = true,
+        ValidateAudience = true,
+        ValidateIssuer = true,
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.Zero,
+        ValidIssuer = configuration["jWTSetting:Issuer"],
+        ValidAudience = configuration["jWTSetting:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["jWTSetting:IssuerSigningKey"]))
+    };
+});
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+// Configure Swagger
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo {Title="",Version="v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Sample Web API", Version = "v1" });
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT Authorization header using the Bearer scheme.",
         Name = "Authorization",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.ApiKey,
-        Scheme="Brarer",
-        BearerFormat="JWT",
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
     });
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
@@ -77,14 +81,16 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
-//Cors Policy
+
+// Configure CORS Policy
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
-        b => b.AllowAnyMethod()
-        .AllowAnyHeader()
-        .AllowAnyOrigin());
+        builder => builder.AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowAnyOrigin());
 });
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -100,6 +106,5 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseApiResponseAndExceptionWrapper();
 app.MapControllers();
-
 
 app.Run();
