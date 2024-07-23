@@ -27,6 +27,7 @@
 </style>
 <MudContainer>
     <MudText Typo="Typo.h6" Color="Color.Success">Selected User : @UserName</MudText>
+        <MudButton Disabled="@(userStack.Count == 0)" OnClick="GoBack">Go Back</MudButton>
         <MudGrid>
             @if (usersList.Any())
         {
@@ -37,7 +38,7 @@
             if (SuperAdmin != null)
             {
                 <MudItem xs="12" sm="12" md="12" lg="12" class="card">
-                    <MudCard @onclick="() => OnCardClick(SuperAdmin.Id, SuperAdmin.CustomerId)">
+                    <MudCard @onclick="() => OnCardClick(SuperAdmin.Id, SuperAdmin.CustomerId, SuperAdmin.Role)">
                         <MudCardHeader class="card-header">
                             <MudText Typo="Typo.h6" Color="Color.Surface">@SuperAdmin.Role</MudText>
                             </MudCardHeader>
@@ -61,7 +62,7 @@
                     if (customer != null)
                     {
                         <MudItem xs="12" sm="12" md="12" lg="12" class="card">
-                            <MudCard @onclick="() => OnCardClick(customer.Id, customer.CustomerId)">
+                            <MudCard @onclick="() => OnCardClick(customer.Id, customer.CustomerId, customer.Role)">
                                 <MudCardHeader class="card-header">
                                     <MudText Typo="Typo.h6" Color="Color.Default">@customer.Role</MudText>
                                     </MudCardHeader>
@@ -79,7 +80,7 @@
                     {
 
                         <MudItem xs="12" sm="6" md="3" lg="3" class="card">
-                            <MudCard @onclick="() => OnCardClick(item.Id, item.CustomerId)">
+                            <MudCard @onclick="() => OnCardClick(item.Id, item.CustomerId, item.Role)">
                                 <MudCardHeader class="card-header">
                                     <MudText Typo="Typo.h6" Color="Color.Secondary">@item.Role</MudText>
                                     </MudCardHeader>
@@ -121,36 +122,79 @@
 @code {
     List<UserWithRolesDto> usersList = new List<UserWithRolesDto>();
     private string UserName = "";
+      private Stack<(string UserId, string CustomerId, string Role)> userStack = new();
     protected override async Task OnInitializedAsync()
+    {
+        await LoadUserStackAsync();
+        await LoadUsersAsync();
+    }
+
+    private async Task LoadUsersAsync()
     {
         var role = await _localStorage.GetItemAsync<string>("Role");
         var CustomerId = await _localStorage.GetItemAsync<string>("CustomerId");
         var LoginUserId = await _localStorage.GetItemAsync<string>("LoginUserId");
         UserName = await _localStorage.GetItemAsync<string>("UserName");
-        if (!string.IsNullOrEmpty(role) && role.Contains("SuperAdmin"))
-        {
-            usersList = await _authRepo.GetUsersListWithRoles();
-        }
-        if (!string.IsNullOrEmpty(role) && role.Contains("Customer"))
-        {
-            usersList = await _authRepo.GetCustomerUsersListWithRoles(LoginUserId);
-        }
-        if (!string.IsNullOrEmpty(role) && role.Contains("Client"))
-        {
-            usersList = await _authRepo.GetClientUsersWithRoles(LoginUserId, CustomerId);
-        }
-        if (!string.IsNullOrEmpty(role) && role.Contains("Vendor"))
-        {
-            usersList = await _authRepo.GetVendorsUsersWithRoles(LoginUserId, CustomerId);
-        }
 
+        if (!string.IsNullOrEmpty(role))
+        {
+            usersList = role switch
+            {
+                "SuperAdmin" => await _authRepo.GetUsersListWithRoles(),
+                "Customer" => await _authRepo.GetCustomerUsersListWithRoles(LoginUserId),
+                "Client" => await _authRepo.GetClientUsersWithRoles(LoginUserId, CustomerId),
+                "Vendor" => await _authRepo.GetVendorsUsersWithRoles(LoginUserId, CustomerId),
+                _ => new List<UserWithRolesDto>()
+            };
+        }
     }
-    private async Task OnCardClick(string LoginUserId, string CustomerId)
+
+    private async Task OnCardClick(string LoginUserId, string CustomerId, string Role)
     {
+        var currentUserId = await _localStorage.GetItemAsync<string>("LoginUserId");
+        var currentCustomerId = await _localStorage.GetItemAsync<string>("CustomerId");
+        var currentRole = await _localStorage.GetItemAsync<string>("Role");
+
+        userStack.Push((currentUserId, currentCustomerId, currentRole));
+        await SaveUserStackAsync();
+
         var IsSuccess = await _authRepo.GetUserById(LoginUserId);
         if (IsSuccess)
         {
-            await OnInitializedAsync();
+            await LoadUsersAsync();
         }
+    }
+
+    private async Task GoBack()
+    {
+        if (userStack.Count > 0)
+        {
+            var (previousUserId, previousCustomerId, previousRole) = userStack.Pop();
+            await SaveUserStackAsync();
+
+            var IsSuccess = await _authRepo.GetUserById(previousUserId);
+            if (IsSuccess)
+            {
+                await _localStorage.SetItemAsync("LoginUserId", previousUserId);
+                await _localStorage.SetItemAsync("CustomerId", previousCustomerId);
+                await _localStorage.SetItemAsync("Role", previousRole);
+                await LoadUsersAsync();
+            }
+        }
+    }
+
+    private async Task LoadUserStackAsync()
+    {
+        var serializedStack = await _localStorage.GetItemAsync<string>("UserStack");
+        if (!string.IsNullOrEmpty(serializedStack))
+        {
+            userStack = Newtonsoft.Json.JsonConvert.DeserializeObject<Stack<(string UserId, string CustomerId, string Role)>>(serializedStack);
+        }
+    }
+
+    private async Task SaveUserStackAsync()
+    {
+        var serializedStack = Newtonsoft.Json.JsonConvert.SerializeObject(userStack);
+        await _localStorage.SetItemAsync("UserStack", serializedStack);
     }
 }

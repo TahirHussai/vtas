@@ -239,6 +239,7 @@ namespace Sample.BlazorUI.Implementation
             await _localStorageService.RemoveItemAsync("CreatedById");
             //await _localStorageService.RemoveItemAsync("AuthJwtToken");
             await _localStorageService.RemoveItemAsync("Email");
+            await _localStorageService.RemoveItemAsync("UserStack");
             await ((AuthenticationProvider)_authenticationProvider).LoggedOut();
         }
 
