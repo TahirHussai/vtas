@@ -1,0 +1,75 @@
+﻿@page "/role-assignment"
+@using Sample.DTOS
+
+@inject IAuthRepository _authRepo
+@inject ISnackbar Snackbar
+<style>
+    .role-assignment-header {
+        background-color: #f5f5f5;
+        font-weight: bold;
+        text-align: center;
+        padding: 10px;
+    }
+
+    .role-checkbox {
+        margin-right: 10px;
+    }
+
+    .save-button {
+        margin-top: 10px;
+    }
+
+    .table-header {
+        background-color: #b3aaaa;
+        font-weight: bold;
+    }
+</style>
+<MudContainer>
+    <MudText Typo="Typo.h4" Color="Color.Primary">Role Assignment</MudText>
+    <MudTable Items="@users" Hover="true" Striped="true">
+        <HeaderContent>
+            <MudTh class=" mud-theme-primary rounded">User Name</MudTh>
+            <MudTh class=" mud-theme-primary rounded">Roles</MudTh>
+            <MudTh class=" mud-theme-primary rounded">Actions</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>@context.UserName</MudTd>
+                <MudTd>
+                    <MudGrid>
+                        @foreach (var role in context.Roles)
+                    {
+                        <MudItem xs="12" sm="6" md="2" Class="role-assignment-header">
+                            <MudCheckBox T="bool" Class="role-checkbox" @bind-Checked="role.IsAssigned">@role.RoleName</MudCheckBox>
+                            </MudItem>
+                    }
+                </MudGrid>
+            </MudTd>
+            <MudTd>
+                <MudButton Color="Color.Success" Variant="Variant.Filled" > Save</MudButton>
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+</MudContainer>
+
+@code {
+    private List<UsersWithRolesDto> users = new List<UsersWithRolesDto>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        users = await _authRepo.GetUsersWithRolesAsync();
+    }
+
+    private async Task UpdateRoles(UsersWithRolesDto user)
+    {
+        var assignedRoles = user.Roles.Where(r => r.IsAssigned).Select(r => r.RoleId).ToList();
+        // var success = await _authRepo.UpdateUserRolesAsync(user.UserId, assignedRoles);
+        // if (success)
+        // {
+        //     Snackbar.Add("Roles updated successfully.", Severity.Success);
+        // }
+        // else
+        // {
+        //     Snackbar.Add("Failed to update roles.", Severity.Error);
+        // }
+    }
+}

@@ -65,9 +65,9 @@ namespace Sample.BlazorUI.Implementation
             }
             return true;
         }
-        public async Task<List<UserWithRolesDto>> GetUsersListWithRoles()
+        public async Task<List<UserWithRoleDto>> GetUsersListWithRole()
         {
-            var list = new List<UserWithRolesDto>();
+            var list = new List<UserWithRoleDto>();
 
             try
             {
@@ -80,7 +80,7 @@ namespace Sample.BlazorUI.Implementation
                     var content = await response.Content.ReadAsStringAsync();
 
                     var jsonObject = JObject.Parse(content);
-                    var usersList = jsonObject["result"].ToObject<List<UserWithRolesDto>>();
+                    var usersList = jsonObject["result"].ToObject<List<UserWithRoleDto>>();
 
                     if (usersList?.Any() == true)
                     {
@@ -95,9 +95,9 @@ namespace Sample.BlazorUI.Implementation
 
             return list;
         }
-        public async Task<List<UserWithRolesDto>> GetCustomerUsersListWithRoles(string CustomerId)
+        public async Task<List<UserWithRoleDto>> GetCustomerUsersListWithRoles(string CustomerId)
         {
-            var list = new List<UserWithRolesDto>();
+            var list = new List<UserWithRoleDto>();
 
             try
             {
@@ -110,7 +110,7 @@ namespace Sample.BlazorUI.Implementation
                     var content = await response.Content.ReadAsStringAsync();
 
                     var jsonObject = JObject.Parse(content);
-                    var usersList = jsonObject["result"].ToObject<List<UserWithRolesDto>>();
+                    var usersList = jsonObject["result"].ToObject<List<UserWithRoleDto>>();
 
                     if (usersList?.Any() == true)
                     {
@@ -126,9 +126,9 @@ namespace Sample.BlazorUI.Implementation
             return list;
         }
 
-        public async Task<List<UserWithRolesDto>> GetClientUsersWithRoles(string ClientId, string CustomerId)
+        public async Task<List<UserWithRoleDto>> GetClientUsersWithRoles(string ClientId, string CustomerId)
         {
-            var list = new List<UserWithRolesDto>();
+            var list = new List<UserWithRoleDto>();
 
             try
             {
@@ -141,7 +141,7 @@ namespace Sample.BlazorUI.Implementation
                     var content = await response.Content.ReadAsStringAsync();
 
                     var jsonObject = JObject.Parse(content);
-                    var usersList = jsonObject["result"].ToObject<List<UserWithRolesDto>>();
+                    var usersList = jsonObject["result"].ToObject<List<UserWithRoleDto>>();
 
                     if (usersList?.Any() == true)
                     {
@@ -157,9 +157,9 @@ namespace Sample.BlazorUI.Implementation
             return list;
         }
 
-        public async Task<List<UserWithRolesDto>> GetVendorsUsersWithRoles(string VendorId, string CustomerId)
+        public async Task<List<UserWithRoleDto>> GetVendorsUsersWithRoles(string VendorId, string CustomerId)
         {
-            var list = new List<UserWithRolesDto>();
+            var list = new List<UserWithRoleDto>();
 
             try
             {
@@ -171,7 +171,7 @@ namespace Sample.BlazorUI.Implementation
                 {
                     var content = await response.Content.ReadAsStringAsync();
                     var jsonObject = JObject.Parse(content);
-                    var usersList = jsonObject["result"].ToObject<List<UserWithRolesDto>>();
+                    var usersList = jsonObject["result"].ToObject<List<UserWithRoleDto>>();
 
                     if (usersList?.Any() == true)
                     {
@@ -187,7 +187,7 @@ namespace Sample.BlazorUI.Implementation
             return list;
         }
 
-        public Task<List<UserWithRolesDto>> GetRecruiterUsersWithRoles(string RecruiterId, string CustomerId)
+        public Task<List<UserWithRoleDto>> GetRecruiterUsersWithRoles(string RecruiterId, string CustomerId)
         {
             throw new NotImplementedException();
         }
@@ -242,7 +242,32 @@ namespace Sample.BlazorUI.Implementation
             await _localStorageService.RemoveItemAsync("UserStack");
             await ((AuthenticationProvider)_authenticationProvider).LoggedOut();
         }
+        public async Task<List<UsersWithRolesDto>> GetUsersWithRolesAsync()
+        {
 
+            var usersList = new List<UsersWithRolesDto>();
+            try
+            {
+
+                var request = new HttpRequestMessage(HttpMethod.Get, $"{_baseUrl}api/Account/users-with-roles");
+                var client = _httpClientFactory.CreateClient();
+                var response = await client.SendAsync(request);
+
+                if (!response.IsSuccessStatusCode)
+                    return new List<UsersWithRolesDto>();
+
+                var content = await response.Content.ReadAsStringAsync();
+                var jsonObject = JObject.Parse(content);
+                 usersList = jsonObject["result"].ToObject<List<UsersWithRolesDto>>();
+              //  usersList = JsonConvert.DeserializeObject<List<UsersWithRolesDto>>(content);
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+            return usersList ?? new List<UsersWithRolesDto>();
+        }
         private string GetBaseUrl(IHttpClientFactory httpClientFactory)
         {
             // Assuming you have a client named "LocalApi" configured with the base address

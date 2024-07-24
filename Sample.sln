@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample.BlazorUI", "Sample.B
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample.DTOS", "Sample.DTOS\Sample.DTOS.csproj", "{A14EF936-4836-4C7B-ABF0-A9313BAF7CBF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.Common", "Sample.Common\Sample.Common.csproj", "{973EEC48-3E60-4C6B-ACDD-4CB786A10C0A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample.Common", "Sample.Common\Sample.Common.csproj", "{973EEC48-3E60-4C6B-ACDD-4CB786A10C0A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -120,7 +120,7 @@
 </MudContainer>
 
 @code {
-    List<UserWithRolesDto> usersList = new List<UserWithRolesDto>();
+    List<UserWithRoleDto> usersList = new List<UserWithRoleDto>();
     private string UserName = "";
       private Stack<(string UserId, string CustomerId, string Role)> userStack = new();
     protected override async Task OnInitializedAsync()
@@ -140,11 +140,11 @@
         {
             usersList = role switch
             {
-                "SuperAdmin" => await _authRepo.GetUsersListWithRoles(),
+                "SuperAdmin" => await _authRepo.GetUsersListWithRole(),
                 "Customer" => await _authRepo.GetCustomerUsersListWithRoles(LoginUserId),
                 "Client" => await _authRepo.GetClientUsersWithRoles(LoginUserId, CustomerId),
                 "Vendor" => await _authRepo.GetVendorsUsersWithRoles(LoginUserId, CustomerId),
-                _ => new List<UserWithRolesDto>()
+                _ => new List<UserWithRoleDto>()
             };
         }
     }

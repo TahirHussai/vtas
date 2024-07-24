@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using Sample.DTOS;
 using Sample.WebApi;
 using Sample.WebApi.Models;
+using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -25,9 +26,12 @@ namespace Sample.WebApi.Controllers
         private readonly ILogger<AccountController> logger;
         private readonly IConfiguration configuration;
         private readonly JwtSecurityTokenHandler _jwtSecurityTokenHandler;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-
-        public AccountController(JwtSecurityTokenHandler jwtSecurityTokenHandler, IConfiguration configuration, ILogger<AccountController> logger, IMapper mapper, UserManager<UserPofile> userManager, SignInManager<UserPofile> signInManager)
+        public AccountController(JwtSecurityTokenHandler jwtSecurityTokenHandler, 
+            IConfiguration configuration, ILogger<AccountController> logger, IMapper mapper, 
+            UserManager<UserPofile> userManager, SignInManager<UserPofile> signInManager,
+            RoleManager<IdentityRole> roleManager)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
@@ -35,6 +39,7 @@ namespace Sample.WebApi.Controllers
             this.logger = logger;
             this.configuration = configuration;
             _jwtSecurityTokenHandler = jwtSecurityTokenHandler;
+            _roleManager = roleManager;
         }
         [HttpPost]
         [Route("UserLogin")]
@@ -86,17 +91,49 @@ namespace Sample.WebApi.Controllers
 
             return Ok(response);
         }
-        [HttpGet("AllUsersWithRoles")]
-        //[Authorize(Roles = "SuperAdmin")] // Optional: Require Admin role to access this endpoint
+        [HttpGet("users-with-roles")]
         public async Task<IActionResult> GetAllUsersWithRoles()
         {
+            var users = userManager.Users.ToList();
+            var roles = _roleManager.Roles.ToList();
+            var userRoles = new List<UsersWithRolesDto>();
+
+            foreach (var user in users.Where(a=>a.Email!= "superadmin@admin.com"))
+            {
+                var userRolesDto = new UsersWithRolesDto
+                {
+                    UserId = user.Id,
+                    UserName = $"{user.FirstName} {user.Lastname}",
+                    Email=user.Email,
+                    Roles = new List<RoleDto>()
+                };
+
+                foreach (var role in roles.Where(a=>a.Name!= "SuperAdmin"))
+                {
+                    var isAssigned = await userManager.IsInRoleAsync(user, role.Name);
+                    userRolesDto.Roles.Add(new RoleDto
+                    {
+                        RoleId = role.Id,
+                        RoleName = role.Name,
+                        IsAssigned = isAssigned
+                    });
+                }
+                userRoles.Add(userRolesDto);
+            }
+
+            return Ok(userRoles);
+        }
+        [HttpGet("AllUsersWithRole")]
+        //[Authorize(Roles = "SuperAdmin")] // Optional: Require Admin role to access this endpoint
+        public async Task<IActionResult> GetAllUsersWithRole()
+        {
             var usersList = userManager.Users.ToList();
-            var userRoles = new List<UserWithRolesDto>();
+            var userRoles = new List<UserWithRoleDto>();
 
             foreach (var user in usersList)
             {
                 var roles = await userManager.GetRolesAsync(user);
-                userRoles.Add(new UserWithRolesDto
+                userRoles.Add(new UserWithRoleDto
                 {
                     Id = user.Id,
                     UserName = user.FirstName + (string.IsNullOrEmpty(user.Lastname) ? "" : " " + user.Lastname),
@@ -114,14 +151,14 @@ namespace Sample.WebApi.Controllers
         //[Authorize(Roles = "Customer")] // Optional: Require Customer role to access this endpoint
         public async Task<IActionResult> GetCustomerUsersWithRoles(string CustomerId)
         {
-            var userRoles = new List<UserWithRolesDto>();
+            var userRoles = new List<UserWithRoleDto>();
             if (!string.IsNullOrEmpty(CustomerId))
             {
                 var usersList = await userManager.Users.Where(a => a.CustomerId == CustomerId).ToListAsync();
                 foreach (var user in usersList)
                 {
                     var roles = await userManager.GetRolesAsync(user);
-                    userRoles.Add(new UserWithRolesDto
+                    userRoles.Add(new UserWithRoleDto
                     {
                         Id = user.Id,
                         UserName = user.FirstName + (string.IsNullOrEmpty(user.Lastname) ? "" : " " + user.Lastname),
@@ -140,14 +177,14 @@ namespace Sample.WebApi.Controllers
         //[Authorize(Roles = "Client")] // Optional: Require Client role to access this endpoint
         public async Task<IActionResult> GetClientUsersWithRoles(string ClientId, string CustomerId)
         {
-            var userRoles = new List<UserWithRolesDto>();
+            var userRoles = new List<UserWithRoleDto>();
             if (!string.IsNullOrEmpty(ClientId))
             {
                 var usersList = await userManager.Users.Where(a => a.CustomerId == CustomerId && a.CreatedById== ClientId).ToListAsync();
                 foreach (var user in usersList)
                 {
                     var roles = await userManager.GetRolesAsync(user);
-                    userRoles.Add(new UserWithRolesDto
+                    userRoles.Add(new UserWithRoleDto
                     {
                         Id = user.Id,
                         UserName = user.FirstName + (string.IsNullOrEmpty(user.Lastname) ? "" : " " + user.Lastname),
@@ -164,7 +201,7 @@ namespace Sample.WebApi.Controllers
         //[Authorize(Roles = "Vendor")] // Optional: Require Vendor role to access this endpoint
         public async Task<IActionResult> GetVendorsUsersWithRoles(string VendorId, string CustomerId)
         {
-            var UserRoles = new UserWithRolesDto();
+            var UserRoles = new UserWithRoleDto();
             if (!string.IsNullOrEmpty(VendorId))
             {
                 var user = userManager.Users.FirstOrDefault(a => a.CreatedById == VendorId  && a.CustomerId == CustomerId);
@@ -189,7 +226,7 @@ namespace Sample.WebApi.Controllers
         //[Authorize(Roles = "Vendor")] // Optional: Require Vendor role to access this endpoint
         public async Task<IActionResult> GetRecruiterUsersWithRoles(string RecruiterId, string CustomerId)
         {
-            var UserRoles = new UserWithRolesDto();
+            var UserRoles = new UserWithRoleDto();
             if (!string.IsNullOrEmpty(RecruiterId))
             {
                 var user = userManager.Users.FirstOrDefault(a => a.CreatedById == RecruiterId && a.Id == RecruiterId && a.CustomerId == CustomerId);
