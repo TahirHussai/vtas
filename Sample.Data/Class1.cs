@@ -1,4 +1,4 @@
-﻿namespace Sample.Repository
+﻿namespace Sample.Data
 {
     public class Class1
     {

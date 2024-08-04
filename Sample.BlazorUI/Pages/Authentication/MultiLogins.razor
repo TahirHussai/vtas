@@ -1,0 +1,31 @@
+﻿@page "/multiLogns"
+@layout LogInLayout
+
+<MudContainer Class="d-flex justify-center align-center mt-5" >
+    <MudPaper Class="pa-4 text-center" Elevation="4">
+        <MudText Typo="Typo.h4" Class="mb-4">Select Login Type</MudText>
+        <MudGrid Justify="Justify.Center" AlignItems="AlignItems.Center">
+            <MudItem xs="12" sm="12" md="12">
+                <MudButton Href="/" Variant="Variant.Filled" Color="Color.Primary" >Admin Login</MudButton>
+            </MudItem>
+            <MudItem xs="12" sm="12" md="12">
+                <MudButton Href="/" Variant="Variant.Filled" Color="Color.Secondary">Customer Login</MudButton>
+            </MudItem>
+            <MudItem xs="12" sm="12" md="12">
+                <MudButton Href="/" Variant="Variant.Filled" Color="Color.Tertiary">Client Login</MudButton>
+            </MudItem>
+            <MudItem xs="12" sm="12" md="12">
+                <MudButton Href="/" Variant="Variant.Filled" Color="Color.Dark">Vendor Login</MudButton>
+            </MudItem>
+            <MudItem xs="12" sm="12" md="12">
+                <MudButton Href="/" Variant="Variant.Filled" Color="Color.Default">Recruiter Login</MudButton>
+            </MudItem>
+            <MudItem xs="12" sm="12" md="12">
+                <MudButton Href="/" Variant="Variant.Filled" Color="Color.Inherit">Applicant Login</MudButton>
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+</MudContainer>
+@code {
+
+}

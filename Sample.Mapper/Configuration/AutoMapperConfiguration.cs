@@ -1,11 +1,12 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Identity;
-using Sample.DTOS;
-using Sample.WebApi.Mapper;
-using Sample.WebApi.Models;
+﻿
+using AutoMapper;
+using Microsoft.Extensions.DependencyInjection;
+
+using Sample.Mapper.MaperConfig;
+
 using System.Runtime.CompilerServices;
 
-namespace Sample.WebApi.Configuration
+namespace Sample.Mapper.Configuration
 {
     public static class AutoMapperConfiguration
     {

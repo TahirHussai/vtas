@@ -47,7 +47,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Sample.Data\Sample.Data.csproj" />
     <ProjectReference Include="..\Sample.DTOS\Sample.DTOS.csproj" />
+    <ProjectReference Include="..\Sample.Mapper\Sample.Mapper.csproj" />
   </ItemGroup>
 
 </Project>

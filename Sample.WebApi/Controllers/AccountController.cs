@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Sample.Data;
 using Sample.DTOS;
 using Sample.WebApi;
 using Sample.WebApi.Models;

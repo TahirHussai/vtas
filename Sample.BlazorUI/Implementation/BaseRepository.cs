@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 using Sample.BlazorUI.Service;
 using System.Net.Http.Headers;
 using System.Text;
-using Sample.BlazorUI.EndPoint;
+using Sample.Common.EndPoint;
 
 namespace Sample.BlazorUI.Implementation
 {

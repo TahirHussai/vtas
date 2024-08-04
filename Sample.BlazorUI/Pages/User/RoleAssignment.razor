@@ -45,7 +45,7 @@
                 </MudGrid>
             </MudTd>
             <MudTd>
-                <MudButton Color="Color.Success" Variant="Variant.Filled" > Save</MudButton>
+                <MudButton Color="Color.Success" OnClick="() => SaveRoles(context)" Variant="Variant.Filled"> Save</MudButton>
             </MudTd>
         </RowTemplate>
     </MudTable>
@@ -53,23 +53,31 @@
 
 @code {
     private List<UsersWithRolesDto> users = new List<UsersWithRolesDto>();
+    private UserRoleAssignmentDto dto = new UserRoleAssignmentDto();
 
     protected override async Task OnInitializedAsync()
     {
         users = await _authRepo.GetUsersWithRolesAsync();
     }
-
-    private async Task UpdateRoles(UsersWithRolesDto user)
+    private async Task SaveRoles(UsersWithRolesDto user)
     {
-        var assignedRoles = user.Roles.Where(r => r.IsAssigned).Select(r => r.RoleId).ToList();
-        // var success = await _authRepo.UpdateUserRolesAsync(user.UserId, assignedRoles);
-        // if (success)
-        // {
-        //     Snackbar.Add("Roles updated successfully.", Severity.Success);
-        // }
-        // else
-        // {
-        //     Snackbar.Add("Failed to update roles.", Severity.Error);
-        // }
+        var roleIds = user.Roles.Where(r => r.IsAssigned).Select(r => r.RoleId).ToList();
+        dto.RoleIds = roleIds;
+        dto.UserId = user.UserId;
+        var success = await UpdateUserRolesAsync(dto);
+        if (success)
+        {
+            Snackbar.Add($"Roles updated for {user.UserName}", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add($"Failed to update roles for {user.UserName}", Severity.Error);
+        }
+    }
+
+    private async Task<bool> UpdateUserRolesAsync(UserRoleAssignmentDto dto)
+    {
+        var response = await _authRepo.UpdateUserRoles(dto);
+        return response;
     }
 }

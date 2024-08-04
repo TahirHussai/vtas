@@ -4,11 +4,12 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sample.BlazorUI.AuthProvider;
 using Sample.DTOS;
-using Sample.BlazorUI.EndPoint;
+
 using Sample.BlazorUI.Service;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using System.Text;
+using Sample.Common.EndPoint;
 
 namespace Sample.BlazorUI.Implementation
 {
@@ -258,8 +259,8 @@ namespace Sample.BlazorUI.Implementation
 
                 var content = await response.Content.ReadAsStringAsync();
                 var jsonObject = JObject.Parse(content);
-                 usersList = jsonObject["result"].ToObject<List<UsersWithRolesDto>>();
-              //  usersList = JsonConvert.DeserializeObject<List<UsersWithRolesDto>>(content);
+                usersList = jsonObject["result"].ToObject<List<UsersWithRolesDto>>();
+                //  usersList = JsonConvert.DeserializeObject<List<UsersWithRolesDto>>(content);
             }
             catch (Exception ex)
             {
@@ -273,6 +274,32 @@ namespace Sample.BlazorUI.Implementation
             // Assuming you have a client named "LocalApi" configured with the base address
             var client = httpClientFactory.CreateClient("LocalApi");
             return client.BaseAddress.ToString();
+        }
+
+        public async Task<bool> UpdateUserRoles(UserRoleAssignmentDto dto)
+        {
+            bool IsSuccess = false;
+            try
+            {
+                var request = new HttpRequestMessage(HttpMethod.Post, _baseUrl + StaticEndPoint.UpdateUserRolesEndpoint)
+                {
+                    Content = new StringContent(JsonConvert.SerializeObject(dto), Encoding.UTF8, "application/json")
+                };
+                var client = _httpClientFactory.CreateClient();
+
+                HttpResponseMessage response = await client.SendAsync(request);
+                if (response.IsSuccessStatusCode)
+                {
+                    IsSuccess = response.IsSuccessStatusCode;
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                IsSuccess = false;
+            }
+            return IsSuccess;
         }
 
 

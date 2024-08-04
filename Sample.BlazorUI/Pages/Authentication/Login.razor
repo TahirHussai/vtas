@@ -7,10 +7,10 @@
 @inject NavigationManager _navManager
 
 <MudForm Model="@model" @ref="form" ValidationDelay="0">
-
+    <MudIcon Icon="@Icons.Custom.Brands.MudBlazor" Size="Size.Large" Style="width:100px; height:100px;" />
     <MudText Typo="Typo.h4" GutterBottom="true">Sign In</MudText>
 
-    <MudText>Don't have an account? <MudLink Href="/Authentication/SignUp">Sign Up</MudLink></MudText>
+ @*    <MudText>Don't have an account? <MudLink Href="/Authentication/SignUp">Sign Up</MudLink></MudText> *@
 
     <MudTextField T="string" @bind-Value="model.Email" Label="E-mail" Variant="Variant.Outlined" Class="my-6" For="@(() => model.Email)" Required="true" />
 

@@ -21,26 +21,15 @@
             <MudText Typo="Typo.subtitle2">Admin Dashboard</MudText>
         </MudHidden>
         <MudSpacer />
-        <MudMenu Icon="@Icons.Material.Outlined.Translate" Color="Color.Inherit" Direction="Direction.Bottom" OffsetY="true" Dense="true">
-            <MudMenuItem>English</MudMenuItem>
-            <MudMenuItem>Swedish</MudMenuItem>
-            <MudMenuItem>Old Norse</MudMenuItem>
+       
+        <MudMenu Icon="@Icons.Material.Filled.Settings"
+                 Color="Color.Inherit"
+                 AriaLabel="Open user menu" OffsetX="true" OffsetY="true" Dense="true" Class="mt-1 ml-4">
+            <MudMenuItem>Profile</MudMenuItem>
+            <MudMenuItem Href="/cardlist">Back to Profile</MudMenuItem>
+            <MudMenuItem Href="/Authentication/logout">Logout</MudMenuItem>
         </MudMenu>
-        <MudMenu Icon="@Icons.Material.Outlined.Widgets" Color="Color.Inherit" Direction="Direction.Bottom" OffsetY="true" Dense="true">
-            <MudMenuItem Link="https://mudblazor.com/">MudBlazor</MudMenuItem>
-            <MudMenuItem Link="https://github.com/Garderoben/MudBlazor.Templates">Source Code</MudMenuItem>
-        </MudMenu>
-        <MudMenu Direction="Direction.Left" OffsetX="true" Dense="true" Class="mt-1 ml-4">
-            <ActivatorContent>
-                <MudAvatar Image="images/avatar_jonny.jpg" />
-            </ActivatorContent>
-            <ChildContent>
-                <PersonCard Class="mt-n2" />
-                <MudDivider Class="mb-2" />
-           
-                @* <MudListItem Text="Logout" Icon="@Icons.Material.Outlined.Login" Href="/Authentication/logout" /> *@
-            </ChildContent>
-        </MudMenu>
+        
     </MudAppBar>
    
     <MudDrawer @bind-Open="_drawerOpen" Elevation="0" ClipMode="0">

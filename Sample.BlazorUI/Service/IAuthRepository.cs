@@ -14,5 +14,6 @@ namespace Sample.BlazorUI.Service
         public Task<List<UserWithRoleDto>> GetClientUsersWithRoles(string ClientId, string CustomerId);
         public Task<List<UserWithRoleDto>> GetVendorsUsersWithRoles(string VendorId, string CustomerId);
         public Task<List<UserWithRoleDto>> GetRecruiterUsersWithRoles(string RecruiterId, string CustomerId);
+        public Task<bool> UpdateUserRoles(UserRoleAssignmentDto dto);
     }
 }

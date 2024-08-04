@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Sample.DTOS;
 
-namespace Sample.WebApi.Mapper
+namespace Sample.Mapper.MaperConfig
 {
     public class IdentityRoleMapper:Profile
     {

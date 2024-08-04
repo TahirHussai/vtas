@@ -1,4 +1,4 @@
-﻿namespace Sample.BlazorUI.EndPoint
+﻿namespace Sample.Common.EndPoint
 {
     public class StaticEndPoint
     {
@@ -13,6 +13,7 @@
         public static string GetCustomerUsersEndpoint = $"api/Account/GetCustomerUsersWithRoles?CustomerId=";
         public static string GetClientUsersEndpoint = $"api/Account/GetClientUsersWithRoles?ClientId=";
         public static string GetVendorsUsersEndpoint = $"api/Account/GetVendorsUsersWithRoles?VendorId=";
+        public static string UpdateUserRolesEndpoint = $"api/Account/update-user-roles";
         #endregion
 
 

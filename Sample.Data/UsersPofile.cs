@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace Sample.WebApi.Models
+namespace Sample.Data
 {
     public class UserPofile: IdentityUser
     {
