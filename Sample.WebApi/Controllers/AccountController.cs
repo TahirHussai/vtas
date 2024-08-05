@@ -1,18 +1,14 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Sample.Data;
 using Sample.DTOS;
-using Sample.WebApi;
-using Sample.WebApi.Models;
+using Sample.Services.Interfaces;
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text;
 
 namespace Sample.WebApi.Controllers
@@ -24,15 +20,17 @@ namespace Sample.WebApi.Controllers
         private readonly UserManager<UserPofile> userManager;
         private readonly SignInManager<UserPofile> signInManager;
         private readonly IMapper mapper;
+        private readonly IUserService _userService;
         private readonly ILogger<AccountController> logger;
         private readonly IConfiguration configuration;
         private readonly JwtSecurityTokenHandler _jwtSecurityTokenHandler;
         private readonly RoleManager<IdentityRole> _roleManager;
 
-        public AccountController(JwtSecurityTokenHandler jwtSecurityTokenHandler, 
-            IConfiguration configuration, ILogger<AccountController> logger, IMapper mapper, 
+
+        public AccountController(JwtSecurityTokenHandler jwtSecurityTokenHandler,
+            IConfiguration configuration, ILogger<AccountController> logger, IMapper mapper,
             UserManager<UserPofile> userManager, SignInManager<UserPofile> signInManager,
-            RoleManager<IdentityRole> roleManager)
+            RoleManager<IdentityRole> roleManager, IUserService userService)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
@@ -41,6 +39,7 @@ namespace Sample.WebApi.Controllers
             this.configuration = configuration;
             _jwtSecurityTokenHandler = jwtSecurityTokenHandler;
             _roleManager = roleManager;
+            _userService = userService;
         }
         [HttpPost]
         [Route("UserLogin")]
@@ -88,7 +87,7 @@ namespace Sample.WebApi.Controllers
             var user = new UserPofile();
 
             user = await userManager.FindByIdAsync(UserId);
-            var response =await GetUser(user);
+            var response = await GetUser(user);
 
             return Ok(response);
         }
@@ -99,17 +98,17 @@ namespace Sample.WebApi.Controllers
             var roles = _roleManager.Roles.ToList();
             var userRoles = new List<UsersWithRolesDto>();
 
-            foreach (var user in users.Where(a=>a.Email!= "superadmin@admin.com"))
+            foreach (var user in users.Where(a => a.Email != "superadmin@admin.com"))
             {
                 var userRolesDto = new UsersWithRolesDto
                 {
                     UserId = user.Id,
                     UserName = $"{user.FirstName} {user.Lastname}",
-                    Email=user.Email,
+                    Email = user.Email,
                     Roles = new List<RoleDto>()
                 };
 
-                foreach (var role in roles.Where(a=>a.Name!= "SuperAdmin"))
+                foreach (var role in roles.Where(a => a.Name != "SuperAdmin"))
                 {
                     var isAssigned = await userManager.IsInRoleAsync(user, role.Name);
                     userRolesDto.Roles.Add(new RoleDto
@@ -181,7 +180,7 @@ namespace Sample.WebApi.Controllers
             var userRoles = new List<UserWithRoleDto>();
             if (!string.IsNullOrEmpty(ClientId))
             {
-                var usersList = await userManager.Users.Where(a => a.CustomerId == CustomerId && a.CreatedById== ClientId).ToListAsync();
+                var usersList = await userManager.Users.Where(a => a.CustomerId == CustomerId && a.CreatedById == ClientId).ToListAsync();
                 foreach (var user in usersList)
                 {
                     var roles = await userManager.GetRolesAsync(user);
@@ -205,7 +204,7 @@ namespace Sample.WebApi.Controllers
             var UserRoles = new UserWithRoleDto();
             if (!string.IsNullOrEmpty(VendorId))
             {
-                var user = userManager.Users.FirstOrDefault(a => a.CreatedById == VendorId  && a.CustomerId == CustomerId);
+                var user = userManager.Users.FirstOrDefault(a => a.CreatedById == VendorId && a.CustomerId == CustomerId);
                 if (user != null)
                 {
 
@@ -268,7 +267,32 @@ namespace Sample.WebApi.Controllers
                     return BadRequest(ModelState);
                 }
             }
-            await userManager.AddToRoleAsync(user, userDto.RoleName);
+            // Add the user to the role
+            var roleResult = await userManager.AddToRoleAsync(user, userDto.RoleName);
+
+            if (roleResult.Succeeded)
+            {
+                // Get the role
+                var role = await _roleManager.FindByNameAsync(userDto.RoleName);
+
+                if (role != null)
+                {
+                    // Manually add the record to AspNetUserRoles with additional fields
+                    var userRole = new AspNetUserRole
+                    {
+                        UserId = user.Id,
+                        RoleId = role.Id,
+                        AccessLevelID = 1,
+                        CreateByID = user.Id,
+                        CreatedDate = DateTime.UtcNow,
+                        PersonStatusID = 1,
+                        UpdatedByID = user.Id,
+                        UpdatedDate = DateTime.UtcNow
+                    };
+                    await _userService.AddUserRoleAsync(userRole);
+
+                }
+            }
             return Ok();
         }
         private async Task<ActionResult<ResponseDto>> LoginUser(LoginDTO userDto)
@@ -277,27 +301,27 @@ namespace Sample.WebApi.Controllers
             try
             {
 
-            
-            var user = await userManager.FindByEmailAsync(userDto.Email);
-            if (user == null)
-            {
-                logger.LogError($"Something went wrong with the {userDto.Email}");
-                return Unauthorized(userDto);
-            }
 
-            var validatePassword = await userManager.CheckPasswordAsync(user, userDto.Password);
-            if (validatePassword == false)
-            {
-                return Unauthorized(userDto);
-            }
+                var user = await userManager.FindByEmailAsync(userDto.Email);
+                if (user == null)
+                {
+                    logger.LogError($"Something went wrong with the {userDto.Email}");
+                    return Unauthorized(userDto);
+                }
 
-            var token = await GenerateToken(user);
+                var validatePassword = await userManager.CheckPasswordAsync(user, userDto.Password);
+                if (validatePassword == false)
+                {
+                    return Unauthorized(userDto);
+                }
 
-            await userManager.UpdateAsync(user);
-            //var tokenHandler = new JwtSecurityTokenHandler();
-            //var tokenString = tokenHandler.WriteToken(token);
+                var token = await GenerateToken(user);
 
-             response = await GetUser(user);
+                await userManager.UpdateAsync(user);
+                //var tokenHandler = new JwtSecurityTokenHandler();
+                //var tokenString = tokenHandler.WriteToken(token);
+
+                response = await GetUser(user);
             }
             catch (Exception)
             {

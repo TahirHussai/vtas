@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Sample.Data;
 
-namespace Sample.WebApi.Models
+namespace Sample.Data
 {
     public partial class App_BlazorDBContext : IdentityDbContext<UserPofile>
     {
@@ -15,7 +15,7 @@ namespace Sample.WebApi.Models
             : base(options)
         {
         }
-
+        public DbSet<AspNetUserRole> AspNetUserRoles { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)

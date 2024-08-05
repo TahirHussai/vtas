@@ -50,10 +50,12 @@
     <ProjectReference Include="..\Sample.Data\Sample.Data.csproj" />
     <ProjectReference Include="..\Sample.DTOS\Sample.DTOS.csproj" />
     <ProjectReference Include="..\Sample.Mapper\Sample.Mapper.csproj" />
+    <ProjectReference Include="..\Sample.Services\Sample.Services.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Migrations\" />
+    <Folder Include="Models\" />
   </ItemGroup>
 
 </Project>
