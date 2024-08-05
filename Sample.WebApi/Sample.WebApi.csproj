@@ -52,4 +52,8 @@
     <ProjectReference Include="..\Sample.Mapper\Sample.Mapper.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>

@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Sample.WebApi.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial_Migration_With_Rolesetc : Migration
+    public partial class Initial_Plus_AddFieldsToAspNetUserRoles_AspNetUsers : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -43,6 +43,19 @@ namespace Sample.WebApi.Migrations
                     ModifyById = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ParentId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CustomerId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MiddleName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SufixId = table.Column<int>(type: "int", nullable: true),
+                    FamilyName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NickName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MailingAddressId = table.Column<int>(type: "int", nullable: true),
+                    PermanentAddressId = table.Column<int>(type: "int", nullable: true),
+                    EmailWorkId = table.Column<int>(type: "int", nullable: true),
+                    EmailPersonalId = table.Column<int>(type: "int", nullable: true),
+                    EmergencyPersonId = table.Column<int>(type: "int", nullable: true),
+                    SpouseId = table.Column<int>(type: "int", nullable: true),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Crid = table.Column<int>(type: "int", nullable: true),
+                    PrimaryPhoneId = table.Column<int>(type: "int", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -109,8 +122,8 @@ namespace Sample.WebApi.Migrations
                 name: "AspNetUserLogins",
                 columns: table => new
                 {
-                    LoginProvider = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
-                    ProviderKey = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProviderKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ProviderDisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
@@ -130,7 +143,14 @@ namespace Sample.WebApi.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Discriminator = table.Column<string>(type: "nvarchar(34)", maxLength: 34, nullable: false),
+                    CreateByID = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedByID = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    AccessLevelID = table.Column<int>(type: "int", nullable: true),
+                    PersonStatusID = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -154,8 +174,8 @@ namespace Sample.WebApi.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    LoginProvider = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
@@ -184,20 +204,20 @@ namespace Sample.WebApi.Migrations
 
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
-                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "CreatedById", "CreatedDate", "CustomerId", "Email", "EmailConfirmed", "FirstName", "IsActive", "Lastname", "LockoutEnabled", "LockoutEnd", "ModifyById", "ModifyDate", "NormalizedEmail", "NormalizedUserName", "ParentId", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "ProfilePicture", "SecurityStamp", "TwoFactorEnabled", "UserName", "UserPassword" },
+                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "CreatedById", "CreatedDate", "Crid", "CustomerId", "Email", "EmailConfirmed", "EmailPersonalId", "EmailWorkId", "EmergencyPersonId", "FamilyName", "FirstName", "IsActive", "Lastname", "LockoutEnabled", "LockoutEnd", "MailingAddressId", "MiddleName", "ModifyById", "ModifyDate", "NickName", "NormalizedEmail", "NormalizedUserName", "ParentId", "PasswordHash", "PermanentAddressId", "PhoneNumber", "PhoneNumberConfirmed", "PrimaryPhoneId", "ProfilePicture", "SecurityStamp", "SpouseId", "SufixId", "Title", "TwoFactorEnabled", "UserName", "UserPassword" },
                 values: new object[,]
                 {
-                    { "2314094f-0974-4783-ae24-97b801faf01d", 0, "5dc92ddb-94a2-4738-8994-a08725e599da", "", new DateTime(2024, 7, 7, 15, 54, 38, 467, DateTimeKind.Local).AddTicks(2328), "", "superadmin@admin.com", true, "Super", true, "Admin", false, null, "", new DateTime(2024, 7, 7, 15, 54, 38, 467, DateTimeKind.Local).AddTicks(2342), "SUPERADMINADMIN@ADMIN.COM", "SUPERADMIN@ADMIN.COM", "", "AQAAAAIAAYagAAAAEAu/pcx524s7YwJj6IutB8OzunyvTBTe6yk8O/7gS24gF9/aJ90xf3/DQIOZ2bWwsw==", null, false, "noimage.png", "5528a643-61d1-4474-b130-cb5051222555", false, "superadmin@admin.com", "superadmin@123#Admin" },
-                    { "7375512a-4e4b-4178-babc-1de292b177b4", 0, "247a299e-1da1-43d9-b403-7f88e3ced2da", "2314094f-0974-4783-ae24-97b801faf01d", new DateTime(2024, 7, 7, 15, 54, 38, 598, DateTimeKind.Local).AddTicks(6720), "", "customer@admin.com", true, "Customer", true, "Admin", false, null, "2314094f-0974-4783-ae24-97b801faf01d", new DateTime(2024, 7, 7, 15, 54, 38, 598, DateTimeKind.Local).AddTicks(6736), "CUSTOMER@ADMIN.COM", "CUSTOMER@ADMIN.COM", "2314094f-0974-4783-ae24-97b801faf01d", "AQAAAAIAAYagAAAAEDAs+SRl9IP+uq/ohA2BztLUc9f4Cvap6gsx9V7aYkdHTqbhbX5Z/0s8vEcZJc4/tg==", null, false, "noimage.png", "1dcb8b7c-ae54-462d-bb36-53ec8f696500", false, "customer@admin.com", "superadmin@123#Admin" }
+                    { "2314094f-0974-4783-ae24-97b801faf01d", 0, "1b38de53-f241-48d7-b2ac-7892c0dc73a4", "", new DateTime(2024, 8, 6, 0, 19, 32, 497, DateTimeKind.Local).AddTicks(8073), null, "", "superadmin@admin.com", true, null, null, null, null, "Super", true, "Admin", false, null, null, null, "", new DateTime(2024, 8, 6, 0, 19, 32, 497, DateTimeKind.Local).AddTicks(8087), null, "SUPERADMIN@ADMIN.COM", "SUPERADMIN@ADMIN.COM", "", "AQAAAAIAAYagAAAAEFnIVsF7zLPuoh7vfJ1pulf2drvC7mRY2I4IkCiC5zfHEcyOr6IjtDhT8OaX3f4RDA==", null, null, false, null, "noimage.png", "23a1a01c-ba5a-45db-af93-973c1b01023c", null, null, null, false, "superadmin@admin.com", "superadmin@123#Admin" },
+                    { "7375512a-4e4b-4178-babc-1de292b177b4", 0, "ce061d8b-b3e7-42b6-850c-4147dab35679", "2314094f-0974-4783-ae24-97b801faf01d", new DateTime(2024, 8, 6, 0, 19, 32, 622, DateTimeKind.Local).AddTicks(663), null, "", "customer@admin.com", true, null, null, null, null, "Customer", true, "Admin", false, null, null, null, "2314094f-0974-4783-ae24-97b801faf01d", new DateTime(2024, 8, 6, 0, 19, 32, 622, DateTimeKind.Local).AddTicks(675), null, "CUSTOMER@ADMIN.COM", "CUSTOMER@ADMIN.COM", "2314094f-0974-4783-ae24-97b801faf01d", "AQAAAAIAAYagAAAAEFlXrUVoWzZfMkQiDy9AlvFoWkG15FxIiGW9Gjz3xD/a855kKjDO7KEi+RoGFhMAGQ==", null, null, false, null, "noimage.png", "0f15cfb6-0abe-4898-919b-ebf37d441f28", null, null, null, false, "customer@admin.com", "superadmin@123#Admin" }
                 });
 
             migrationBuilder.InsertData(
                 table: "AspNetUserRoles",
-                columns: new[] { "RoleId", "UserId" },
+                columns: new[] { "RoleId", "UserId", "AccessLevelID", "CreateByID", "CreatedDate", "Discriminator", "PersonStatusID", "UpdatedByID", "UpdatedDate" },
                 values: new object[,]
                 {
-                    { "bda30051-c030-467c-93e8-ae3e0b5bee4e", "2314094f-0974-4783-ae24-97b801faf01d" },
-                    { "e15c12c3-5582-4711-9306-984e0df1dcdd", "7375512a-4e4b-4178-babc-1de292b177b4" }
+                    { "bda30051-c030-467c-93e8-ae3e0b5bee4e", "2314094f-0974-4783-ae24-97b801faf01d", 1, "2314094f-0974-4783-ae24-97b801faf01d", new DateTime(2024, 8, 6, 0, 19, 32, 633, DateTimeKind.Local).AddTicks(8057), "AspNetUserRole", 1, "2314094f-0974-4783-ae24-97b801faf01d", new DateTime(2024, 8, 6, 0, 19, 32, 633, DateTimeKind.Local).AddTicks(8071) },
+                    { "e15c12c3-5582-4711-9306-984e0df1dcdd", "7375512a-4e4b-4178-babc-1de292b177b4", 1, "2314094f-0974-4783-ae24-97b801faf01d", new DateTime(2024, 8, 6, 0, 19, 32, 633, DateTimeKind.Local).AddTicks(8077), "AspNetUserRole", 1, "2314094f-0974-4783-ae24-97b801faf01d", new DateTime(2024, 8, 6, 0, 19, 32, 633, DateTimeKind.Local).AddTicks(8079) }
                 });
 
             migrationBuilder.CreateIndex(

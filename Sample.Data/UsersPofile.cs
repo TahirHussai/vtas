@@ -15,7 +15,20 @@ namespace Sample.Data
         public string? ModifyById { get; set; }
         public string ParentId { get; set; }// ParentId is SuperAdminId
         public string CustomerId { get; set; }
-        
+        public string? MiddleName { get; set; }
+        public int? SufixId { get; set; }
+        public string? FamilyName { get; set; }
+        public string? NickName { get; set; }
+        public int? MailingAddressId { get; set; }
+        public int? PermanentAddressId { get; set; }
+        public int? EmailWorkId { get; set; }
+        public int? EmailPersonalId { get; set; }
+        public int? EmergencyPersonId { get; set; }
+        public int? SpouseId { get; set; }
+        public string? Title { get; set; }
+        public int? Crid { get; set; }
+        public int? PrimaryPhoneId { get; set; }
+
 
     }
 }

@@ -23,12 +23,13 @@ namespace Sample.WebApi.Models
 
             }
         }
-
+     
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
             OnModelCreatingPartial(modelBuilder);
-            modelBuilder.Entity<IdentityRole>().HasData(
+            
+        modelBuilder.Entity<IdentityRole>().HasData(
 
                 new IdentityRole
                 {
@@ -47,7 +48,7 @@ namespace Sample.WebApi.Models
                        Name = "Vendor",
                        NormalizedName = "VENDOR",
                        Id = "04552f0c-1204-454f-88fe-dd5346ec5faf"
-                   } ,
+                   },
                    new IdentityRole
                    {
                        Name = "Applicant",
@@ -78,7 +79,7 @@ namespace Sample.WebApi.Models
                    Email = "superadmin@admin.com",
                    NormalizedEmail = "SUPERADMIN@ADMIN.COM",
                    PasswordHash = hash.HashPassword(null, "superadmin@123#Admin"),
-                   UserPassword= "superadmin@123#Admin",
+                   UserPassword = "superadmin@123#Admin",
                    UserName = "superadmin@admin.com",
                    NormalizedUserName = "SUPERADMIN@ADMIN.COM",
                    FirstName = "Super",
@@ -88,10 +89,10 @@ namespace Sample.WebApi.Models
                    ModifyById = "",
                    CreatedDate = DateTime.Now,
                    ModifyDate = DateTime.Now,
-                   ProfilePicture ="noimage.png",
-                   CustomerId="",
-                   IsActive=true,
-                   EmailConfirmed=true
+                   ProfilePicture = "noimage.png",
+                   CustomerId = "",
+                   IsActive = true,
+                   EmailConfirmed = true
                },
                 new UserPofile
                 {
@@ -104,37 +105,48 @@ namespace Sample.WebApi.Models
                     FirstName = "Customer",
                     Lastname = "Admin",
                     CreatedDate = DateTime.Now,
-                    ModifyDate=DateTime.Now,
+                    ModifyDate = DateTime.Now,
                     ParentId = "2314094f-0974-4783-ae24-97b801faf01d",
                     CreatedById = "2314094f-0974-4783-ae24-97b801faf01d",
                     ModifyById = "2314094f-0974-4783-ae24-97b801faf01d",
                     ProfilePicture = "noimage.png",
                     CustomerId = "",
-                      IsActive = true,
+                    IsActive = true,
                     EmailConfirmed = true,
                     UserPassword = "superadmin@123#Admin",
                 }
           );
-            modelBuilder.Entity<IdentityUserRole<string>>().HasData(
 
-               new IdentityUserRole<string>
-               {
-                   UserId = "2314094f-0974-4783-ae24-97b801faf01d",
-                   RoleId = "bda30051-c030-467c-93e8-ae3e0b5bee4e"
-               },
-                new IdentityUserRole<string>
-                {
-                    UserId = "7375512a-4e4b-4178-babc-1de292b177b4",
-                    RoleId = "e15c12c3-5582-4711-9306-984e0df1dcdd"
-
-                }
-          );
+            modelBuilder.Entity<AspNetUserRole>().HasData(
+            new AspNetUserRole
+            {
+                UserId = "2314094f-0974-4783-ae24-97b801faf01d",
+                RoleId = "bda30051-c030-467c-93e8-ae3e0b5bee4e",
+                AccessLevelID = 1,
+                CreateByID = "2314094f-0974-4783-ae24-97b801faf01d",
+                CreatedDate = DateTime.Now,
+                PersonStatusID = 1,
+                UpdatedByID = "2314094f-0974-4783-ae24-97b801faf01d",
+                UpdatedDate = DateTime.Now
+            },
+            new AspNetUserRole
+            {
+                UserId = "7375512a-4e4b-4178-babc-1de292b177b4",
+                RoleId = "e15c12c3-5582-4711-9306-984e0df1dcdd",
+                AccessLevelID = 1,
+                CreateByID = "2314094f-0974-4783-ae24-97b801faf01d",
+                CreatedDate = DateTime.Now,
+                PersonStatusID = 1,
+                UpdatedByID = "2314094f-0974-4783-ae24-97b801faf01d",
+                UpdatedDate = DateTime.Now
+            }
+        );
 
 
 
 
         }
-     
-     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+
+        partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
     }
 }
