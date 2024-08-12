@@ -10,15 +10,19 @@
   <ItemGroup>
     <Compile Remove="Contract\**" />
     <Compile Remove="Data\**" />
+    <Compile Remove="Models\**" />
     <Compile Remove="Services\**" />
     <Content Remove="Contract\**" />
     <Content Remove="Data\**" />
+    <Content Remove="Models\**" />
     <Content Remove="Services\**" />
     <EmbeddedResource Remove="Contract\**" />
     <EmbeddedResource Remove="Data\**" />
+    <EmbeddedResource Remove="Models\**" />
     <EmbeddedResource Remove="Services\**" />
     <None Remove="Contract\**" />
     <None Remove="Data\**" />
+    <None Remove="Models\**" />
     <None Remove="Services\**" />
   </ItemGroup>
 
@@ -55,7 +59,6 @@
 
   <ItemGroup>
     <Folder Include="Migrations\" />
-    <Folder Include="Models\" />
   </ItemGroup>
 
 </Project>

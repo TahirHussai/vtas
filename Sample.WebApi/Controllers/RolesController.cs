@@ -4,8 +4,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Sample.Data;
 using Sample.DTOS;
-using Sample.WebApi.Models;
+
 
 
 namespace Sample.WebApi.Controllers

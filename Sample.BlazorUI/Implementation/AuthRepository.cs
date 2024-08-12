@@ -10,16 +10,17 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using System.Text;
 using Sample.Common.EndPoint;
+using Sample.Services.Implementations;
 
 namespace Sample.BlazorUI.Implementation
 {
     public class AuthRepository : IAuthRepository
     {
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly ILocalStorageService _localStorageService;
+        private readonly LocalStorageService _localStorageService;
         private readonly AuthenticationProvider _authenticationProvider;
         private readonly string _baseUrl;
-        public AuthRepository(AuthenticationProvider authenticationProvider, ILocalStorageService localStorageService,
+        public AuthRepository(AuthenticationProvider authenticationProvider, LocalStorageService localStorageService,
             IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             _httpClientFactory = httpClientFactory;
@@ -30,7 +31,11 @@ namespace Sample.BlazorUI.Implementation
 
         public async Task<bool> Login(LoginDTO dto)
         {
-
+            var role = await _localStorageService.GetItemAsync("LoginUserRole");
+            if (!string.IsNullOrEmpty(role))
+            {
+                dto.Role = role;
+            }
             var request = new HttpRequestMessage(HttpMethod.Post, _baseUrl + StaticEndPoint.AuthLoginEndpoint)
             {
                 Content = new StringContent(JsonConvert.SerializeObject(dto), Encoding.UTF8, "application/json")

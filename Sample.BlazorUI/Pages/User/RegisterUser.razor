@@ -5,7 +5,7 @@
 @inject IAuthRepository _authRepo
 @inject ISnackbar Snackbar
 @inject NavigationManager _navManager
-@inject ILocalStorageService _localStorage
+@inject LocalStorageService _localStorage
 
 
 <MudForm Model="@model" @ref="form" ValidationDelay="0">
@@ -18,13 +18,13 @@
 
     <MudTextField T="string" @bind-Value="model.Password" Label="Password" Variant="Variant.Outlined" Adornment="Adornment.End" For="@(() => model.Password)" Required="true" />
     <MudSelect T="string" @bind-Value="model.RoleName" Label="Select User Role" Variant="Variant.Outlined">
-    @foreach (var role in allRoles)
-    {
+        @foreach (var role in allRoles)
+        {
             <MudSelectItem T="string" Value="@role">@role</MudSelectItem>
-    }
+        }
     </MudSelect>
 
-   
+
     <MudButton Variant="Variant.Filled" class="mt-5" Color="Color.Primary" OnClick="HandleRegister" Size="Size.Large" FullWidth="true">Reister</MudButton>
 </MudForm>
 @code {
@@ -34,9 +34,9 @@
     private bool response = true;
     protected override async Task OnInitializedAsync()
     {
-        var role = await _localStorage.GetItemAsync<string>("Role");
+        var role = await _localStorage.GetItemAsync("Role");
         allRoles = await UserRoleHelper.GetAllUserRoleNames();
-       
+
         if (!string.IsNullOrEmpty(role) && role.Contains("SuperAdmin"))
         {
             allRoles.Remove("SuperAdmin");
@@ -66,10 +66,10 @@
         await form.Validate();
         if (form.IsValid)
         {
-            var role = await _localStorage.GetItemAsync<string>("Role");
-            var CustomerId = await _localStorage.GetItemAsync<string>("CustomerId");
-            var ParentId = await _localStorage.GetItemAsync<string>("ParentId");
-            var LoginUserId = await _localStorage.GetItemAsync<string>("LoginUserId");
+            var role = await _localStorage.GetItemAsync("Role");
+            var CustomerId = await _localStorage.GetItemAsync("CustomerId");
+            var ParentId = await _localStorage.GetItemAsync("ParentId");
+            var LoginUserId = await _localStorage.GetItemAsync("LoginUserId");
             if (!string.IsNullOrEmpty(role) && role.Contains("SuperAdmin"))
             {
                 model.SuperAdminId = LoginUserId;
@@ -98,7 +98,7 @@
 
             if (response)
             {
-                
+
                 Snackbar.Add("Register successfully!.", MudBlazor.Severity.Success);
                 _navManager.NavigateTo("/cardlist");
             }

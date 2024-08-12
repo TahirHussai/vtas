@@ -1,31 +1,38 @@
-﻿@page "/multiLogns"
+﻿@page "/"
+@page "/multiLogns"
 @layout LogInLayout
+@inject LocalStorageService  _localStorage
+@inject NavigationManager _navManager
 
 <MudContainer Class="d-flex justify-center align-center mt-5" >
     <MudPaper Class="pa-4 text-center" Elevation="4">
         <MudText Typo="Typo.h4" Class="mb-4">Select Login Type</MudText>
         <MudGrid Justify="Justify.Center" AlignItems="AlignItems.Center">
             <MudItem xs="12" sm="12" md="12">
-                <MudButton Href="/" Variant="Variant.Filled" Color="Color.Primary" >Admin Login</MudButton>
+                <MudButton @onclick="() => SetRole(UserRole.SuperAdmin.ToString())" Variant="Variant.Filled" Color="Color.Primary">Admin Login</MudButton>
             </MudItem>
             <MudItem xs="12" sm="12" md="12">
-                <MudButton Href="/" Variant="Variant.Filled" Color="Color.Secondary">Customer Login</MudButton>
+                <MudButton @onclick="() => SetRole(UserRole.Customer.ToString())" Variant="Variant.Filled" Color="Color.Secondary">Customer Login</MudButton>
             </MudItem>
             <MudItem xs="12" sm="12" md="12">
-                <MudButton Href="/" Variant="Variant.Filled" Color="Color.Tertiary">Client Login</MudButton>
+                <MudButton @onclick="() => SetRole(UserRole.Client.ToString())" Variant="Variant.Filled" Color="Color.Tertiary">Client Login</MudButton>
             </MudItem>
             <MudItem xs="12" sm="12" md="12">
-                <MudButton Href="/" Variant="Variant.Filled" Color="Color.Dark">Vendor Login</MudButton>
+                <MudButton @onclick="() => SetRole(UserRole.Vendor.ToString())" Variant="Variant.Filled" Color="Color.Dark">Vendor Login</MudButton>
             </MudItem>
             <MudItem xs="12" sm="12" md="12">
-                <MudButton Href="/" Variant="Variant.Filled" Color="Color.Default">Recruiter Login</MudButton>
+                <MudButton @onclick="() => SetRole(UserRole.Recruiter.ToString())" Variant="Variant.Filled" Color="Color.Default">Recruiter Login</MudButton>
             </MudItem>
             <MudItem xs="12" sm="12" md="12">
-                <MudButton Href="/" Variant="Variant.Filled" Color="Color.Inherit">Applicant Login</MudButton>
+                <MudButton @onclick="() => SetRole(UserRole.Applicant.ToString())" Variant="Variant.Filled" Color="Color.Inherit">Applicant Login</MudButton>
             </MudItem>
         </MudGrid>
     </MudPaper>
 </MudContainer>
 @code {
-
+    private async Task SetRole(string Role)
+    {
+        await _localStorage.SetItemAsync("LoginUserRole", Role);
+        _navManager.NavigateTo("/login");
+    }
 }

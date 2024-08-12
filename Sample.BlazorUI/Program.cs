@@ -5,6 +5,7 @@ using Sample.BlazorUI.AuthProvider;
 using Sample.BlazorUI.Data;
 using Sample.BlazorUI.Implementation;
 using Sample.BlazorUI.Service;
+using Sample.Services.Implementations;
 using System.IdentityModel.Tokens.Jwt;
 
 
@@ -18,6 +19,7 @@ builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddTransient<IAuthRepository, AuthRepository>();
 builder.Services.AddMudServices();
 builder.Services.AddBlazoredLocalStorage();
+builder.Services.AddScoped<LocalStorageService>();
 builder.Services.AddScoped<AuthenticationProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(p =>
 p.GetRequiredService<AuthenticationProvider>());

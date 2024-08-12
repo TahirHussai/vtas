@@ -19,6 +19,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Sample.Common\Sample.Common.csproj" />
     <ProjectReference Include="..\Sample.DTOS\Sample.DTOS.csproj" />
+    <ProjectReference Include="..\Sample.Services\Sample.Services.csproj" />
+    <ProjectReference Include="..\Sample.WebApi\Sample.WebApi.csproj" />
   </ItemGroup>
 
 </Project>

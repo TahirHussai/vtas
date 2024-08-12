@@ -6,7 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Sample.Data;
 using Sample.Mapper.Configuration;
-using Sample.WebApi.Models;
+using Sample.Services.Configuration;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
@@ -19,7 +19,8 @@ var connectionString = configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<App_BlazorDBContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddScoped<JwtSecurityTokenHandler>();
-
+// Call the ConfigureServices method to register services
+ServiceConfiguration.ConfigureServices(builder.Services, builder.Configuration);
 // Configure Identity options and add Identity services
 builder.Services.AddIdentity<UserPofile, IdentityRole>(options =>
 {
