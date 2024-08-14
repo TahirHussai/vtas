@@ -363,7 +363,7 @@ namespace Sample.Services.Implementations
                 UserId = user.Id,
                 CustomerId = CustomerId,
                 SuperAdminId = ParentId,
-                Role = Role,
+                Role = rle,
                 Token = token,
                 UserName = user.FirstName + (string.IsNullOrEmpty(user.Lastname) ? "" : " " + user.Lastname),
             };
