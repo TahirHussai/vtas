@@ -16,7 +16,8 @@
     {
         public bool IsSuccess { get; set; }
         public string Message { get; set; }
-        public Object Obj { get; set; }
+        public object Obj { get; set; }
     }
 
-    }
+
+}

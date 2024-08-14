@@ -3,6 +3,7 @@
 
 @inject IAuthRepository _authRepo
 @inject ISnackbar Snackbar
+@inject ILocalStorageService _localStorage
 <style>
     .role-assignment-header {
         background-color: #f5f5f5;
@@ -64,6 +65,12 @@
         var roleIds = user.Roles.Where(r => r.IsAssigned).Select(r => r.RoleId).ToList();
         dto.RoleIds = roleIds;
         dto.UserId = user.UserId;
+        dto.CreateByID = await _localStorage.GetItemAsync<string>("LoginUserId");
+        dto.UpdatedByID = await _localStorage.GetItemAsync<string>("LoginUserId");
+        dto.UpdatedDate = DateTime.Now;
+        dto.CreatedDate = DateTime.Now;
+        dto.AccessLevelID = 1;
+        dto.PersonStatusID = 1;
         var success = await UpdateUserRolesAsync(dto);
         if (success)
         {

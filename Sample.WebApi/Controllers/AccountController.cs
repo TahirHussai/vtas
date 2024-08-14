@@ -23,26 +23,24 @@ namespace Sample.WebApi.Controllers
         [Route("UserLogin")]
         public async Task<ActionResult<CustomResponseDto>> Login(LoginDTO userDto)
         {
+            var response = new CustomResponseDto();
             if (userDto == null)
             {
-                return BadRequest(new CustomResponseDto { IsSuccess = false, Message = "Invalid data", Obj = null });
+                response = new CustomResponseDto { IsSuccess = false, Message = "Invalid data", Obj = null };
+                return BadRequest(response);
             }
 
             try
             {
                 _logger.LogInformation($"Attempting login for {userDto.Email}");
-                var response = await _authService.LoginUser(userDto);
-                return Ok(new CustomResponseDto { IsSuccess = true, Message = "Login successful", Obj = response });
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                _logger.LogWarning($"Unauthorized login attempt for {userDto.Email}");
-                return Unauthorized(new CustomResponseDto { IsSuccess = false, Message = ex.Message, Obj = null });
+                response = await _authService.LoginUser(userDto);
+                return response;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error during login for {userDto.Email}");
-                return StatusCode(500, new CustomResponseDto { IsSuccess = false, Message = ex.Message, Obj = null });
+                response = new CustomResponseDto { IsSuccess = false, Message = ex.Message, Obj = null };
+                return BadRequest(response);
             }
         }
 
@@ -50,21 +48,23 @@ namespace Sample.WebApi.Controllers
         [Route("UserRegister")]
         public async Task<ActionResult<CustomResponseDto>> Register([FromBody] UserDto userDto)
         {
+            var response = new CustomResponseDto();
             if (userDto == null)
             {
-                return BadRequest(new CustomResponseDto { IsSuccess = false, Message = "Invalid data", Obj = null });
+                response = new CustomResponseDto { IsSuccess = false, Message = "Invalid data", Obj = null };
+                return BadRequest(response);
             }
-
             try
             {
                 _logger.LogInformation($"Attempting registration for {userDto.Email}");
-                await _authService.RegisterUser(userDto);
-                return Ok(new CustomResponseDto { IsSuccess = true, Message = "Registration successful", Obj = null });
+                response = await _authService.RegisterUser(userDto);
+                return Ok(response);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error during registration for {userDto.Email}");
-                return StatusCode(500, new CustomResponseDto { IsSuccess = false, Message = ex.Message, Obj = null });
+                response = new CustomResponseDto { IsSuccess = false, Message = ex.Message, Obj = null };
+                return BadRequest(response);
             }
         }
 
@@ -72,42 +72,57 @@ namespace Sample.WebApi.Controllers
         public async Task<ActionResult<CustomResponseDto>> GetUserById(string userId)
         {
             var user = await _authService.GetUserById(userId);
-            return Ok(new CustomResponseDto { IsSuccess = true, Message = "User retrieved successfully", Obj = user });
+            return user;
         }
 
         [HttpGet("users-with-roles")]
         public async Task<ActionResult<CustomResponseDto>> GetAllUsersWithRoles()
         {
             var users = await _authService.GetAllUsersWithRoles();
-            return Ok(new CustomResponseDto { IsSuccess = true, Message = "Users retrieved successfully", Obj = users });
+            return users;
+        }
+        [HttpPost]
+        [Route("assign-roles")]
+        public async Task<ActionResult<CustomResponseDto>> AssignNewRole(UserRoleAssignmentDto dto)
+        {
+            var roles = await _authService.AssignNewRole(dto);
+            return roles;
+        }
+        [HttpGet("AllUsersWithRole")]
+        //[Authorize(Roles = "SuperAdmin")] // Optional: Require Admin role to access this endpoint
+        public async Task<ActionResult<CustomResponseDto>> GetAllUsersWithRole()
+        {
+            var users = await _authService.GetUsersWithRole();
+
+            return users;
         }
 
         [HttpGet("GetCustomerUsersWithRoles")]
         public async Task<ActionResult<CustomResponseDto>> GetCustomerUsersWithRoles(string customerId)
         {
             var users = await _authService.GetCustomerUsersWithRoles(customerId);
-            return Ok(new CustomResponseDto { IsSuccess = true, Message = "Customer users retrieved successfully", Obj = users });
+            return users;
         }
 
         [HttpGet("GetClientUsersWithRoles/{clientId}/{customerId}")]
         public async Task<ActionResult<CustomResponseDto>> GetClientUsersWithRoles(string clientId, string customerId)
         {
             var users = await _authService.GetClientUsersWithRoles(clientId, customerId);
-            return Ok(new CustomResponseDto { IsSuccess = true, Message = "Client users retrieved successfully", Obj = users });
+            return users;
         }
 
         [HttpGet("GetVendorsUsersWithRoles/{vendorId}/{customerId}")]
         public async Task<ActionResult<CustomResponseDto>> GetVendorsUsersWithRoles(string vendorId, string customerId)
         {
             var user = await _authService.GetVendorsUsersWithRoles(vendorId, customerId);
-            return Ok(new CustomResponseDto { IsSuccess = true, Message = "Vendor users retrieved successfully", Obj = user });
+            return user;
         }
 
         [HttpGet("GetRecruiterUsersWithRoles/{recruiterId}/{customerId}")]
         public async Task<ActionResult<CustomResponseDto>> GetRecruiterUsersWithRoles(string recruiterId, string customerId)
         {
             var user = await _authService.GetRecruiterUsersWithRoles(recruiterId, customerId);
-            return Ok(new CustomResponseDto { IsSuccess = true, Message = "Recruiter users retrieved successfully", Obj = user });
+            return user;
         }
     }
 

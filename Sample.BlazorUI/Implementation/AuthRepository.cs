@@ -29,8 +29,9 @@ namespace Sample.BlazorUI.Implementation
             _baseUrl = GetBaseUrl(httpClientFactory);
         }
 
-        public async Task<bool> Login(LoginDTO dto)
+        public async Task<CustomResponseDto> Login(LoginDTO dto)
         {
+            var ApiResponse = new CustomResponseDto();
             var role = await _localStorageService.GetItemAsync("LoginUserRole");
             if (!string.IsNullOrEmpty(role))
             {
@@ -43,19 +44,22 @@ namespace Sample.BlazorUI.Implementation
             var client = _httpClientFactory.CreateClient();
 
             HttpResponseMessage response = await client.SendAsync(request);
-            if (!response.IsSuccessStatusCode)
-            {
-                return false;
-            }
+           
             var content = await response.Content.ReadAsStringAsync();
-            await SetUserData(content);
+            var jsonObject = JObject.Parse(content);
+            ApiResponse = jsonObject["result"].ToObject<CustomResponseDto>();
+            if (ApiResponse != null)
+            {
+                await SetUserData(content);
+            }
+         
             //await StoreTokensAndUserData(Apiresponse);
 
             //// Change auth state of app
             //await ((AuthenticationProvider)_authenticationProvider).LoggedIn(Apiresponse.Email);
             //client.DefaultRequestHeaders.Authorization =
             //    new AuthenticationHeaderValue("bearer", Apiresponse.TokenString);
-            return true;
+            return ApiResponse;
 
         }
 
@@ -86,7 +90,8 @@ namespace Sample.BlazorUI.Implementation
                     var content = await response.Content.ReadAsStringAsync();
 
                     var jsonObject = JObject.Parse(content);
-                    var usersList = jsonObject["result"].ToObject<List<UserWithRoleDto>>();
+                    var respnse = jsonObject["result"].ToObject<CustomResponseDto>();
+                    var usersList = JsonConvert.DeserializeObject<List<UserWithRoleDto>>(Convert.ToString(respnse.Obj));
 
                     if (usersList?.Any() == true)
                     {
@@ -116,8 +121,8 @@ namespace Sample.BlazorUI.Implementation
                     var content = await response.Content.ReadAsStringAsync();
 
                     var jsonObject = JObject.Parse(content);
-                    var usersList = jsonObject["result"].ToObject<List<UserWithRoleDto>>();
-
+                    var respnse = jsonObject["result"].ToObject<CustomResponseDto>();
+                    var usersList = JsonConvert.DeserializeObject<List<UserWithRoleDto>>(Convert.ToString(respnse.Obj));
                     if (usersList?.Any() == true)
                     {
                         list = usersList;
@@ -200,9 +205,9 @@ namespace Sample.BlazorUI.Implementation
 
         private async Task SetUserData(string content)
         {
-            //var Apiresponse = JsonConvert.DeserializeObject<ResponseDto>(content);
+          
             var jsonObject = JObject.Parse(content);
-            var Apiresponse = jsonObject["result"].ToObject<ResponseDto>();
+            var Apiresponse = jsonObject["result"]["obj"].ToObject<ResponseDto>();
             await _localStorageService.SetItemAsync("CreatedById", Apiresponse.CreatedById);
             await _localStorageService.SetItemAsync("CustomerId", Apiresponse.CustomerId);
             await _localStorageService.SetItemAsync("ParentId", Apiresponse.SuperAdminId);
@@ -264,7 +269,7 @@ namespace Sample.BlazorUI.Implementation
 
                 var content = await response.Content.ReadAsStringAsync();
                 var jsonObject = JObject.Parse(content);
-                usersList = jsonObject["result"].ToObject<List<UsersWithRolesDto>>();
+                usersList = jsonObject["result"]["obj"].ToObject<List<UsersWithRolesDto>>();
                 //  usersList = JsonConvert.DeserializeObject<List<UsersWithRolesDto>>(content);
             }
             catch (Exception ex)

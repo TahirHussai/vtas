@@ -4,7 +4,7 @@ namespace Sample.BlazorUI.Service
 {
     public interface IAuthRepository
     {
-        Task<bool> Login(LoginDTO dto);
+        Task<CustomResponseDto> Login(LoginDTO dto);
         public Task<bool> Register(UserDto dto);
         public Task Logout();
         public Task<List<UsersWithRolesDto>> GetUsersWithRolesAsync();

@@ -19,10 +19,12 @@ namespace Sample.Services.Implementations
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IMapper _mapper;
         private readonly IUserService _userService;
-        
+
         private readonly IConfiguration _configuration;
         private readonly JwtSecurityTokenHandler _jwtSecurityTokenHandler;
         private readonly ILogger<AuthService> _logger;
+        private readonly App_BlazorDBContext _context;
+
 
         public AuthService(
             UserManager<UserPofile> userManager,
@@ -31,7 +33,8 @@ namespace Sample.Services.Implementations
             IUserService userService,
             IConfiguration configuration,
             JwtSecurityTokenHandler jwtSecurityTokenHandler,
-            ILogger<AuthService> logger)
+            ILogger<AuthService> logger,
+            App_BlazorDBContext context)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -40,30 +43,38 @@ namespace Sample.Services.Implementations
             _configuration = configuration;
             _jwtSecurityTokenHandler = jwtSecurityTokenHandler;
             _logger = logger;
+            _context = context;
         }
+
 
         public async Task<CustomResponseDto> LoginUser(LoginDTO userDto)
         {
+            var Obj = new ResponseDto();
             var user = await _userManager.FindByEmailAsync(userDto.Email);
-            if (user == null || !await _userManager.CheckPasswordAsync(user, userDto.Password))
+            if (user == null)
             {
-                _logger.LogWarning($"Invalid login attempt for {userDto.Email}");
-                return new CustomResponseDto { IsSuccess = false, Message = "Invalid credentials" };
+                _logger.LogWarning($"Invalid Email {userDto.Email}");
+                return new CustomResponseDto { IsSuccess = false, Message = "Invalid Email" };
             }
-
-            var token = await GenerateToken(user);
-            var role = _roleManager.FindByNameAsync(userDto.Role);
+            if (user != null && !await _userManager.CheckPasswordAsync(user, userDto.Password))
+            {
+                _logger.LogWarning($"Invalid Password for {userDto.Email}");
+                return new CustomResponseDto { IsSuccess = false, Message = "Invalid Password" };
+            }
+            var UserRole = await _roleManager.FindByNameAsync(userDto.Role);
+            var roles = await _userManager.GetRolesAsync(user);
+            var rle = roles.Where(a => a.Contains(userDto.Role)).FirstOrDefault();
+            if (rle == null)
+            {
+                _logger.LogWarning($"Invalid Role for {userDto.Email}");
+                return new CustomResponseDto { IsSuccess = false, Message = $"User {userDto.Email} don't has Role like {userDto.Role}" };
+            }
+            var obj = await GetUser(user, userDto.Role);
             return new CustomResponseDto
             {
                 IsSuccess = true,
                 Message = "Login successful",
-                Obj = new ResponseDto
-                {
-                    Token = token,
-                    Email = user.Email,
-                    UserName = $"{user.FirstName} {user.Lastname}",
-                    Role = role.ToString(),
-                }
+                Obj = obj
             };
         }
 
@@ -71,7 +82,12 @@ namespace Sample.Services.Implementations
         {
             var user = _mapper.Map<UserPofile>(userDto);
             user.UserName = userDto.Email;
-
+            var UserExist = await _userManager.FindByEmailAsync(userDto.Email);
+            if (UserExist != null)
+            {
+                _logger.LogWarning($"A user with {userDto.Email} is already registered");
+                return new CustomResponseDto { IsSuccess = false, Message = "A user with {userDto.Email} is already registered, Please try with other one" };
+            }
             var result = await _userManager.CreateAsync(user, userDto.Password);
             if (!result.Succeeded)
             {
@@ -100,6 +116,7 @@ namespace Sample.Services.Implementations
             return new CustomResponseDto { IsSuccess = true, Message = "Registration successful" };
         }
 
+
         public async Task<CustomResponseDto> GetUserById(string userId)
         {
             try
@@ -118,8 +135,35 @@ namespace Sample.Services.Implementations
         {
             try
             {
-                var users = await _userManager.Users.ToListAsync();
-                return new CustomResponseDto { IsSuccess = true, Message = "Users retrieved successfully", Obj = await MapUsersToRoles(users) };
+                var users = _userManager.Users.ToList();
+                var roles = _roleManager.Roles.ToList();
+                var userRoles = new List<UsersWithRolesDto>();
+
+                foreach (var user in users)
+                {
+                    var userRolesDto = new UsersWithRolesDto
+                    {
+                        UserId = user.Id,
+                        UserName = $"{user.FirstName} {user.Lastname}",
+                        Email = user.Email,
+                        Roles = new List<RoleDto>()
+                    };
+
+                    foreach (var role in roles)
+                    {
+                        var isAssigned = await _userManager.IsInRoleAsync(user, role.Name);
+
+
+                        userRolesDto.Roles.Add(new RoleDto
+                        {
+                            RoleId = role.Id,
+                            RoleName = role.Name,
+                            IsAssigned = isAssigned
+                        });
+                    }
+                    userRoles.Add(userRolesDto);
+                }
+                return new CustomResponseDto { IsSuccess = true, Message = "Users retrieved successfully", Obj = userRoles };
             }
             catch (Exception ex)
             {
@@ -127,17 +171,40 @@ namespace Sample.Services.Implementations
                 return new CustomResponseDto { IsSuccess = false, Message = ex.Message };
             }
         }
+        public async Task<CustomResponseDto> GetUsersWithRole()
+        {
+            var users = _userManager.Users.ToList();
 
-        public async Task<CustomResponseDto> GetCustomerUsersWithRoles(string customerId)
+            return new CustomResponseDto { IsSuccess = true, Message = "Users retrieved successfully", Obj = await MapUsersToRoles(users) };
+        }
+        public async Task<CustomResponseDto> GetCustomerUsersWithRoles(string CustomerId)
         {
             try
             {
-                var users = await _userManager.Users.Where(u => u.CustomerId == customerId).ToListAsync();
-                return new CustomResponseDto { IsSuccess = true, Message = "Users retrieved successfully", Obj = await MapUsersToRoles(users) };
+                var userRoles = new List<UserWithRoleDto>();
+                if (!string.IsNullOrEmpty(CustomerId))
+                {
+                    var usersList = await _userManager.Users.Where(a => a.CustomerId == CustomerId).ToListAsync();
+                    foreach (var user in usersList)
+                    {
+                        var roles = await _userManager.GetRolesAsync(user);
+                        userRoles.Add(new UserWithRoleDto
+                        {
+                            Id = user.Id,
+                            UserName = user.FirstName + (string.IsNullOrEmpty(user.Lastname) ? "" : " " + user.Lastname),
+                            Email = user.Email,
+                            Role = roles.FirstOrDefault(),
+                            CustomerId = user.CustomerId,
+                            ParentId = user.ParentId
+                        });
+                    }
+
+                }
+                return new CustomResponseDto { IsSuccess = true, Message = "Users retrieved successfully", Obj = userRoles };
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error retrieving users for customer {customerId}");
+                _logger.LogError(ex, $"Error retrieving users for customer {CustomerId}");
                 return new CustomResponseDto { IsSuccess = false, Message = ex.Message };
             }
         }
@@ -223,7 +290,21 @@ namespace Sample.Services.Implementations
             var userRoles = new List<UserWithRoleDto>();
             foreach (var user in users)
             {
-                userRoles.Add(await MapUserToRole(user));
+                var roles = await _userManager.GetRolesAsync(user);
+                if (roles.Any())
+                {
+
+                    foreach (var role in roles)
+                    {
+                        userRoles.Add(new UserWithRoleDto
+                        {
+                            Id = user.Id,
+                            UserName = $"{user.FirstName} {user.Lastname}",
+                            Email = user.Email,
+                            Role = role
+                        });
+                    }
+                }
             }
             return userRoles;
         }
@@ -231,6 +312,7 @@ namespace Sample.Services.Implementations
         private async Task<UserWithRoleDto> MapUserToRole(UserPofile user)
         {
             var roles = await _userManager.GetRolesAsync(user);
+
             return new UserWithRoleDto
             {
                 Id = user.Id,
@@ -239,6 +321,102 @@ namespace Sample.Services.Implementations
                 Role = roles.ToString()
             };
         }
-    }
+        private async Task<ResponseDto> GetUser(UserPofile user, string Role)
+        {
+            string ParentId = "0";
+            string CustomerId = "0";
 
+            string role = "";
+
+            var roles = await _userManager.GetRolesAsync(user);
+            var rle = roles.Where(a => a.Contains(Role)).FirstOrDefault();
+            if (rle != null)
+            {
+                Role = roles.FirstOrDefault();
+                if (rle.Contains("SuperAdmin"))
+                {
+                    ParentId = user.Id;
+                }
+                if (rle.Contains("Customer"))
+                {
+                    ParentId = user.ParentId;
+                    CustomerId = user.Id;
+                }
+                if (rle.Contains("Vendor"))
+                {
+                    ParentId = user.ParentId;
+                    CustomerId = user.CustomerId;
+                }
+                if (rle.Contains("Client"))
+                {
+                    ParentId = user.ParentId;
+                    CustomerId = user.CustomerId;
+                }
+            }
+            // var encodedTokenString = Base64UrlEncoder.Encode(tokenString);
+            var token = await GenerateToken(user);
+
+            var response = new ResponseDto
+            {
+                Email = user.Email,
+                CreatedById = user.CreatedById,
+                UserId = user.Id,
+                CustomerId = CustomerId,
+                SuperAdminId = ParentId,
+                Role = Role,
+                Token = token,
+                UserName = user.FirstName + (string.IsNullOrEmpty(user.Lastname) ? "" : " " + user.Lastname),
+            };
+            return response;
+        }
+
+        public async Task<CustomResponseDto> AssignNewRole(UserRoleAssignmentDto userDto)
+        {
+            var user = await _userManager.FindByIdAsync(userDto.UserId);
+            if (user == null)
+            {
+                _logger.LogWarning($"User with ID {userDto.UserId} not found.");
+                return new CustomResponseDto { IsSuccess = false, Message = "Invalid Email" };
+            }
+            // Get the current roles of the user
+            var currentRoles = await _userManager.GetRolesAsync(user);
+
+            // Remove existing roles
+            await _userManager.RemoveFromRolesAsync(user, currentRoles);
+
+            foreach (var roleId in userDto.RoleIds)
+            {
+                var role = await _roleManager.FindByIdAsync(roleId);
+                if (role == null)
+                {
+                    _logger.LogWarning($"User with Role {role} with UserId {userDto.UserId} not found.");
+                    return new CustomResponseDto { IsSuccess = false, Message = "Role Not Exist" };
+                }
+
+                var userRole = new AspNetUserRole();
+
+
+
+
+                if (userRole != null)
+                {
+                    userRole.RoleId = roleId;
+                    userRole.UserId = userDto.UserId;
+                    userRole.Discriminator = roleId;
+                    userRole.CreateByID = userDto.CreateByID;
+                    userRole.UpdatedByID = userDto.UpdatedByID;
+                    userRole.UpdatedDate = userDto.UpdatedDate;
+                    userRole.CreatedDate = userDto.CreatedDate;
+                    userRole.AccessLevelID = userDto.AccessLevelID;
+                    userRole.PersonStatusID = userDto.PersonStatusID;
+                    // Update other fields as needed
+
+                    await _context.UserRoles.AddAsync(userRole);
+                    _context.SaveChanges();
+                }
+            }
+            _logger.LogWarning($"Role Assigned Successfully");
+            return new CustomResponseDto { IsSuccess = false, Message = "Role Assigned Successfully" };
+        }
+    }
 }

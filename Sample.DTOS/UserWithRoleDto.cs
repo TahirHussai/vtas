@@ -20,6 +20,12 @@ namespace Sample.DTOS
     public class UserRoleAssignmentDto
     {
         public string UserId { get; set; }
+        public string CreateByID { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public DateTime UpdatedDate { get; set; }
+        public string UpdatedByID { get; set; }
+        public int? AccessLevelID { get; set; }
+        public int? PersonStatusID { get; set; }
         public List<string> RoleIds { get; set; }
     }
     public class RoleDto

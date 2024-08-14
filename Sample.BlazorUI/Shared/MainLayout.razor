@@ -21,14 +21,18 @@
             <MudText Typo="Typo.subtitle2">Admin Dashboard</MudText>
         </MudHidden>
         <MudSpacer />
-       
-        <MudMenu Icon="@Icons.Material.Filled.Settings"
+        <MudMenu Color="Color.Inherit" Label="Setting" EndIcon="@Icons.Material.Filled.Settings" AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.TopLeft">
+            <MudMenuItem>Profile</MudMenuItem>
+            <MudMenuItem Href="/cardlist">Back to Profile</MudMenuItem>
+            <MudMenuItem Href="/Authentication/logout">Logout</MudMenuItem>
+        </MudMenu>
+      @*   <MudMenu Icon="@Icons.Material.Filled.Settings"
                  Color="Color.Inherit"
                  AriaLabel="Open user menu" OffsetX="true" OffsetY="true" Dense="true" Class="mt-1 ml-4">
             <MudMenuItem>Profile</MudMenuItem>
             <MudMenuItem Href="/cardlist">Back to Profile</MudMenuItem>
             <MudMenuItem Href="/Authentication/logout">Logout</MudMenuItem>
-        </MudMenu>
+        </MudMenu> *@
         
     </MudAppBar>
    

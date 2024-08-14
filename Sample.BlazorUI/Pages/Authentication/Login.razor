@@ -24,7 +24,7 @@
 @code {
     private MudForm form;
     private LoginDTO model = new LoginDTO();
-    private bool response = true;
+    private CustomResponseDto response = new CustomResponseDto();
 
     private async Task HandleLogin()
     {
@@ -33,14 +33,14 @@
         {
             response = await _authRepo.Login(model);
 
-            if (response)
+            if (response.IsSuccess)
             {
                 Snackbar.Add("Login successfully!.", MudBlazor.Severity.Success);
                 _navManager.NavigateTo("/cardlist");
             }
             else
             {
-                Snackbar.Add("Please provide a valid email and password!.", MudBlazor.Severity.Warning);
+                Snackbar.Add(response.Message, MudBlazor.Severity.Warning);
             }
         }
         else

@@ -28,59 +28,26 @@
 
 <MudContainer>
     <MudText Typo="Typo.h6" Color="Color.Success">Selected User : @UserName</MudText>
-        <MudButton Disabled="@(userStack.Count == 0)" OnClick="GoBack">Go Back</MudButton>
-        <MudGrid>
-            @if (usersList.Any())
+    <MudButton Disabled="@(userStack.Count == 0)" OnClick="GoBack">Go Back</MudButton>
+    <MudGrid>
+        @if (usersList.Any())
         {
-           @*  var superAdmin = usersList.Where(a => a.Role == "SuperAdmin").FirstOrDefault();
-            if (superAdmin != null)
-            {
-                <MudItem xs="12" sm="6" md="4" lg="3" class="card">
-                    <MudCard @onclick="() => OnCardClick(superAdmin.Id, superAdmin.CustomerId, superAdmin.Role)">
-                        <MudCardHeader class="card-header">
-                            <MudText Typo="Typo.h6" Color="Color.Surface">@superAdmin.Role</MudText>
-                            </MudCardHeader>
-                            <MudCardContent class="card-content">
-                                <MudText Typo="Typo.h5">@superAdmin.UserName</MudText>
-                            </MudCardContent>
-                        </MudCard>
-                    </MudItem>
-            } *@
-
-           @*  var customers = usersList.Where(a => a.CustomerId != "")
-            .Select(a => a.CustomerId)
-            .Distinct(); *@
+           
 
             foreach (var item in usersList)
             {
-                //var customer = usersList.FirstOrDefault(a => a.Id == custId );
-               // if (customer != null)
-               // {
-                    <MudItem xs="12" sm="6" md="4" lg="3" class="card">
-                    <MudCard @onclick="() => OnCardClick(item.Id, item.CustomerId, item.Role)">
-                            <MudCardHeader class="card-header">
-                            <MudText Typo="Typo.h6" Color="Color.Default">@item.Role</MudText>
-                                </MudCardHeader>
-                                <MudCardContent class="card-content">
-                                <MudText Typo="Typo.h5">@item.UserName</MudText>
-                                </MudCardContent>
-                            </MudCard>
-                        </MudItem>
-             //   }
 
-               @*  foreach (var user in usersList.Where(a => a.CustomerId == custId))
-                {
-                    <MudItem xs="12" sm="6" md="4" lg="3" class="card">
-                        <MudCard @onclick="() => OnCardClick(user.Id, user.CustomerId, user.Role)">
-                            <MudCardHeader class="card-header">
-                                <MudText Typo="Typo.h6" Color="Color.Secondary">@user.Role</MudText>
-                                </MudCardHeader>
-                                <MudCardContent class="card-content">
-                                    <MudText Typo="Typo.h5">@user.UserName</MudText>
-                                </MudCardContent>
-                            </MudCard>
-                        </MudItem>
-                } *@
+                <MudItem xs="12" sm="6" md="4" lg="3" class="card">
+                    <MudCard @onclick="() => OnCardClick(item.Id, item.CustomerId, item.Role)">
+                        <MudCardHeader class="card-header">
+                            <MudText Typo="Typo.h6" Color="Color.Default">@item.Role</MudText>
+                        </MudCardHeader>
+                        <MudCardContent class="card-content">
+                            <MudText Typo="Typo.h5">@item.UserName</MudText>
+                        </MudCardContent>
+                    </MudCard>
+                </MudItem>
+               
             }
         }
         else
@@ -101,7 +68,7 @@
 @code {
     List<UserWithRoleDto> usersList = new List<UserWithRoleDto>();
     private string UserName = "";
-      private Stack<(string UserId, string CustomerId, string Role)> userStack = new();
+    private Stack<(string UserId, string CustomerId, string Role)> userStack = new();
     protected override async Task OnInitializedAsync()
     {
         await LoadUserStackAsync();

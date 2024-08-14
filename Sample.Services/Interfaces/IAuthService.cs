@@ -13,8 +13,10 @@ namespace Sample.Services.Interfaces
     {
         Task<CustomResponseDto> LoginUser(LoginDTO userDto);
         Task<CustomResponseDto> RegisterUser(UserDto userDto);
+        Task<CustomResponseDto> AssignNewRole(UserRoleAssignmentDto userDto);
         Task<CustomResponseDto> GetUserById(string userId);
         Task<CustomResponseDto> GetAllUsersWithRoles();
+        Task<CustomResponseDto> GetUsersWithRole();
         Task<CustomResponseDto> GetCustomerUsersWithRoles(string customerId);
         Task<CustomResponseDto> GetClientUsersWithRoles(string clientId, string customerId);
         Task<CustomResponseDto> GetVendorsUsersWithRoles(string vendorId, string customerId);
