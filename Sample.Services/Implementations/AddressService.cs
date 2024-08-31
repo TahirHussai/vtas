@@ -96,7 +96,7 @@ namespace Sample.Services.Implementations
                 return new CustomResponseDto { IsSuccess = false, Message = ex.Message };
             }
         }
-        public async Task<CustomResponseDto> GetAddressByUserIdAsync(int userId)
+        public async Task<CustomResponseDto> GetAddressByUserIdAsync(string userId)
         {
             try
             {
@@ -122,6 +122,7 @@ namespace Sample.Services.Implementations
             }
         }
 
+     
     }
 
 }
