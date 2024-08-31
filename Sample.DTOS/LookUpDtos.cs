@@ -33,4 +33,14 @@ namespace Sample.DTOS
         public int SuffixID { get; set; }
         public string SuffixVAL { get; set; }
     }
+    public class AddressTypeDto
+    {
+        public int AddressTypeID { get; set; }
+        public string AddressTypeVAL { get; set; }
+    }
+    public class EmailTypeDto
+    {
+        public int EMAILTYPEID { get; set; }
+        public string EMAILTYPEVAL { get; set; }
+    }
 }

@@ -16,6 +16,7 @@ namespace Sample.Services.Configuration
     {
         public static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
+
             // Add custom services
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IUserService, UserService>();
@@ -23,6 +24,7 @@ namespace Sample.Services.Configuration
             services.AddScoped<IEmailAddressService, EmailAddressService>();
             services.AddScoped<IPhoneService, PhoneService>();
             services.AddScoped<ILookupService, LookupService>();
+            services.AddScoped<IOtherDetailsService, OtherDetailsService>();
 
            
         }

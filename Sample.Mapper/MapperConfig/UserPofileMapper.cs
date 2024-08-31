@@ -8,6 +8,8 @@ namespace Sample.Mapper.MaperConfig
     {
         public UserPofileMapper() {
             CreateMap<UserDto, UserPofile>().ReverseMap();
+            CreateMap<UserPofile, UserDto>().ReverseMap();
+            CreateMap<UserCustomerDto, UserPofile>().ReverseMap();
         }
     }
 }

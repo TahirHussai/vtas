@@ -11,6 +11,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using Sample.Common.EndPoint;
 using Sample.Services.Implementations;
+using Azure;
 
 namespace Sample.BlazorUI.Implementation
 {
@@ -240,6 +241,39 @@ namespace Sample.BlazorUI.Implementation
             }
 
         }
+        public async Task<CustomResponseDto> RegisterCustomer(UserCustomerDto dto)
+        {
+            var obj = new CustomResponseDto();
+            try
+            {
+
+
+                var request = new HttpRequestMessage(HttpMethod.Post, _baseUrl + StaticEndPoint.AuthRegisterCustomerEndpoint)
+                {
+                    Content = new StringContent(JsonConvert.SerializeObject(dto), Encoding.UTF8, "application/json")
+                };
+                var client = _httpClientFactory.CreateClient();
+
+                HttpResponseMessage response = await client.SendAsync(request);
+                if (response.IsSuccessStatusCode)
+                {
+                    obj.IsSuccess = true;
+                    obj.Message = "Successed";
+                    obj.Obj = null;
+                }
+                
+            }
+            catch (Exception ex)
+            {
+
+              
+                    obj.IsSuccess = false;
+                    obj.Message =ex.ToString();
+                    obj.Obj = null;
+               
+            }
+            return obj;
+        }
         public async Task Logout()
         {
             await _localStorageService.RemoveItemAsync("CustomerId");
@@ -311,6 +345,8 @@ namespace Sample.BlazorUI.Implementation
             }
             return IsSuccess;
         }
+
+        
 
 
 

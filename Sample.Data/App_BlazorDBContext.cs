@@ -95,7 +95,16 @@ namespace Sample.Data
                    ProfilePicture = "noimage.png",
                    CustomerId = "",
                    IsActive = true,
-                   EmailConfirmed = true
+                   EmailConfirmed = true,
+                   AltId="NA",
+                   OldId= "NA",
+                   OldVtasId= "NA",
+                   IndustryID= "NA",
+                   LOB_ID= "NA",
+                   Crid = "NA",
+                   DisplayName= "Super Admin",
+                   FaxID="NA"
+
                },
                 new UserPofile
                 {
@@ -117,6 +126,15 @@ namespace Sample.Data
                     IsActive = true,
                     EmailConfirmed = true,
                     UserPassword = "superadmin@123#Admin",
+                    AltId = "NA",
+                    OldId = "NA",
+                    OldVtasId = "NA",
+                    IndustryID = "NA",
+                    LOB_ID = "NA",
+                    Crid="NA",
+                    DisplayName = "Customer Admin",
+                    FaxID = "NA"
+
                 }
           );
 

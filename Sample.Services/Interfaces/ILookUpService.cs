@@ -20,6 +20,8 @@ namespace Sample.Services.Interfaces
         Task<CustomResponseDto> GetAllPhoneTypesAsync();
         Task<CustomResponseDto> GetAllPrefixesAsync();
         Task<CustomResponseDto> GetAllShiftTypesAsync();
+        Task<CustomResponseDto> GetAllSuffixAsync();
+        Task<CustomResponseDto> GetAllStatesAsync();
     }
 
 }

@@ -7,6 +7,7 @@
         //Api User Register/Login Endpoints
         #region Account Api
         public static string AuthRegisterEndpoint = $"api/Account/UserRegister";
+        public static string AuthRegisterCustomerEndpoint = $"api/Account/RegisterCustomer";
         public static string AuthLoginEndpoint = $"api/Account/UserLogin";
         public static string GetUsersEndpoint = $"api/Account/AllUsersWithRole";
         public static string GetUserByIdEndpoint = $"api/Account/GetUserById?UserId=";
@@ -28,6 +29,7 @@
         public static string GetAllPhoneTypesEndpoint = "api/Lookup/phone-types";
         public static string GetAllPrefixesEndpoint = "api/Lookup/prefixes";
         public static string GetAllShiftTypesEndpoint = "api/Lookup/shift-types";
+        public static string GetAllSuffixEndpoint = "api/Lookup/suffix";
         #endregion
 
     }

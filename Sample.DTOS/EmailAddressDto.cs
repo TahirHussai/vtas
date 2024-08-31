@@ -22,7 +22,7 @@ namespace Sample.DTOS
 
         public bool Active { get; set; } = false;
 
-        public int? CreatedById { get; set; }
+        public string? CreatedById { get; set; }
 
         public DateTime CreateDate { get; set; } = DateTime.Now;
     }

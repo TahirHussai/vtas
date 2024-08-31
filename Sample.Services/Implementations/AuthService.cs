@@ -34,7 +34,9 @@ namespace Sample.Services.Implementations
             IConfiguration configuration,
             JwtSecurityTokenHandler jwtSecurityTokenHandler,
             ILogger<AuthService> logger,
-            App_BlazorDBContext context)
+            App_BlazorDBContext context
+            )
+
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -44,6 +46,7 @@ namespace Sample.Services.Implementations
             _jwtSecurityTokenHandler = jwtSecurityTokenHandler;
             _logger = logger;
             _context = context;
+
         }
 
 
@@ -61,7 +64,7 @@ namespace Sample.Services.Implementations
                 _logger.LogWarning($"Invalid Password for {userDto.Email}");
                 return new CustomResponseDto { IsSuccess = false, Message = "Invalid Password" };
             }
-           
+
             var roles = await _userManager.GetRolesAsync(user);
             var rle = roles.Where(a => a.Contains(userDto.Role)).FirstOrDefault();
             if (rle == null)
@@ -77,6 +80,111 @@ namespace Sample.Services.Implementations
                 Obj = obj
             };
         }
+        public async Task<CustomResponseDto> RegisterCustomer(UserCustomerDto userDto)
+        {
+            var user = _mapper.Map<UserPofile>(userDto);
+            user.SufixId = userDto.SuffixId;
+            user.FaxID = userDto.Fax;
+            user.UserName = userDto.UserName;
+            user.ParentId = userDto.SuperAdminId;
+            user.UserPassword = userDto.Password;
+            user.CustomerId = "00";
+            user.ProfilePicture = string.Empty;
+            user.MiddleName = userDto.MiddleName;
+            user.DisplayName = user.DisplayName ?? "NA";
+            user.OldVtasId = user.OldVtasId ?? "NA";
+            user.AltId = user.AltId ?? "NA";
+            user.FaxID = user.FaxID ?? "NA";
+            user.OldId = user.OldId ?? "NA";
+            user.IndustryID = user.IndustryID ?? "NA";
+            user.LOB_ID = user.LOB_ID ?? "NA";
+            user.Crid = user.Crid ?? "NA";
+            //user.LockoutEnd = DateTime.Now;
+            try
+            {
+                if (string.IsNullOrEmpty(userDto.UserName) || string.IsNullOrEmpty(userDto.Email))
+                {
+                    return new CustomResponseDto { IsSuccess = false, Message = "User name and email are required." };
+                }
+                if (user == null || string.IsNullOrEmpty(user.UserName) || string.IsNullOrEmpty(user.Email))
+                {
+                    _logger.LogError("User object is not populated correctly");
+                    return new CustomResponseDto { IsSuccess = false, Message = "User object is not populated correctly" };
+                }
+
+                var existingUser = await _userManager.FindByEmailAsync(userDto.Email);
+                if (existingUser != null)
+                {
+                    // Check other fields if needed
+                    var userName = existingUser.UserName ?? "Unknown"; // Handle possible null value
+                    _logger.LogWarning($"A user with the email {userDto.Email} and username {userName} is already registered.");
+
+                    return new CustomResponseDto
+                    {
+                        IsSuccess = false,
+                        Message = $"A user with the email {userDto.Email} is already registered. Please try with a different one."
+                    };
+                }
+
+
+                var existingUserName = await _userManager.FindByEmailAsync(userDto.UserName);
+                if (existingUserName != null)
+                {
+                    _logger.LogWarning($"A user with {userDto.UserName} is already registered");
+                    return new CustomResponseDto { IsSuccess = false, Message = $"A user with {userDto.UserName} is already registered. Please try with a different one." };
+                }
+                var result = await _userManager.CreateAsync(user, userDto.Password);
+                if (!result.Succeeded)
+                {
+                    var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                    _logger.LogError($"Failed to register user {userDto.Email}: {errors}");
+                    return new CustomResponseDto { IsSuccess = false, Message = $"Failed to register user: {errors}" };
+                }
+
+                // Assign Role
+                await AssignUserRoleAsync(user, userDto.RoleName);
+
+                return new CustomResponseDto { IsSuccess = true, Message = "Customer Registration successful", Obj = user.Id };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An error occurred while registering the user {userDto.Email}");
+                return new CustomResponseDto { IsSuccess = false, Message = $"An unexpected error occurred during registration. Error {ex.ToString()}" };
+            }
+        }
+
+        private async Task AssignUserRoleAsync(UserPofile user, string roleName)
+        {
+            // Check if the user is already in the role to avoid duplication
+            if (!await _userManager.IsInRoleAsync(user, roleName))
+            {
+                // Add the user to the role using UserManager
+                var result = await _userManager.AddToRoleAsync(user, roleName);
+
+                if (result.Succeeded)
+                {
+                    // Retrieve the role entity
+                    var role = await _roleManager.FindByNameAsync(roleName);
+                    if (role != null)
+                    {
+                        // Update the existing user role with custom fields, if needed
+                        var userRole = _context.AspNetUserRoles.SingleOrDefault(ur => ur.UserId == user.Id && ur.RoleId == role.Id);
+                        if (userRole != null)
+                        {
+                            userRole.CreateByID = user.Id;
+                            userRole.CreatedDate = DateTime.UtcNow;
+                            userRole.PersonStatusID = 1;
+                            userRole.UpdatedByID = user.Id;
+                            userRole.UpdatedDate = DateTime.UtcNow;
+                            userRole.Discriminator = roleName;
+
+                            _context.UserRoles.Update(userRole);
+                            await _context.SaveChangesAsync();
+                        }
+                    }
+                }
+            }
+        }
 
         public async Task<CustomResponseDto> RegisterUser(UserDto userDto)
         {
@@ -88,36 +196,36 @@ namespace Sample.Services.Implementations
             try
             {
 
-            
-            if (UserExist != null)
-            {
-                _logger.LogWarning($"A user with {userDto.Email} is already registered");
-                return new CustomResponseDto { IsSuccess = false, Message = "A user with {userDto.Email} is already registered, Please try with other one" };
-            }
-            var result = await _userManager.CreateAsync(user, userDto.Password);
-            if (!result.Succeeded)
-            {
-                _logger.LogError($"Failed to register user {userDto.Email}: {string.Join(", ", result.Errors.Select(e => e.Description))}");
-                return new CustomResponseDto { IsSuccess = false, Message = $"Failed to register user: {string.Join(", ", result.Errors.Select(e => e.Description))}" };
-            }
 
-            await _userManager.AddToRoleAsync(user, userDto.RoleName);
-            var role = await _roleManager.FindByNameAsync(userDto.RoleName);
-            if (role != null)
-            {
-                var userRole = new AspNetUserRole
+                if (UserExist != null)
                 {
-                    UserId = user.Id,
-                    RoleId = role.Id,
-                    //AccessLevelID = 1,
-                    CreateByID = user.Id,
-                    CreatedDate = DateTime.UtcNow,
-                    PersonStatusID = 1,
-                    UpdatedByID = user.Id,
-                    UpdatedDate = DateTime.UtcNow
-                };
-                await _userService.AddUserRoleAsync(userRole);
-            }
+                    _logger.LogWarning($"A user with {userDto.Email} is already registered");
+                    return new CustomResponseDto { IsSuccess = false, Message = "A user with {userDto.Email} is already registered, Please try with other one" };
+                }
+                var result = await _userManager.CreateAsync(user, userDto.Password);
+                if (!result.Succeeded)
+                {
+                    _logger.LogError($"Failed to register user {userDto.Email}: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+                    return new CustomResponseDto { IsSuccess = false, Message = $"Failed to register user: {string.Join(", ", result.Errors.Select(e => e.Description))}" };
+                }
+
+                await _userManager.AddToRoleAsync(user, userDto.RoleName);
+                var role = await _roleManager.FindByNameAsync(userDto.RoleName);
+                if (role != null)
+                {
+                    var userRole = new AspNetUserRole
+                    {
+                        UserId = user.Id,
+                        RoleId = role.Id,
+                        //AccessLevelID = 1,
+                        CreateByID = user.Id,
+                        CreatedDate = DateTime.UtcNow,
+                        PersonStatusID = 1,
+                        UpdatedByID = user.Id,
+                        UpdatedDate = DateTime.UtcNow
+                    };
+                    await _userService.AddUserRoleAsync(userRole);
+                }
             }
             catch (Exception ex)
             {
@@ -429,5 +537,7 @@ namespace Sample.Services.Implementations
             _logger.LogWarning($"Role Assigned Successfully");
             return new CustomResponseDto { IsSuccess = false, Message = "Role Assigned Successfully" };
         }
+
+
     }
 }

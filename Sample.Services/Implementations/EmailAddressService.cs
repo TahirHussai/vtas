@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Sample.Data;
 using Sample.DTOS;
@@ -14,12 +15,12 @@ namespace Sample.Services.Implementations
 {
     public class EmailAddressService : IEmailAddressService
     {
-        private readonly IDbConnection _dbConnection;
+        private readonly App_DapperContext _context;
         private readonly ILogger<EmailAddressService> _logger;
 
-        public EmailAddressService(IDbConnection dbConnection, ILogger<EmailAddressService> logger)
+        public EmailAddressService(App_DapperContext dbConnection, ILogger<EmailAddressService> logger)
         {
-            _dbConnection = dbConnection;
+            _context = dbConnection;
             _logger = logger;
         }
 
@@ -29,18 +30,20 @@ namespace Sample.Services.Implementations
             {
                 var parameters = new DynamicParameters();
                 parameters.Add("@EmailId", emailId);
-
-                var emailAddress = await _dbConnection.QueryFirstOrDefaultAsync<EmailAddress>(
+                using (var connection = _context.CreateConnection())
+                {
+                    var emailAddress = await connection.QueryFirstOrDefaultAsync<EmailAddress>(
                     "sp_GetEmailAddressById",
                     parameters,
                     commandType: CommandType.StoredProcedure);
 
-                if (emailAddress == null)
-                {
-                    return new CustomResponseDto { IsSuccess = false, Message = "Email address not found for the given ID" };
-                }
+                    if (emailAddress == null)
+                    {
+                        return new CustomResponseDto { IsSuccess = false, Message = "Email address not found for the given ID" };
+                    }
 
-                return new CustomResponseDto { IsSuccess = true, Message = "Email address retrieved successfully", Obj = emailAddress };
+                    return new CustomResponseDto { IsSuccess = true, Message = "Email address retrieved successfully", Obj = emailAddress };
+                }
             }
             catch (Exception ex)
             {
@@ -59,13 +62,16 @@ namespace Sample.Services.Implementations
                 parameters.Add("@EmailTypeId", emailAddressDto.EmailTypeId);
                 parameters.Add("@IsActive", emailAddressDto.Active);
                 parameters.Add("@CreatedById", emailAddressDto.CreatedById);
-
-                var result = await _dbConnection.ExecuteAsync(
+                parameters.Add("@UserId", emailAddressDto.UserId);
+                using (var connection = _context.CreateConnection())
+                {
+                    var result = await connection.ExecuteAsync(
                     "sp_AddOrUpdateEmailAddress",
                     parameters,
                     commandType: CommandType.StoredProcedure);
 
-                return new CustomResponseDto { IsSuccess = true, Message = !string.IsNullOrEmpty(emailAddressDto.EmailId.ToString()) ? "Email address updated successfully" : "Email address created successfully", Obj = result };
+                    return new CustomResponseDto { IsSuccess = true, Message = !string.IsNullOrEmpty(emailAddressDto.EmailId.ToString()) ? "Email address updated successfully" : "Email address created successfully", Obj = result };
+                }
             }
             catch (Exception ex)
             {
@@ -80,13 +86,15 @@ namespace Sample.Services.Implementations
             {
                 var parameters = new DynamicParameters();
                 parameters.Add("@EmailId", emailId);
-
-                var result = await _dbConnection.ExecuteAsync(
+                using (var connection = _context.CreateConnection())
+                {
+                    var result = await connection.ExecuteAsync(
                     "sp_DeleteEmailAddress",
                     parameters,
                     commandType: CommandType.StoredProcedure);
 
-                return new CustomResponseDto { IsSuccess = true, Message = "Email address deleted successfully", Obj = result };
+                    return new CustomResponseDto { IsSuccess = true, Message = "Email address deleted successfully", Obj = result };
+                }
             }
             catch (Exception ex)
             {

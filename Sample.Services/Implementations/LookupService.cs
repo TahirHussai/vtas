@@ -12,13 +12,13 @@ namespace Sample.Services.Implementations
 {
     public class LookupService : ILookupService
     {
-       
+
         private readonly ILogger<LookupService> _logger;
-      
+
 
         private readonly App_DapperContext _context;
 
-      
+
         public LookupService(App_DapperContext context, ILogger<LookupService> logger)
         {
             _context = context;
@@ -79,7 +79,10 @@ namespace Sample.Services.Implementations
         {
             return await GetLookupDataAsync("SELECT * FROM LUShiftType");
         }
-
+        public async Task<CustomResponseDto> GetAllSuffixAsync()
+        {
+            return await GetLookupDataAsync("SELECT * FROM LUSuffix");
+        }
         private async Task<CustomResponseDto> GetLookupDataAsync(string query)
         {
             try
@@ -96,6 +99,7 @@ namespace Sample.Services.Implementations
                 return new CustomResponseDto { IsSuccess = false, Message = "Error retrieving data.", Obj = null };
             }
         }
+
     }
 
 }

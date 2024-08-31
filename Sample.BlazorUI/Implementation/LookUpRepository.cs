@@ -55,7 +55,7 @@ namespace Sample.BlazorUI.Implementation
         public async Task<List<SufixDto>> GetSuffix()
         {
             var list = new List<SufixDto>();
-            var request = new HttpRequestMessage(HttpMethod.Get, _baseUrl + StaticEndPoint.GetAllPrefixesEndpoint);
+            var request = new HttpRequestMessage(HttpMethod.Get, _baseUrl + StaticEndPoint.GetAllSuffixEndpoint);
             try
             {
                 var client = _httpClientFactory.CreateClient();
@@ -80,6 +80,60 @@ namespace Sample.BlazorUI.Implementation
             return list;
         }
 
+        public async Task<List<EmailTypeDto>> GetEmailType()
+        {
+            var list = new List<EmailTypeDto>();
+            var request = new HttpRequestMessage(HttpMethod.Get, _baseUrl + StaticEndPoint.GetAllEmailTypesEndpoint);
+            try
+            {
+                var client = _httpClientFactory.CreateClient();
+
+                HttpResponseMessage response = await client.SendAsync(request);
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var jsonObject = JObject.Parse(content);
+                    var ApiResponse = jsonObject["result"].ToObject<CustomResponseDto>();
+                    if (ApiResponse.IsSuccess)
+                    {
+                        list = JsonConvert.DeserializeObject<List<EmailTypeDto>>(ApiResponse.Obj.ToString());
+                    }
+                    return list;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            return list;
+        }
+        public async Task<List<AddressTypeDto>> GetAddressType()
+        {
+            var list = new List<AddressTypeDto>();
+            var request = new HttpRequestMessage(HttpMethod.Get, _baseUrl + StaticEndPoint.GetAllAddressTypesEndpoint);
+            try
+            {
+                var client = _httpClientFactory.CreateClient();
+
+                HttpResponseMessage response = await client.SendAsync(request);
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var jsonObject = JObject.Parse(content);
+                    var ApiResponse = jsonObject["result"].ToObject<CustomResponseDto>();
+                    if (ApiResponse.IsSuccess)
+                    {
+                        list = JsonConvert.DeserializeObject<List<AddressTypeDto>>(ApiResponse.Obj.ToString());
+                    }
+                    return list;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            return list;
+        }
         private string GetBaseUrl(IHttpClientFactory httpClientFactory)
         {
             // Assuming you have a client named "LocalApi" configured with the base address
@@ -87,7 +141,7 @@ namespace Sample.BlazorUI.Implementation
             return client.BaseAddress.ToString();
         }
 
-
+       
     }
 
 }

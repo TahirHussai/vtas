@@ -17,7 +17,7 @@ namespace Sample.Data
         public string PostalCode { get; set; }
         public int? CountryId { get; set; }
         public int? CountyId { get; set; }
-        public int? CreatedById { get; set; }
+        public string? CreatedById { get; set; }
         public DateTime CreateDate { get; set; }
         public int AddressTypeId { get; set; }
         public bool Active { get; set; }

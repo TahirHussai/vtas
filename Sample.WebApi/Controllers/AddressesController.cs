@@ -25,10 +25,9 @@ namespace Sample.WebApi.Controllers
             _logger.LogInformation($"GetAddressesByUserId endpoint called with UserId: {userId}.");
             try
             {
-                var addresses = await _addressesService.GetAddressesByUserIdAsync(userId);
-                return addresses.Any()
-                    ? CreateResponse(true, "Addresses fetched successfully.", addresses)
-                    : CreateResponse(false, "No records found.", null);
+                var addresses = await _addressesService.GetAddressByUserIdAsync(userId);
+                return addresses;
+                   
             }
             catch (Exception ex)
             {
@@ -39,12 +38,12 @@ namespace Sample.WebApi.Controllers
 
         [HttpPost]
         [Route("CreateAddress")]
-        public async Task<ActionResult<CustomResponseDto>> CreateAddress(CreateAddressDto dto)
+        public async Task<ActionResult<CustomResponseDto>> CreateAddress(AddressDto dto)
         {
             _logger.LogInformation("CreateAddress endpoint called.");
             try
             {
-                var createdAddress = await _addressesService.AddAddressAsync(dto);
+                var createdAddress = await _addressesService.AddOrUpdateAddressAsync(dto);
                 return CreateResponse(true, "Address created successfully.", createdAddress);
             }
             catch (Exception ex)
@@ -61,7 +60,7 @@ namespace Sample.WebApi.Controllers
             _logger.LogInformation("UpdateAddress endpoint called.");
             try
             {
-                await _addressesService.UpdateAddressAsync(dto);
+                await _addressesService.AddOrUpdateAddressAsync(dto);
                 return CreateResponse(true, "Address updated successfully.", dto);
             }
             catch (Exception ex)
@@ -78,10 +77,9 @@ namespace Sample.WebApi.Controllers
             _logger.LogInformation($"DeleteAddressById endpoint called with id: {id}.");
             try
             {
-                var isDeleted = await _addressesService.DeleteAddressAsync(id);
-                return isDeleted
-                    ? CreateResponse(true, "Address deleted successfully.", null)
-                    : CreateResponse(false, "No record found.", null);
+                var  response = await _addressesService.DeleteAddressAsync(id);
+                return response;
+                   
             }
             catch (Exception ex)
             {

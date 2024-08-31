@@ -50,8 +50,9 @@ namespace Sample.Services.Implementations
         {
             try
             {
+                var id = string.IsNullOrEmpty(otherDetailsDto.Id) ? "0" : otherDetailsDto.Id;
                 var parameters = new DynamicParameters();
-                parameters.Add("@Id", otherDetailsDto.Id);
+                parameters.Add("@Id", id);
                 parameters.Add("@UserId", otherDetailsDto.UserId);
                 parameters.Add("@ReferenceByID", otherDetailsDto.ReferenceByID);
                 parameters.Add("@SpouseId", otherDetailsDto.SpouseId);

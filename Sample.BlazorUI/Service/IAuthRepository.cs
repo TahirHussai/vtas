@@ -6,6 +6,7 @@ namespace Sample.BlazorUI.Service
     {
         Task<CustomResponseDto> Login(LoginDTO dto);
         public Task<bool> Register(UserDto dto);
+        public Task<CustomResponseDto> RegisterCustomer(UserCustomerDto dto);
         public Task Logout();
         public Task<List<UsersWithRolesDto>> GetUsersWithRolesAsync();
         public Task<List<UserWithRoleDto>> GetUsersListWithRole();

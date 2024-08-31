@@ -95,6 +95,13 @@ namespace Sample.WebApi.Controllers
             return HandleResponse(response);
         }
 
+        [HttpGet("suffix")]
+        public async Task<ActionResult> GetAllSuffixTypes()
+        {
+            var response = await _lookupService.GetAllSuffixAsync();
+            return HandleResponse(response);
+        }
+
         private ActionResult HandleResponse(CustomResponseDto response)
         {
             if (response.IsSuccess)

@@ -17,7 +17,7 @@ namespace Sample.Data
         public string Email { get; set; }
         public int? EmailTypeId { get; set; }
         public bool Active { get; set; }
-        public int? CreatedById { get; set; }
+        public string? CreatedById { get; set; }
         public DateTime CreateDate { get; set; }
     }
 

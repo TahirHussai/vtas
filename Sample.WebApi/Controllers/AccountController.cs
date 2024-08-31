@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Sample.DTOS;
 using Sample.Services.Interfaces;
+using System.Xml.Schema;
 
 namespace Sample.WebApi.Controllers
 {
@@ -11,12 +12,23 @@ namespace Sample.WebApi.Controllers
         private readonly IAuthService _authService;
         private readonly IUserService _userService;
         private readonly ILogger<AccountController> _logger;
+        private readonly IOtherDetailsService _otherDetailsService;
+        private readonly IAddressService _addressService;
+        private readonly IEmailAddressService _emailAddressService;
 
-        public AccountController(IAuthService authService, IUserService userService, ILogger<AccountController> logger)
+
+        public AccountController(IAuthService authService, IUserService userService, ILogger<AccountController> logger
+            , IOtherDetailsService otherDetailsService,
+           IAddressService addressService,
+           IEmailAddressService emailAddressService)
         {
             _authService = authService;
             _userService = userService;
             _logger = logger;
+            _otherDetailsService = otherDetailsService;
+            _addressService = addressService;
+            _emailAddressService = emailAddressService;
+
         }
 
         [HttpPost]
@@ -66,6 +78,141 @@ namespace Sample.WebApi.Controllers
                 response = new CustomResponseDto { IsSuccess = false, Message = ex.Message, Obj = null };
                 return BadRequest(response);
             }
+        }
+        [HttpPost]
+        [Route("RegisterCustomer")]
+        public async Task<ActionResult<CustomResponseDto>> RegisterCustomer([FromBody] UserCustomerDto userDto)
+        {
+            if (userDto == null)
+            {
+                return BadRequest(new CustomResponseDto { IsSuccess = false, Message = "Invalid data", Obj = null });
+            }
+
+            _logger.LogInformation($"Attempting registration for {userDto.Email}");
+
+            try
+            {
+                var response = await _authService.RegisterCustomer(userDto);
+                if (!response.IsSuccess)
+                {
+                    return BadRequest(response);
+                }
+
+                var userId = Convert.ToString(response.Obj);
+
+                // Add Other Details
+                if (!await AddOrUpdateOtherDetailsAsync(CreateOtherDetails(userId), userDto.Email))
+                {
+                    return BadRequest(new CustomResponseDto { IsSuccess = false, Message = "Failed to add other details." });
+                }
+
+                // Add Address
+        
+                if (!await AddOrUpdateAddressAsync(CreateAddress(userDto, userId), userDto.Email))
+                {
+                    return BadRequest(new CustomResponseDto { IsSuccess = false, Message = "Failed to add address details." });
+                }
+
+                // Add Email
+                if (!await AddOrUpdateEmailAsync(CreateEmail(userDto, userId), userDto.Email))
+                {
+                    return BadRequest(new CustomResponseDto { IsSuccess = false, Message = "Failed to add email details." });
+                }
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error during registration for {userDto.Email}");
+                return BadRequest(new CustomResponseDto { IsSuccess = false, Message = ex.Message, Obj = null });
+            }
+        }
+
+
+        private OtherDetailsDto CreateOtherDetails(string userId)
+        {
+            return new OtherDetailsDto
+            {
+                JobNotes = string.Empty,
+                BlockBGScreen = false,
+                BlockDrugScreen = false,
+                Parent_VendorID = "0",
+                ReferenceByID = -1,
+                UserId = userId,
+                BlockAutoQBR = false,
+                FlagSubVendor = false,
+                Flag_Virtual = false,
+                IsAllow = false,
+                IsAllowDup = false,
+                IsInSOLDB = false,
+                SpouseId = -1,
+                SubmittalClientComp = false
+            };
+        }
+
+        private AddressDto CreateAddress(UserCustomerDto userDto, string userId)
+        {
+            return new AddressDto
+            {
+                Address1 = userDto.MailingAddress,
+                Address2 = userDto.Address2,
+                UserId = userId,
+                CreatedById = userDto.CreatedById,
+                CreateDate = DateTime.Now,
+                PostalCode = userDto.ZipCode,
+                City = userDto.City,
+                CountryId = userDto.CountryId,
+                AddressTypeId = userDto.AddressTypeId,
+                StateId=userDto.StateId
+            };
+        }
+
+        private EmailAddressDto CreateEmail(UserCustomerDto userDto, string userId)
+        {
+            return new EmailAddressDto
+            {
+                Email = userDto.Email,
+                EmailTypeId = userDto.EmailTypeId,
+                UserId = userId,
+                Active = true,
+                CreateDate = DateTime.Now,
+                CreatedById = userDto.CreatedById
+            };
+        }
+
+        private async Task<bool> AddOrUpdateOtherDetailsAsync(OtherDetailsDto otherDetail, string email)
+        {
+            var result = await _otherDetailsService.AddOrUpdateOtherDetailsAsync(otherDetail);
+            if (!result.IsSuccess)
+            {
+                _logger.LogError($"Failed to register user {email}: {string.Join(", ", result.Message)}");
+                return false;
+            }
+            return true;
+        }
+
+        private async Task<bool> AddOrUpdateAddressAsync(AddressDto address, string email)
+        {
+            address.StateId = 0;
+            address.CountryId = 0;
+            var result = await _addressService.AddOrUpdateAddressAsync(address);
+            if (!result.IsSuccess)
+            {
+                _logger.LogError($"Failed to register user {email}: {string.Join(", ", result.Message)}");
+                return false;
+            }
+            return true;
+        }
+
+        private async Task<bool> AddOrUpdateEmailAsync(EmailAddressDto email, string userEmail)
+        {
+            var result = await _emailAddressService.AddOrUpdateEmailAddressAsync(email);
+            if (!result.IsSuccess)
+            {
+                _logger.LogError($"Failed to register user {userEmail}: {string.Join(", ", result.Message)}");
+                return false;
+            }
+            return true;
         }
 
         [HttpGet("GetUserById/{userId}")]
