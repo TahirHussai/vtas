@@ -11,7 +11,7 @@ namespace Sample.Data
         public string Discriminator { get; set; }
         
         public DateTime? UpdatedDate { get; set; }
-        public int? AccessLevelID { get; set; }
+        //public int? AccessLevelID { get; set; }
         public int? PersonStatusID { get; set; }
        
     }

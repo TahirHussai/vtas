@@ -13,9 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample.Common", "Sample.Com
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample.Services", "Sample.Services\Sample.Services.csproj", "{07065034-AAB5-447F-8E82-E73F9BF1734D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.Mapper", "Sample.Mapper\Sample.Mapper.csproj", "{946854A0-91FE-47DA-A28A-0A8EACF81B93}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample.Mapper", "Sample.Mapper\Sample.Mapper.csproj", "{946854A0-91FE-47DA-A28A-0A8EACF81B93}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.Data", "Sample.Data\Sample.Data.csproj", "{BBE8C305-39EA-40E1-BED3-CB5071AA4134}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample.Data", "Sample.Data\Sample.Data.csproj", "{BBE8C305-39EA-40E1-BED3-CB5071AA4134}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

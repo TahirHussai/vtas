@@ -19,6 +19,10 @@ namespace Sample.Services.Configuration
             // Add custom services
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IAddressService, AddressService>();
+            services.AddScoped<IEmailAddressService, EmailAddressService>();
+            services.AddScoped<IPhoneService, PhoneService>();
+            services.AddScoped<ILookupService, LookupService>();
 
            
         }

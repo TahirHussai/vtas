@@ -18,6 +18,7 @@ var configuration = builder.Configuration;
 var connectionString = configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<App_BlazorDBContext>(options =>
     options.UseSqlServer(connectionString));
+builder.Services.AddSingleton<App_DapperContext>();
 builder.Services.AddScoped<JwtSecurityTokenHandler>();
 // Call the ConfigureServices method to register services
 ServiceConfiguration.ConfigureServices(builder.Services, builder.Configuration);

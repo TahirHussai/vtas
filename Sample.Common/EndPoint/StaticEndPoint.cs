@@ -16,7 +16,19 @@
         public static string UpdateUserRolesEndpoint = $"api/Account/assign-roles";
         #endregion
 
+        #region Lookups Api
+        public static string GetAllAddressTypesEndpoint = "api/Lookup/address-types";
+        public static string GetAllApplFileTypesEndpoint = "api/Lookup/appl-file-types";
+        public static string GetAllEmailTypesEndpoint = "api/Lookup/email-types";
+        public static string GetAllEntTypesEndpoint = "api/Lookup/ent-types";
+        public static string GetAllFileTypesEndpoint = "api/Lookup/file-types";
+        public static string GetAllFormFileTypesEndpoint = "api/Lookup/form-file-types";
+        public static string GetAllJobTypesEndpoint = "api/Lookup/job-types";
+        public static string GetAllPersonStatusesEndpoint = "api/Lookup/person-statuses";
+        public static string GetAllPhoneTypesEndpoint = "api/Lookup/phone-types";
+        public static string GetAllPrefixesEndpoint = "api/Lookup/prefixes";
+        public static string GetAllShiftTypesEndpoint = "api/Lookup/shift-types";
+        #endregion
 
-       
     }
 }

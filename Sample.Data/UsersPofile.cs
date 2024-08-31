@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 
 namespace Sample.Data
 {
@@ -26,8 +27,37 @@ namespace Sample.Data
         public int? EmergencyPersonId { get; set; }
         public int? SpouseId { get; set; }
         public string? Title { get; set; }
-        public int? Crid { get; set; }
         public int? PrimaryPhoneId { get; set; }
+        public int? PrefixId { get; set; }
+
+        [MaxLength(100)]
+        public string DisplayName { get; set; }
+
+        public int? PersonStatusID { get; set; }
+
+        // Assuming you commented out PhoneId, AddressId, and ContactID intentionally, they are not included here.
+
+        [MaxLength(250)]
+        public string OldVtasId { get; set; }
+
+        [MaxLength(250)]
+        public string AltId { get; set; }
+
+        [MaxLength(250)]
+        public string Crid { get; set; }
+
+        [MaxLength(250)]
+        public string FaxID { get; set; }
+
+        [MaxLength(250)]
+        public string OldId { get; set; }
+
+        [MaxLength(100)]
+        public string IndustryID { get; set; }
+
+        [MaxLength(100)]
+        public string LOB_ID { get; set; }
+
 
 
     }

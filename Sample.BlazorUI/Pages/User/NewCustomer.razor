@@ -1,0 +1,120 @@
+﻿@page "/new-customer"
+@inject ILookUpRepository _lookupRepo
+<MudContainer MaxWidth="MaxWidth.Medium" Class="pa-4">
+    <MudText Typo="Typo.h6" GutterBottom="true">New Customer Info</MudText>
+    <MudTextField Label="Customer Name" @bind-Value="customerInfo.FirstName" FullWidth="true" Class="mb-4" />
+
+    <MudText Typo="Typo.h6" GutterBottom="true">Customer Contact Info</MudText>
+
+    <MudGrid>
+        <MudItem xs="12" sm="6" md="4">
+            <MudSelect T="int" @bind-Value="customerInfo.Prefix" Label="Prefix" FullWidth="true" Variant="Variant.Outlined">
+                @foreach (var item in prefixList)
+                {
+                    <MudSelectItem T="int" Value="@item.PrefixID">@item.PrefixVal</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+
+        <MudItem xs="12" sm="6" md="4">
+            <MudTextField Label="First Name" @bind-Value="customerInfo.FirstName" FullWidth="true" />
+        </MudItem>
+
+        <MudItem xs="12" sm="6" md="4">
+            <MudTextField Label="Middle Name" @bind-Value="customerInfo.MiddleName" FullWidth="true" />
+        </MudItem>
+
+        <MudItem xs="12" sm="6" md="4">
+            <MudTextField Label="Last Name" @bind-Value="customerInfo.LastName" FullWidth="true" />
+        </MudItem>
+
+        <MudItem xs="12" sm="6" md="4">
+            <MudSelect T="int" @bind-Value="customerInfo.Suffix" Label="Sufix"  FullWidth="true" Variant="Variant.Outlined">
+                @foreach (var item in sufixList)
+                {
+                    <MudSelectItem T="int" Value="@item.SuffixID">@item.SuffixVAL</MudSelectItem>
+                }
+            </MudSelect>
+           
+        </MudItem>
+
+        <MudItem xs="12" sm="6" md="4">
+            <MudTextField Label="Phone" @bind-Value="customerInfo.Phone" FullWidth="true" />
+        </MudItem>
+
+        <MudItem xs="12" sm="6" md="4">
+            <MudTextField Label="Ext." @bind-Value="customerInfo.Ext" FullWidth="true" />
+        </MudItem>
+
+        <MudItem xs="12" sm="6" md="4">
+            <MudTextField Label="Fax" @bind-Value="customerInfo.Fax" FullWidth="true" />
+        </MudItem>
+
+        <MudItem xs="12" sm="6" md="4">
+            <MudTextField Label="Email" @bind-Value="customerInfo.Email" FullWidth="true" />
+        </MudItem>
+
+        <MudItem xs="12" sm="6">
+            <MudTextField Label="Mailing Address" @bind-Value="customerInfo.MailingAddress" FullWidth="true" />
+        </MudItem>
+
+        <MudItem xs="12" sm="6">
+            <MudTextField Label="Address 2" @bind-Value="customerInfo.Address2" FullWidth="true" />
+        </MudItem>
+
+        <MudItem xs="12" sm="6">
+            <MudTextField Label="City" @bind-Value="customerInfo.City" FullWidth="true" />
+        </MudItem>
+
+        <MudItem xs="12" sm="3">
+            <MudSelect Label="State" @bind-Value="customerInfo.State" FullWidth="true">
+                @*  <MudSelectItem Value="CA">CA</MudSelectItem>
+                <MudSelectItem Value="NY">NY</MudSelectItem> *@
+                <!-- Add more options as needed -->
+            </MudSelect>
+        </MudItem>
+
+        <MudItem xs="12" sm="3">
+            <MudTextField Label="Zip Code" @bind-Value="customerInfo.ZipCode" FullWidth="true" />
+        </MudItem>
+    </MudGrid>
+
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="HandleSubmit">Submit</MudButton>
+</MudContainer>
+
+@code {
+    private List<PrefixDto> prefixList = new List<PrefixDto>();
+    private List<SufixDto> sufixList = new List<SufixDto>();
+    public class CustomerInfo
+    {
+        public int Id { get; set; }
+        public int Prefix { get; set; }
+        public string FirstName { get; set; }
+        public string MiddleName { get; set; }
+        public string LastName { get; set; }
+        public int Suffix { get; set; }
+        public string Phone { get; set; }
+        public string Ext { get; set; }
+        public string Fax { get; set; }
+        public string Email { get; set; }
+        public string MailingAddress { get; set; }
+        public string Address2 { get; set; }
+        public string City { get; set; }
+        public string State { get; set; }
+        public string ZipCode { get; set; }
+    }
+    private CustomerInfo customerInfo = new CustomerInfo();
+
+    private async Task HandleSubmit()
+    {
+
+        // Logic to save the customer info to the database
+        // For example, via an injected service
+        // await CustomerService.AddCustomerAsync(customerInfo);
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        prefixList = await _lookupRepo.GetPrefix();
+        sufixList = await _lookupRepo.GetSuffix();
+    }
+}

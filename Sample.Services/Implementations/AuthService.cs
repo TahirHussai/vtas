@@ -61,7 +61,7 @@ namespace Sample.Services.Implementations
                 _logger.LogWarning($"Invalid Password for {userDto.Email}");
                 return new CustomResponseDto { IsSuccess = false, Message = "Invalid Password" };
             }
-            var UserRole = await _roleManager.FindByNameAsync(userDto.Role);
+           
             var roles = await _userManager.GetRolesAsync(user);
             var rle = roles.Where(a => a.Contains(userDto.Role)).FirstOrDefault();
             if (rle == null)
@@ -82,7 +82,13 @@ namespace Sample.Services.Implementations
         {
             var user = _mapper.Map<UserPofile>(userDto);
             user.UserName = userDto.Email;
+            user.ParentId = userDto.SuperAdminId;
+            user.ProfilePicture = "";
             var UserExist = await _userManager.FindByEmailAsync(userDto.Email);
+            try
+            {
+
+            
             if (UserExist != null)
             {
                 _logger.LogWarning($"A user with {userDto.Email} is already registered");
@@ -103,7 +109,7 @@ namespace Sample.Services.Implementations
                 {
                     UserId = user.Id,
                     RoleId = role.Id,
-                    AccessLevelID = 1,
+                    //AccessLevelID = 1,
                     CreateByID = user.Id,
                     CreatedDate = DateTime.UtcNow,
                     PersonStatusID = 1,
@@ -112,7 +118,12 @@ namespace Sample.Services.Implementations
                 };
                 await _userService.AddUserRoleAsync(userRole);
             }
+            }
+            catch (Exception ex)
+            {
 
+                throw;
+            }
             return new CustomResponseDto { IsSuccess = true, Message = "Registration successful" };
         }
 
@@ -332,7 +343,7 @@ namespace Sample.Services.Implementations
             var rle = roles.Where(a => a.Contains(Role)).FirstOrDefault();
             if (rle != null)
             {
-                Role = roles.FirstOrDefault();
+                //Role = roles.FirstOrDefault();
                 if (rle.Contains("SuperAdmin"))
                 {
                     ParentId = user.Id;
@@ -363,7 +374,7 @@ namespace Sample.Services.Implementations
                 UserId = user.Id,
                 CustomerId = CustomerId,
                 SuperAdminId = ParentId,
-                Role = rle,
+                Role = Role,
                 Token = token,
                 UserName = user.FirstName + (string.IsNullOrEmpty(user.Lastname) ? "" : " " + user.Lastname),
             };
@@ -407,7 +418,7 @@ namespace Sample.Services.Implementations
                     userRole.UpdatedByID = userDto.UpdatedByID;
                     userRole.UpdatedDate = userDto.UpdatedDate;
                     userRole.CreatedDate = userDto.CreatedDate;
-                    userRole.AccessLevelID = userDto.AccessLevelID;
+                    //userRole.AccessLevelID = userDto.AccessLevelID;
                     userRole.PersonStatusID = userDto.PersonStatusID;
                     // Update other fields as needed
 

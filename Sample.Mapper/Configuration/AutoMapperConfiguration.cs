@@ -1,9 +1,9 @@
 ﻿
 using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
-
+using Sample.Data;
 using Sample.Mapper.MaperConfig;
-
+using Sample.Mapper.MapperConfig;
 using System.Runtime.CompilerServices;
 
 namespace Sample.Mapper.Configuration
@@ -17,6 +17,7 @@ namespace Sample.Mapper.Configuration
               
                 a.AddProfile(new IdentityRoleMapper());
                 a.AddProfile(new UserPofileMapper());
+                a.AddProfile(new OtherDetailsMapper());
             });
             IMapper mapper = mapperConfig.CreateMapper();
             services.AddSingleton(mapper);

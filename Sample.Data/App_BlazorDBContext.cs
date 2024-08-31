@@ -1,16 +1,19 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Sample.Data;
+using System.Data;
 
 namespace Sample.Data
 {
     public partial class App_BlazorDBContext : IdentityDbContext<UserPofile>
     {
+     
         public App_BlazorDBContext()
         {
         }
-
         public App_BlazorDBContext(DbContextOptions<App_BlazorDBContext> options)
             : base(options)
         {
@@ -122,7 +125,7 @@ namespace Sample.Data
             {
                 UserId = "2314094f-0974-4783-ae24-97b801faf01d",
                 RoleId = "bda30051-c030-467c-93e8-ae3e0b5bee4e",
-                AccessLevelID = 1,
+                //AccessLevelID = 1,
                 CreateByID = "2314094f-0974-4783-ae24-97b801faf01d",
                 CreatedDate = DateTime.Now,
                 PersonStatusID = 1,
@@ -133,7 +136,7 @@ namespace Sample.Data
             {
                 UserId = "7375512a-4e4b-4178-babc-1de292b177b4",
                 RoleId = "e15c12c3-5582-4711-9306-984e0df1dcdd",
-                AccessLevelID = 1,
+                //AccessLevelID = 1,
                 CreateByID = "2314094f-0974-4783-ae24-97b801faf01d",
                 CreatedDate = DateTime.Now,
                 PersonStatusID = 1,
