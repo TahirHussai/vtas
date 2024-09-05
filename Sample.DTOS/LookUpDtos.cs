@@ -43,4 +43,10 @@ namespace Sample.DTOS
         public int EMAILTYPEID { get; set; }
         public string EMAILTYPEVAL { get; set; }
     }
+
+    public class StatesDto
+    {
+        public int StateId { get; set; }
+        public string StateVal { get; set; }
+    }
 }

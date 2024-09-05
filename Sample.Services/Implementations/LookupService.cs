@@ -79,6 +79,12 @@ namespace Sample.Services.Implementations
         {
             return await GetLookupDataAsync("SELECT * FROM LUShiftType");
         }
+
+        public async Task<CustomResponseDto> GetAllStatesAsync()
+        {
+            return await GetLookupDataAsync("SELECT * FROM LUShiftType");
+        }
+
         public async Task<CustomResponseDto> GetAllSuffixAsync()
         {
             return await GetLookupDataAsync("SELECT * FROM LUSuffix");
