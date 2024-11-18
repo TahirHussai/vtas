@@ -134,6 +134,61 @@ namespace Sample.BlazorUI.Implementation
             }
             return list;
         }
+        public async Task<List<StateDto>> GetStates()
+        {
+            var list = new List<StateDto>();
+            var request = new HttpRequestMessage(HttpMethod.Get, _baseUrl + StaticEndPoint.GetAllStatesEndpoint);
+            try
+            {
+                var client = _httpClientFactory.CreateClient();
+
+                HttpResponseMessage response = await client.SendAsync(request);
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var jsonObject = JObject.Parse(content);
+                    var ApiResponse = jsonObject["result"].ToObject<CustomResponseDto>();
+                    if (ApiResponse.IsSuccess)
+                    {
+                        list = JsonConvert.DeserializeObject<List<StateDto>>(ApiResponse.Obj.ToString());
+                    }
+                    return list;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            return list;
+        }
+
+        public async Task<List<ZipCodeDto>> GetZipCodes(string State)
+        {
+            var list = new List<ZipCodeDto>();
+            var request = new HttpRequestMessage(HttpMethod.Get, _baseUrl + StaticEndPoint.GetAllZipCodeEndpoint + "?state=" +State);
+            try
+            {
+                var client = _httpClientFactory.CreateClient();
+
+                HttpResponseMessage response = await client.SendAsync(request);
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var jsonObject = JObject.Parse(content);
+                    var ApiResponse = jsonObject["result"].ToObject<CustomResponseDto>();
+                    if (ApiResponse.IsSuccess)
+                    {
+                        list = JsonConvert.DeserializeObject<List<ZipCodeDto>>(ApiResponse.Obj.ToString());
+                    }
+                    return list;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            return list;
+        }
         private string GetBaseUrl(IHttpClientFactory httpClientFactory)
         {
             // Assuming you have a client named "LocalApi" configured with the base address
@@ -141,7 +196,7 @@ namespace Sample.BlazorUI.Implementation
             return client.BaseAddress.ToString();
         }
 
-       
+      
     }
 
 }

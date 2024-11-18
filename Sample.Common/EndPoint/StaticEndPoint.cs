@@ -15,6 +15,7 @@
         public static string GetClientUsersEndpoint = $"api/Account/GetClientUsersWithRoles?ClientId=";
         public static string GetVendorsUsersEndpoint = $"api/Account/GetVendorsUsersWithRoles?VendorId=";
         public static string UpdateUserRolesEndpoint = $"api/Account/assign-roles";
+        public static string GetAllCustomersEndpoint = $"api/Account/GetAllCustomers";
         #endregion
 
         #region Lookups Api
@@ -30,6 +31,8 @@
         public static string GetAllPrefixesEndpoint = "api/Lookup/prefixes";
         public static string GetAllShiftTypesEndpoint = "api/Lookup/shift-types";
         public static string GetAllSuffixEndpoint = "api/Lookup/suffix";
+        public static string GetAllStatesEndpoint = "api/Lookup/states";
+        public static string GetAllZipCodeEndpoint = "api/Lookup/zipCodes";
         #endregion
 
     }

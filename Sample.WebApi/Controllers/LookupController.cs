@@ -101,7 +101,18 @@ namespace Sample.WebApi.Controllers
             var response = await _lookupService.GetAllSuffixAsync();
             return HandleResponse(response);
         }
-
+        [HttpGet("states")]
+        public async Task<ActionResult> GetAllStates()
+        {
+            var response = await _lookupService.GetAllStatesAsync();
+            return HandleResponse(response);
+        }
+        [HttpGet("zipCodes")]
+        public async Task<ActionResult> GetAllZipCodes(string state)
+        {
+            var response = await _lookupService.GetAllZipCodesByStateAsync(state);
+            return HandleResponse(response);
+        }
         private ActionResult HandleResponse(CustomResponseDto response)
         {
             if (response.IsSuccess)

@@ -20,14 +20,8 @@ namespace Sample.Data
         public int? SufixId { get; set; }
         public string? FamilyName { get; set; }
         public string? NickName { get; set; }
-        public int? MailingAddressId { get; set; }
-        public int? PermanentAddressId { get; set; }
-        public int? EmailWorkId { get; set; }
-        public int? EmailPersonalId { get; set; }
-        public int? EmergencyPersonId { get; set; }
         public int? SpouseId { get; set; }
         public string? Title { get; set; }
-        public int? PrimaryPhoneId { get; set; }
         public int? PrefixId { get; set; }
 
         [MaxLength(100)]
@@ -38,25 +32,25 @@ namespace Sample.Data
         // Assuming you commented out PhoneId, AddressId, and ContactID intentionally, they are not included here.
 
         [MaxLength(250)]
-        public string OldVtasId { get; set; }
+        public string? OldVtasId { get; set; }
 
         [MaxLength(250)]
-        public string AltId { get; set; }
+        public string? AltId { get; set; }
 
         [MaxLength(250)]
-        public string Crid { get; set; }
+        public string? Crid { get; set; }
 
         [MaxLength(250)]
-        public string FaxID { get; set; }
+        public string? FaxID { get; set; }
 
         [MaxLength(250)]
-        public string OldId { get; set; }
+        public string? OldId { get; set; }
 
         [MaxLength(100)]
-        public string IndustryID { get; set; }
+        public string? IndustryID { get; set; }
 
         [MaxLength(100)]
-        public string LOB_ID { get; set; }
+        public string? LOB_ID { get; set; }
 
 
 

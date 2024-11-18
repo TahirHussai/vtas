@@ -1,12 +1,10 @@
 ﻿@inherits LayoutComponentBase
 
-
-<MudThemeProvider/>
+<MudThemeProvider />
+<MudPopoverProvider /> <!-- Ensure this is standalone -->
 <MudDialogProvider />
 <MudSnackbarProvider />
-
-<MudLayout >
-  
+<MudLayout>
     <MudAppBar Elevation="0">
         <MudHidden Breakpoint="Breakpoint.SmAndDown">
             <MudIcon Icon="@Icons.Custom.Brands.MudBlazor" Size="Size.Large" />
@@ -26,18 +24,9 @@
             <MudMenuItem Href="/cardlist">Back to Profile</MudMenuItem>
             <MudMenuItem Href="/Authentication/logout">Logout</MudMenuItem>
         </MudMenu>
-      @*   <MudMenu Icon="@Icons.Material.Filled.Settings"
-                 Color="Color.Inherit"
-                 AriaLabel="Open user menu" OffsetX="true" OffsetY="true" Dense="true" Class="mt-1 ml-4">
-            <MudMenuItem>Profile</MudMenuItem>
-            <MudMenuItem Href="/cardlist">Back to Profile</MudMenuItem>
-            <MudMenuItem Href="/Authentication/logout">Logout</MudMenuItem>
-        </MudMenu> *@
-        
     </MudAppBar>
-   
     <MudDrawer @bind-Open="_drawerOpen" Elevation="0" ClipMode="0">
-        <NavMenu/>
+        <NavMenu />
     </MudDrawer>
     <MudMainContent>
         <MudHidden Breakpoint="Breakpoint.SmAndDown">
@@ -45,43 +34,22 @@
                 <MudIconButton Icon="@Icons.Material.Outlined.Menu" Color="Color.Inherit" OnClick="@((e) => DrawerToggle())" Class="ml-3" />
                 <MudBreadcrumbs Items="_items"></MudBreadcrumbs>
                 <MudSpacer />
-                
             </MudToolBar>
-          
         </MudHidden>
         <MudContainer MaxWidth="MaxWidth.False" Class="mt-4">
             @Body
         </MudContainer>
     </MudMainContent>
-  
 </MudLayout>
 
-
 @code {
-    
-
     public bool _drawerOpen = true;
-    public bool _themeManagerOpen = false;
-
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
     }
-
-    void OpenThemeManager(bool value)
-    {
-        _themeManagerOpen = value;
-    }
-
- 
-
-    protected override void OnInitialized()
-    {
-        StateHasChanged();
-    }
-
     private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
-{
+    {
         new BreadcrumbItem("Personal", href: "#"),
         new BreadcrumbItem("Dashboard", href: "#"),
     };

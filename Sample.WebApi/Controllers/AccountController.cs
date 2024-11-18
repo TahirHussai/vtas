@@ -107,18 +107,77 @@ namespace Sample.WebApi.Controllers
                 }
 
                 // Add Address
-        
-                if (!await AddOrUpdateAddressAsync(CreateAddress(userDto, userId), userDto.Email))
+                if (userDto.AddressDto.AddressTypeId > 0)
                 {
-                    return BadRequest(new CustomResponseDto { IsSuccess = false, Message = "Failed to add address details." });
-                }
 
+
+                    if (!await AddOrUpdateAddressAsync(CreateAddress(userDto, userId), userDto.Email))
+                    {
+                        return BadRequest(new CustomResponseDto { IsSuccess = false, Message = "Failed to add address details." });
+                    }
+                }
                 // Add Email
-                if (!await AddOrUpdateEmailAsync(CreateEmail(userDto, userId), userDto.Email))
+                if (userDto.EmailAddressDto.EmailTypeId > 0)
                 {
-                    return BadRequest(new CustomResponseDto { IsSuccess = false, Message = "Failed to add email details." });
+                    if (!await AddOrUpdateEmailAsync(CreateEmail(userDto, userId), userDto.Email))
+                    {
+                        return BadRequest(new CustomResponseDto { IsSuccess = false, Message = "Failed to add email details." });
+                    }
+                }
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error during registration for {userDto.Email}");
+                return BadRequest(new CustomResponseDto { IsSuccess = false, Message = ex.Message, Obj = null });
+            }
+        }
+
+        [HttpPost]
+        [Route("RegisterClient")]
+        public async Task<ActionResult<CustomResponseDto>> RegisterClient([FromBody] UserCustomerDto userDto)
+        {
+            if (userDto == null)
+            {
+                return BadRequest(new CustomResponseDto { IsSuccess = false, Message = "Invalid data", Obj = null });
+            }
+
+            _logger.LogInformation($"Attempting registration for {userDto.Email}");
+
+            try
+            {
+                var response = await _authService.RegisterCustomer(userDto);
+                if (!response.IsSuccess)
+                {
+                    return BadRequest(response);
                 }
 
+                var userId = Convert.ToString(response.Obj);
+
+                // Add Other Details
+                if (!await AddOrUpdateOtherDetailsAsync(CreateOtherDetails(userId), userDto.Email))
+                {
+                    return BadRequest(new CustomResponseDto { IsSuccess = false, Message = "Failed to add other details." });
+                }
+
+                // Add Address
+                if (userDto.AddressDto.AddressTypeId > 0)
+                {
+
+
+                    if (!await AddOrUpdateAddressAsync(CreateAddress(userDto, userId), userDto.Email))
+                    {
+                        return BadRequest(new CustomResponseDto { IsSuccess = false, Message = "Failed to add address details." });
+                    }
+                }
+                // Add Email
+                if (userDto.EmailAddressDto.EmailTypeId > 0)
+                {
+                    if (!await AddOrUpdateEmailAsync(CreateEmail(userDto, userId), userDto.Email))
+                    {
+                        return BadRequest(new CustomResponseDto { IsSuccess = false, Message = "Failed to add email details." });
+                    }
+                }
                 return Ok(response);
             }
             catch (Exception ex)
@@ -154,16 +213,16 @@ namespace Sample.WebApi.Controllers
         {
             return new AddressDto
             {
-                Address1 = userDto.MailingAddress,
-                Address2 = userDto.Address2,
+                Address1 = userDto.AddressDto.Address1,
+                Address2 = userDto.AddressDto.Address2,
                 UserId = userId,
                 CreatedById = userDto.CreatedById,
                 CreateDate = DateTime.Now,
-                PostalCode = userDto.ZipCode,
-                City = userDto.City,
-                CountryId = userDto.CountryId,
-                AddressTypeId = userDto.AddressTypeId,
-                StateId=userDto.StateId
+                PostalCode = userDto.AddressDto.PostalCode,
+                City = userDto.AddressDto.City,
+                CountryId = userDto.AddressDto.CountryId,
+                AddressTypeId = userDto.AddressDto.AddressTypeId,
+                State = userDto.AddressDto.State
             };
         }
 
@@ -172,7 +231,7 @@ namespace Sample.WebApi.Controllers
             return new EmailAddressDto
             {
                 Email = userDto.Email,
-                EmailTypeId = userDto.EmailTypeId,
+                EmailTypeId = userDto.EmailAddressDto.EmailTypeId,
                 UserId = userId,
                 Active = true,
                 CreateDate = DateTime.Now,
@@ -193,7 +252,7 @@ namespace Sample.WebApi.Controllers
 
         private async Task<bool> AddOrUpdateAddressAsync(AddressDto address, string email)
         {
-            address.StateId = 0;
+            //address.State = "";
             address.CountryId = 0;
             var result = await _addressService.AddOrUpdateAddressAsync(address);
             if (!result.IsSuccess)
@@ -244,6 +303,12 @@ namespace Sample.WebApi.Controllers
             return users;
         }
 
+        [HttpGet("GetAllCustomers")]
+        public async Task<ActionResult<CustomResponseDto>> GetAllCustomers()
+        {
+            var users = await _authService.GetAllCustomerWithRoles();
+            return users;
+        }
         [HttpGet("GetCustomerUsersWithRoles")]
         public async Task<ActionResult<CustomResponseDto>> GetCustomerUsersWithRoles(string customerId)
         {

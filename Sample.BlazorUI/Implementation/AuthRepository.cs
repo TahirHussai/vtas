@@ -255,10 +255,16 @@ namespace Sample.BlazorUI.Implementation
                 var client = _httpClientFactory.CreateClient();
 
                 HttpResponseMessage response = await client.SendAsync(request);
+              
                 if (response.IsSuccessStatusCode)
                 {
+                    var content = await response.Content.ReadAsStringAsync();
+
+                    var jsonObject = JObject.Parse(content);
+                    var respnse = jsonObject["result"].ToObject<CustomResponseDto>();
+
                     obj.IsSuccess = true;
-                    obj.Message = "Successed";
+                    obj.Message = respnse.Message;
                     obj.Obj = null;
                 }
                 
@@ -313,6 +319,38 @@ namespace Sample.BlazorUI.Implementation
             }
             return usersList ?? new List<UsersWithRolesDto>();
         }
+
+        public async Task<CustomResponseDto> GetCustomers()
+        {
+             var obj = new CustomResponseDto();
+
+            try
+            {
+                var request = new HttpRequestMessage(HttpMethod.Get, $"{_baseUrl}{StaticEndPoint.GetAllCustomersEndpoint}");
+                var client = _httpClientFactory.CreateClient();
+                var response = await client.SendAsync(request);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+
+                    var jsonObject = JObject.Parse(content);
+                    obj = jsonObject["result"].ToObject<CustomResponseDto>();
+                  
+
+                   
+                }
+            }
+            catch (Exception ex)
+            {
+                obj.IsSuccess = false;
+                obj.Message = ex.ToString();
+                obj.Obj = null;
+            }
+
+            return obj;
+        }
+
         private string GetBaseUrl(IHttpClientFactory httpClientFactory)
         {
             // Assuming you have a client named "LocalApi" configured with the base address
@@ -346,7 +384,8 @@ namespace Sample.BlazorUI.Implementation
             return IsSuccess;
         }
 
-        
+     
+
 
 
 

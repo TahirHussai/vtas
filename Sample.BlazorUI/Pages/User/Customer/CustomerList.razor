@@ -1,0 +1,49 @@
+﻿@page "/customerList"
+@using Newtonsoft.Json
+@using Sample.DTOS
+@using Sample.Common
+
+@inject IAuthRepository _authRepo
+@inject ISnackbar Snackbar
+@inject NavigationManager _navManager
+@inject LocalStorageService _localStorage
+@inject HttpClient httpClient
+@using System.Net.Http.Json
+
+<MudCardActions>
+    <MudButton ButtonType="ButtonType.Submit" StartIcon="@Icons.Material.Filled.VerifiedUser" OnClick="AddNewUser" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">New Customer</MudButton>
+</MudCardActions>
+<MudTable Items="@customersList">
+   
+    <HeaderContent>
+        <MudTh>Customer Id</MudTh>
+        <MudTh>Customer Name</MudTh>
+        <MudTh>Customer Email</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Id">@context.Id</MudTd>
+        <MudTd DataLabel="UserName">Customer Name</MudTd>
+        <MudTd DataLabel="Email">@context.Email</MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private CustomResponseDto responseDto = new CustomResponseDto();
+    private List<UserWithRoleDto> customersList = new List<UserWithRoleDto>();
+    private void AddNewUser()
+    {
+        _navManager.NavigateTo("/new-customer");
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        responseDto = await _authRepo.GetCustomers();
+        if (responseDto.IsSuccess)
+        {
+            customersList = JsonConvert.DeserializeObject<List<UserWithRoleDto>>(Convert.ToString(responseDto.Obj));
+            customersList= customersList.OrderByDescending(a => a.Id).ToList();
+        }
+    }
+}

@@ -54,15 +54,15 @@ namespace Sample.Services.Implementations
             {
                 var parameters = new DynamicParameters();
                 parameters.Add("@AddressId", addressDto.AddressId);
-                parameters.Add("@Address1", addressDto.Address1);
-                parameters.Add("@Address2", addressDto.Address2);
+                parameters.Add("@AddressLine1", addressDto.Address1);
+                parameters.Add("@AddressLine2", addressDto.Address2);
                 parameters.Add("@City", addressDto.City);
-                parameters.Add("@StateId", addressDto.StateId ??0);
+                parameters.Add("@State", addressDto.State);
                 parameters.Add("@PostalCode", addressDto.PostalCode);
                 parameters.Add("@CountryId", addressDto.CountryId);
                 parameters.Add("@CreatedById", addressDto.CreatedById);
                 parameters.Add("@AddressTypeId", addressDto.AddressTypeId);
-                parameters.Add("@Active", addressDto.Active);
+                parameters.Add("@Active", true);
                 parameters.Add("@UserId", addressDto.UserId);
                 using (var connection = _context.CreateConnection())
                 {

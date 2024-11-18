@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -9,8 +9,8 @@
   <ItemGroup>
     <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="7.6.2" />
-    <PackageReference Include="MudBlazor" Version="6.15.0" />
-    <PackageReference Include="MudBlazor.ThemeManager" Version="1.1.0" />
+    <PackageReference Include="MudBlazor" Version="7.15.0" />
+    <PackageReference Include="MudBlazor.ThemeManager" Version="2.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.6.2" />
     <PackageReference Include="Toolbelt.Blazor.HttpClientInterceptor" Version="10.2.0" />
@@ -21,6 +21,10 @@
     <ProjectReference Include="..\Sample.DTOS\Sample.DTOS.csproj" />
     <ProjectReference Include="..\Sample.Services\Sample.Services.csproj" />
     <ProjectReference Include="..\Sample.WebApi\Sample.WebApi.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Pages\User\Client\" />
   </ItemGroup>
 
 </Project>

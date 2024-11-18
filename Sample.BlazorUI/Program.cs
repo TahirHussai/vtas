@@ -26,6 +26,24 @@ builder.Services.AddScoped<AuthenticationStateProvider>(p =>
 p.GetRequiredService<AuthenticationProvider>());
 builder.Services.AddScoped<JwtSecurityTokenHandler>();
 builder.Services.AddHttpClient("LocalApi", client => client.BaseAddress = new Uri("https://localhost:7182"));
+builder.Services.AddServerSideBlazor()
+       .AddCircuitOptions(options => {
+           options.DetailedErrors = true;
+           options.DisconnectedCircuitMaxRetained = 100; // Allow reconnection
+           options.DisconnectedCircuitRetentionPeriod = TimeSpan.FromMinutes(5);
+       })
+       .AddHubOptions(options =>
+        {
+            options.ClientTimeoutInterval = TimeSpan.FromSeconds(60); // Increase timeout
+            options.HandshakeTimeout = TimeSpan.FromSeconds(30); // Optional
+            options.KeepAliveInterval = TimeSpan.FromSeconds(15); // Keep the connection alive
+        });
+
+builder.Services.AddSignalR(options =>
+{
+    options.ClientTimeoutInterval = TimeSpan.FromSeconds(60);
+    options.KeepAliveInterval = TimeSpan.FromSeconds(30);
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

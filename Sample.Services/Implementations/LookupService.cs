@@ -82,7 +82,11 @@ namespace Sample.Services.Implementations
 
         public async Task<CustomResponseDto> GetAllStatesAsync()
         {
-            return await GetLookupDataAsync("SELECT * FROM LUShiftType");
+            return await GetLookupDataAsync("Select Distinct State from zip_code_database");
+        }
+        public async Task<CustomResponseDto> GetAllZipCodesByStateAsync(string state)
+        {
+            return await GetLookupDataAsync($"Select  zip as ZipCode from zip_code_database where state='{state}'");
         }
 
         public async Task<CustomResponseDto> GetAllSuffixAsync()

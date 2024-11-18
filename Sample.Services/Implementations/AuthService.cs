@@ -83,14 +83,17 @@ namespace Sample.Services.Implementations
         public async Task<CustomResponseDto> RegisterCustomer(UserCustomerDto userDto)
         {
             var user = _mapper.Map<UserPofile>(userDto);
-            user.SufixId = userDto.SuffixId;
-            user.FaxID = userDto.Fax;
-            user.UserName = userDto.UserName;
-            user.ParentId = userDto.SuperAdminId;
-            user.UserPassword = userDto.Password;
-            user.CustomerId = "00";
+            //user.SufixId = userDto.SuffixId;
+            //user.FaxID = userDto.Fax;
+            user.UserName = userDto.Email;
+            //user.DisplayName = userDto.Email;
+            //user.ParentId = userDto.SuperAdminId;
+            //user.UserPassword = userDto.Password;
+            //user.CustomerId = "00";
+            user.ParentId = userDto.CreatedById;
+            user.PersonStatusID = 1;
             user.ProfilePicture = string.Empty;
-            user.MiddleName = userDto.MiddleName;
+            //user.MiddleName = userDto.MiddleName;
             user.DisplayName = user.DisplayName ?? "NA";
             user.OldVtasId = user.OldVtasId ?? "NA";
             user.AltId = user.AltId ?? "NA";
@@ -102,11 +105,11 @@ namespace Sample.Services.Implementations
             //user.LockoutEnd = DateTime.Now;
             try
             {
-                if (string.IsNullOrEmpty(userDto.UserName) || string.IsNullOrEmpty(userDto.Email))
+                if (string.IsNullOrEmpty(userDto.Email))
                 {
-                    return new CustomResponseDto { IsSuccess = false, Message = "User name and email are required." };
+                    return new CustomResponseDto { IsSuccess = false, Message = "Email is required." };
                 }
-                if (user == null || string.IsNullOrEmpty(user.UserName) || string.IsNullOrEmpty(user.Email))
+                if (user == null  || string.IsNullOrEmpty(user.Email))
                 {
                     _logger.LogError("User object is not populated correctly");
                     return new CustomResponseDto { IsSuccess = false, Message = "User object is not populated correctly" };
@@ -127,12 +130,12 @@ namespace Sample.Services.Implementations
                 }
 
 
-                var existingUserName = await _userManager.FindByEmailAsync(userDto.UserName);
-                if (existingUserName != null)
-                {
-                    _logger.LogWarning($"A user with {userDto.UserName} is already registered");
-                    return new CustomResponseDto { IsSuccess = false, Message = $"A user with {userDto.UserName} is already registered. Please try with a different one." };
-                }
+                //var existingUserName = await _userManager.FindByEmailAsync(user.UserName);
+                //if (existingUserName != null)
+                //{
+                //    _logger.LogWarning($"A user with {user.UserName} is already registered");
+                //    return new CustomResponseDto { IsSuccess = false, Message = $"A user with {user.UserName} is already registered. Please try with a different one." };
+                //}
                 var result = await _userManager.CreateAsync(user, userDto.Password);
                 if (!result.Succeeded)
                 {
@@ -370,6 +373,89 @@ namespace Sample.Services.Implementations
             }
         }
 
+        public async Task<CustomResponseDto> AssignNewRole(UserRoleAssignmentDto userDto)
+        {
+            var user = await _userManager.FindByIdAsync(userDto.UserId);
+            if (user == null)
+            {
+                _logger.LogWarning($"User with ID {userDto.UserId} not found.");
+                return new CustomResponseDto { IsSuccess = false, Message = "Invalid Email" };
+            }
+            // Get the current roles of the user
+            var currentRoles = await _userManager.GetRolesAsync(user);
+
+            // Remove existing roles
+            await _userManager.RemoveFromRolesAsync(user, currentRoles);
+
+            foreach (var roleId in userDto.RoleIds)
+            {
+                var role = await _roleManager.FindByIdAsync(roleId);
+                if (role == null)
+                {
+                    _logger.LogWarning($"User with Role {role} with UserId {userDto.UserId} not found.");
+                    return new CustomResponseDto { IsSuccess = false, Message = "Role Not Exist" };
+                }
+
+                var userRole = new AspNetUserRole();
+
+
+
+
+                if (userRole != null)
+                {
+                    userRole.RoleId = roleId;
+                    userRole.UserId = userDto.UserId;
+                    userRole.Discriminator = roleId;
+                    userRole.CreateByID = userDto.CreateByID;
+                    userRole.UpdatedByID = userDto.UpdatedByID;
+                    userRole.UpdatedDate = userDto.UpdatedDate;
+                    userRole.CreatedDate = userDto.CreatedDate;
+                    //userRole.AccessLevelID = userDto.AccessLevelID;
+                    userRole.PersonStatusID = userDto.PersonStatusID;
+                    // Update other fields as needed
+
+                    await _context.UserRoles.AddAsync(userRole);
+                    _context.SaveChanges();
+                }
+            }
+            _logger.LogWarning($"Role Assigned Successfully");
+            return new CustomResponseDto { IsSuccess = false, Message = "Role Assigned Successfully" };
+        }
+
+        public async Task<CustomResponseDto> GetAllCustomerWithRoles()
+        {
+            try
+            {
+                var userRoles = new List<UserWithRoleDto>();
+                var usersList = await _userManager.Users.ToListAsync();
+
+                foreach (var user in usersList)
+                {
+                    var roles = await _userManager.GetRolesAsync(user);
+                    // Check if the user has the "Customer" role
+                    if (roles.Contains("Customer"))
+                    {
+                        userRoles.Add(new UserWithRoleDto
+                        {
+                            Id = user.Id,
+                            UserName = user.FirstName + (string.IsNullOrEmpty(user.Lastname) ? "" : " " + user.Lastname),
+                            Email = user.Email,
+                            Role = roles.FirstOrDefault(),
+                            CustomerId = user.CustomerId,
+                            ParentId = user.ParentId
+                        });
+                    }
+                }
+
+                return new CustomResponseDto { IsSuccess = true, Message = "Users retrieved successfully", Obj = userRoles };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving users for customer.");
+                return new CustomResponseDto { IsSuccess = false, Message = ex.Message };
+            }
+        }
+
         private async Task<string> GenerateToken(UserPofile user)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSetting:IssuerSigningKey"]));
@@ -489,55 +575,6 @@ namespace Sample.Services.Implementations
             return response;
         }
 
-        public async Task<CustomResponseDto> AssignNewRole(UserRoleAssignmentDto userDto)
-        {
-            var user = await _userManager.FindByIdAsync(userDto.UserId);
-            if (user == null)
-            {
-                _logger.LogWarning($"User with ID {userDto.UserId} not found.");
-                return new CustomResponseDto { IsSuccess = false, Message = "Invalid Email" };
-            }
-            // Get the current roles of the user
-            var currentRoles = await _userManager.GetRolesAsync(user);
-
-            // Remove existing roles
-            await _userManager.RemoveFromRolesAsync(user, currentRoles);
-
-            foreach (var roleId in userDto.RoleIds)
-            {
-                var role = await _roleManager.FindByIdAsync(roleId);
-                if (role == null)
-                {
-                    _logger.LogWarning($"User with Role {role} with UserId {userDto.UserId} not found.");
-                    return new CustomResponseDto { IsSuccess = false, Message = "Role Not Exist" };
-                }
-
-                var userRole = new AspNetUserRole();
-
-
-
-
-                if (userRole != null)
-                {
-                    userRole.RoleId = roleId;
-                    userRole.UserId = userDto.UserId;
-                    userRole.Discriminator = roleId;
-                    userRole.CreateByID = userDto.CreateByID;
-                    userRole.UpdatedByID = userDto.UpdatedByID;
-                    userRole.UpdatedDate = userDto.UpdatedDate;
-                    userRole.CreatedDate = userDto.CreatedDate;
-                    //userRole.AccessLevelID = userDto.AccessLevelID;
-                    userRole.PersonStatusID = userDto.PersonStatusID;
-                    // Update other fields as needed
-
-                    await _context.UserRoles.AddAsync(userRole);
-                    _context.SaveChanges();
-                }
-            }
-            _logger.LogWarning($"Role Assigned Successfully");
-            return new CustomResponseDto { IsSuccess = false, Message = "Role Assigned Successfully" };
-        }
-
-
+      
     }
 }

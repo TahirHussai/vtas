@@ -22,6 +22,7 @@ namespace Sample.Services.Interfaces
         Task<CustomResponseDto> GetAllShiftTypesAsync();
         Task<CustomResponseDto> GetAllSuffixAsync();
         Task<CustomResponseDto> GetAllStatesAsync();
+        Task<CustomResponseDto> GetAllZipCodesByStateAsync(string state);
     }
 
 }
