@@ -6,33 +6,8 @@
 @using Sample.DTOS
 @inject LocalStorageService _localStorage
 
-<style>
-    .legend {
-        font-family: sans-serif;
-        font-size: 14px;
-        color: #555555;
-        background-color: #ffffff;
-        font-weight: normal !important;
-        text-align: left !important;
-        width: inherit;
-        margin-bottom: 0 !important;
-        padding: 0 10px;
-        border-bottom: none;
-    }
 
-    .fieldset {
-        font-family: sans-serif;
-        color: #555555;
-        border: 1px groove #DFDED8 !important;
-        padding: 1px 15px 5px 15px !important;
-        margin: 0 0 5px 0 !important;
-        -webkit-box-shadow: 0px 0px 0px 0px gray;
-        box-shadow: 0px 0px 0px 0px gray;
-        border-color: #DFDED8 !important;
-        border-style: solid !important;
-    }
-</style>
-<fieldset class="fieldset">
+<fieldset class="fieldset" >
     <legend class="legend">  <MudText Align="Align.Center">New Customer</MudText></legend>
     <MudContainer MaxWidth="MaxWidth.Large" Class="pa-4">
         <!-- Outer fieldset -->
@@ -41,14 +16,14 @@
         <MudForm Model="@customerInfo" @ref="form" ValidationDelay="0">
 
             <!-- Customer Name -->
-            <MudTextField Label="Customer Name" @bind-Value="customerInfo.DisplayName" FullWidth="true" Class="mb-4" />
+            <MudTextField Label="Customer Name" @bind-Value="customerInfo.DisplayName" Variant="Variant.Filled" FullWidth="true" Class="mb-4" />
 
             <!-- Customer Contact Info -->
             <MudPaper Class="pa-4 mb-4" Outlined="true">
 
                 <MudGrid>
                     <MudItem xs="12" sm="6" md="2">
-                        <MudSelect T="int" @bind-Value="PrefixId" Label="Prefix" FullWidth="true" Variant="Variant.Outlined">
+                        <MudSelect T="int" @bind-Value="PrefixId" Label="Prefix" FullWidth="true" Variant="Variant.Filled">
                             @if (prefixList != null && prefixList.Any())
                             {
                                 foreach (var item in prefixList)
@@ -60,19 +35,19 @@
                     </MudItem>
 
                     <MudItem xs="12" sm="6" md="3">
-                        <MudTextField Label="First Name" @bind-Value="customerInfo.FirstName" FullWidth="true" Variant="Variant.Outlined" For="@(() => customerInfo.FirstName)" Required="true" />
+                        <MudTextField Label="First Name" @bind-Value="customerInfo.FirstName" FullWidth="true" Variant="Variant.Filled" For="@(() => customerInfo.FirstName)" Required="true" />
                     </MudItem>
 
                     <MudItem xs="12" sm="6" md="2">
-                        <MudTextField Label="Middle Name" @bind-Value="customerInfo.MiddleName" FullWidth="true" Variant="Variant.Outlined" />
+                        <MudTextField Label="Middle Name" @bind-Value="customerInfo.MiddleName" FullWidth="true" Variant="Variant.Filled" />
                     </MudItem>
 
                     <MudItem xs="12" sm="6" md="3">
-                        <MudTextField Label="Last Name" @bind-Value="customerInfo.LastName" FullWidth="true" Variant="Variant.Outlined" For="@(() => customerInfo.LastName)" Required="true" />
+                        <MudTextField Label="Last Name" @bind-Value="customerInfo.LastName" FullWidth="true" Variant="Variant.Filled" For="@(() => customerInfo.LastName)" Required="true" />
                     </MudItem>
 
                     <MudItem xs="12" sm="6" md="2">
-                        <MudSelect T="int" @bind-Value="SuffixId" Label="Suffix" FullWidth="true" Variant="Variant.Outlined">
+                        <MudSelect T="int" @bind-Value="SuffixId" Label="Suffix" FullWidth="true" Variant="Variant.Filled">
                             @foreach (var item in sufixList)
                             {
                                 <MudSelectItem T="int" Value="@item.SuffixID">@item.SuffixVAL</MudSelectItem>
@@ -81,23 +56,23 @@
                     </MudItem>
 
                     <MudItem xs="12" sm="6" md="2">
-                        <MudTextField Label="Phone" @bind-Value="customerInfo.Phone" FullWidth="true" Variant="Variant.Outlined" />
+                        <MudTextField Label="Phone" @bind-Value="customerInfo.Phone" FullWidth="true" Variant="Variant.Filled" />
                     </MudItem>
 
                     <MudItem xs="12" sm="6" md="2">
-                        <MudTextField Label="Ext." @bind-Value="customerInfo.ExtId" FullWidth="true" Variant="Variant.Outlined" />
+                        <MudTextField Label="Ext." @bind-Value="customerInfo.ExtId" FullWidth="true" Variant="Variant.Filled" />
                     </MudItem>
 
                     <MudItem xs="12" sm="6" md="3">
-                        <MudTextField Label="Fax" @bind-Value="customerInfo.Fax" FullWidth="true" Variant="Variant.Outlined" />
+                        <MudTextField Label="Fax" @bind-Value="customerInfo.Fax" FullWidth="true" Variant="Variant.Filled" />
                     </MudItem>
 
                     <MudItem xs="12" sm="6" md="3">
-                        <MudTextField Label="Email" @bind-Value="customerInfo.Email" FullWidth="true" Variant="Variant.Outlined" For="@(() => customerInfo.Email)" Required="true" />
+                        <MudTextField Label="Email" @bind-Value="customerInfo.Email" FullWidth="true" Variant="Variant.Filled" For="@(() => customerInfo.Email)" Required="true" />
                     </MudItem>
 
                     <MudItem xs="12" sm="6" md="2">
-                        <MudSelect T="int" @bind-Value="EmailTypeId" Label="Email Type" FullWidth="true" Variant="Variant.Outlined">
+                        <MudSelect T="int" @bind-Value="EmailTypeId" Label="Email Type" FullWidth="true" Variant="Variant.Filled">
                             @foreach (var item in emailTypeList)
                             {
                                 <MudSelectItem T="int" Value="@item.EMAILTYPEID">@item.EMAILTYPEVAL</MudSelectItem>
@@ -106,15 +81,15 @@
                     </MudItem>
 
                     <MudItem xs="12" sm="5">
-                        <MudTextField Label="Mailing Address" @bind-Value="customerInfo.AddressDto.Address1" FullWidth="true" Variant="Variant.Outlined" />
+                        <MudTextField Label="Mailing Address" @bind-Value="customerInfo.AddressDto.Address1" FullWidth="true" Variant="Variant.Filled" />
                     </MudItem>
 
                     <MudItem xs="12" sm="5">
-                        <MudTextField Label="Address 2" @bind-Value="customerInfo.AddressDto.Address2" FullWidth="true" Variant="Variant.Outlined" />
+                        <MudTextField Label="Address 2" @bind-Value="customerInfo.AddressDto.Address2" FullWidth="true" Variant="Variant.Filled" />
                     </MudItem>
 
                     <MudItem xs="12" sm="6" md="2">
-                        <MudSelect T="int" @bind-Value="AddressTypeId" Label="Address Type" FullWidth="true" Variant="Variant.Outlined">
+                        <MudSelect T="int" @bind-Value="AddressTypeId" Label="Address Type" FullWidth="true" Variant="Variant.Filled">
                             @foreach (var item in addressTypeList)
                             {
                                 <MudSelectItem T="int" Value="@item.AddressTypeID">@item.AddressTypeVAL</MudSelectItem>
@@ -123,11 +98,11 @@
                     </MudItem>
 
                     <MudItem xs="12" sm="6">
-                        <MudTextField Label="City" @bind-Value="customerInfo.AddressDto.City" FullWidth="true" Variant="Variant.Outlined" />
+                        <MudTextField Label="City" @bind-Value="customerInfo.AddressDto.City" FullWidth="true" Variant="Variant.Filled" />
                     </MudItem>
 
                     <MudItem xs="12" sm="3">
-                        <MudSelect T="string" Label="State" Value="selectedState" ValueChanged="stateClicked" FullWidth="true" Variant="Variant.Outlined">
+                        <MudSelect T="string" Label="State" Value="selectedState" ValueChanged="stateClicked" FullWidth="true" Variant="Variant.Filled">
                             @foreach (var item in statesList)
                             {
                                 <MudSelectItem T="string" Value="@item.State">@item.State</MudSelectItem>
@@ -136,7 +111,7 @@
                     </MudItem>
 
                     <MudItem xs="12" sm="3">
-                        <MudSelect T="string" Label="ZipCode" @bind-Value="ZipCode" FullWidth="true" Variant="Variant.Outlined">
+                        <MudSelect T="string" Label="ZipCode" @bind-Value="ZipCode" FullWidth="true" Variant="Variant.Filled">
                             @foreach (var item in zipCodesList)
                             {
                                 <MudSelectItem T="string" Value="@item.ZipCode">@item.ZipCode</MudSelectItem>
@@ -144,7 +119,7 @@
                         </MudSelect>
                     </MudItem>
 
-                    @* <MudTextField Label="Zip Code" @bind-Value="customerInfo.ZipCode" FullWidth="true" Variant="Variant.Outlined" />
+                    @* <MudTextField Label="Zip Code" @bind-Value="customerInfo.ZipCode" FullWidth="true" Variant="Variant.Filled" />
                     </MudItem> *@
                 </MudGrid>
 
@@ -250,21 +225,7 @@
         emailTypeList = await _lookupRepo.GetEmailType();
         addressTypeList = await _lookupRepo.GetAddressType();
         statesList = await _lookupRepo.GetStates();
-
     }
-    private void onSelect()
-    {
-
-    }
-    private async void onchangeState(ChangeEventArgs e)
-    {
-        string selectedState = e.Value.ToString();
-        customerInfo.AddressDto.State = selectedState;
-
-        // Load the zip codes based on the selected state
-        zipCodesList = await GetZipCodesByState(selectedState);
-    }
-
     private async  Task<List<ZipCodeDto>> GetZipCodesByState(string state)
     {
         return await _lookupRepo.GetZipCodes(state);
