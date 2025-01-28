@@ -14,6 +14,7 @@ namespace Sample.Services.Interfaces
         Task<CustomResponseDto> LoginUser(LoginDTO userDto);
         Task<CustomResponseDto> RegisterUser(UserDto userDto);
         Task<CustomResponseDto> RegisterCustomer(UserCustomerDto userDto);
+        Task<CustomResponseDto> RegisterClient(UserClientDto userDto);
         Task<CustomResponseDto> AssignNewRole(UserRoleAssignmentDto userDto);
         Task<CustomResponseDto> GetUserById(string userId);
         Task<CustomResponseDto> GetAllUsersWithRoles();

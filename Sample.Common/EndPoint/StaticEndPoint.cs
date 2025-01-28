@@ -8,6 +8,7 @@
         #region Account Api
         public static string AuthRegisterEndpoint = $"api/Account/UserRegister";
         public static string AuthRegisterCustomerEndpoint = $"api/Account/RegisterCustomer";
+        public static string AuthRegisterClientEndpoint = $"api/Account/RegisterClient";
         public static string AuthLoginEndpoint = $"api/Account/UserLogin";
         public static string GetUsersEndpoint = $"api/Account/AllUsersWithRole";
         public static string GetUserByIdEndpoint = $"api/Account/GetUserById?UserId=";

@@ -1,124 +1,176 @@
 ﻿@page "/new-client"
 @inject ISnackbar Snackbar
+@inject IAuthRepository _authRepo
+@inject ILookUpRepository _lookupRepo
+@inject ISnackbar Snackbar
 @inject NavigationManager _navManager
+@using Sample.DTOS
+@inject LocalStorageService _localStorage
 
+<style>
+    .fieldset {
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
 
+.legend {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #555;
+}
+</style>
 
-<fieldset class="fieldset" >
-    <legend class="legend">  <MudText Align="Align.Center">New Client</MudText></legend>
-<MudGrid>
-    <!-- Client Info Section -->
-    <MudItem xs="12" md="6">
-        <MudCard>
-            <MudCardHeader>
-                <MudText Typo="Typo.h6">Client Info</MudText>
-            </MudCardHeader>
-            <MudCardContent>
-                <MudGrid>
-                        <MudItem xs="12" md="6">
-                        <MudTextField T="string" Label="Client Name" Variant="Variant.Filled" />
-                    </MudItem>
-                        <MudItem xs="12" md="6">
-                        <MudTextField T="string" Label="Display Name" Variant="Variant.Filled" />
-                    </MudItem>
-                        <MudItem xs="12" md="6">
-                        <MudTextField T="string" Label="Internal ID" Variant="Variant.Filled" />
-                    </MudItem>
-                    <MudItem xs="12" md="6">
-                        <MudTextField T="string" Label="Phone" Variant="Variant.Filled" />
-                    </MudItem>
+<fieldset class="fieldset">
+    <legend class="legend"><MudText Align="Align.Center">New Client</MudText></legend>
+    <MudContainer MaxWidth="MaxWidth.Large">
+        <MudForm Model="@clientInfo" @ref="form" ValidationDelay="0">
+            <MudGrid>
+                <!-- Client Info Section -->
+                <MudItem xs="12" md="6">
+                    <MudCard>
+                        <MudCardHeader>
+                            <MudText Typo="Typo.h6">Client Info</MudText>
+                        </MudCardHeader>
+                        <MudCardContent>
+                            <MudGrid>
+                                <MudItem xs="12" md="6">
+                                    <MudTextField Label="Client Name" @bind-Value="clientInfo.ClientName" Variant="Variant.Filled" FullWidth="true" />
+                                </MudItem>
+                                <MudItem xs="12" md="6">
+                                    <MudTextField Label="Display Name" @bind-Value="clientInfo.DisplayName" Variant="Variant.Filled" FullWidth="true" />
+                                </MudItem>
+                                <MudItem xs="12" md="4">
+                                    <MudTextField Label="Internal ID" @bind-Value="clientInfo.InternalId" Variant="Variant.Filled" FullWidth="true" />
+                                </MudItem>
+                                <MudItem xs="12" md="6">
+                                    <MudTextField Label="Phone" @bind-Value="clientInfo.Phone" Variant="Variant.Filled" FullWidth="true" />
+                                </MudItem>
+                                <MudItem xs="6" md="2">
+                                    <MudTextField Label="Ext" @bind-Value="clientInfo.Ext1" Variant="Variant.Filled" FullWidth="true" />
+                                </MudItem>
+                                <MudItem xs="6" md="6">
+                                    <MudTextField Label="Fax" @bind-Value="clientInfo.PrimaryFax" Variant="Variant.Filled" FullWidth="true" />
+                                </MudItem>
+                                <MudItem xs="12" md="6">
+                                    <MudTextField Label="Email" @bind-Value="clientInfo.PrimaryEmail" Variant="Variant.Filled" FullWidth="true" />
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudTextField Label="Mailing Address" @bind-Value="clientInfo.AddressDto.Address1" Variant="Variant.Filled" FullWidth="true" />
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudTextField Label="Address 2" @bind-Value="clientInfo.AddressDto.Address2" Variant="Variant.Filled" FullWidth="true" />
+                                </MudItem>
+                                <MudItem xs="12" md="6">
+                                    <MudTextField Label="City" @bind-Value="clientInfo.AddressDto.City" Variant="Variant.Filled" FullWidth="true" />
+                                </MudItem>
+                                <MudItem xs="12" md="3">
+                                    <MudTextField Label="State" @bind-Value="clientInfo.AddressDto.State" Variant="Variant.Filled" FullWidth="true" />
+                                </MudItem>
+                                <MudItem xs="12" md="3">
+                                    <MudTextField Label="Postal Code" @bind-Value="clientInfo.AddressDto.PostalCode" Variant="Variant.Filled" FullWidth="true" />
+                                </MudItem>
+                            </MudGrid>
+                        </MudCardContent>
+                    </MudCard>
+                </MudItem>
 
-                    <MudItem xs="6" md="3">
-                        <MudTextField T="string" Label="Ext" Variant="Variant.Filled" />
-                    </MudItem>
-                    <MudItem xs="6" md="3">
-                        <MudTextField T="string" Label="Fax" Variant="Variant.Filled" />
-                    </MudItem>
-                        <MudItem xs="12" md="6">
-                            <MudTextField T="string" Label="Email" Variant="Variant.Filled" />
-                        </MudItem>
-                    <MudItem xs="12">
-                        <MudTextField T="string" Label="Mailing Address" Variant="Variant.Filled" />
-                    </MudItem>
-                    <MudItem xs="12">
-                        <MudTextField T="string" Label="Address 2" Variant="Variant.Filled" />
-                    </MudItem>
-                    <MudItem xs="12" md="6">
-                        <MudTextField T="string" Label="City" Variant="Variant.Filled" />
-                    </MudItem>
-                    <MudItem xs="12" md="3">
-                        <MudSelect T="string" Label="State" Variant="Variant.Filled">
-                           
-                            <!-- Add other states -->
-                        </MudSelect>
-                    </MudItem>
-                    <MudItem xs="12" md="3">
-                        <MudTextField T="string" Label="Zip Code" Variant="Variant.Filled" />
-                    </MudItem>
-                </MudGrid>
-            </MudCardContent>
-        </MudCard>
-    </MudItem>
-
-    <!-- Contact Info Section -->
-    <MudItem xs="12" md="6">
-        <MudCard>
-            <MudCardHeader>
-                <MudText Typo="Typo.h6">Contact Info</MudText>
-            </MudCardHeader>
-            <MudCardContent>
-                <MudGrid>
-                    <MudItem xs="12" md="3">
-                        <MudSelect T="string" Label="Prefix" Variant="Variant.Filled">
-                          
-                        </MudSelect>
-                    </MudItem>
-                    <MudItem xs="12" md="9">
-                        <MudTextField T="string" Label="Contact First Name" Variant="Variant.Filled" />
-                    </MudItem>
-                    <MudItem xs="12">
-                        <MudTextField T="string" Label="Middle Name" Variant="Variant.Filled" />
-                    </MudItem>
-                    <MudItem xs="12">
-                        <MudTextField T="string" Label="Last Name" Variant="Variant.Filled" />
-                    </MudItem>
-                    <MudItem xs="12" md="3">
-                        <MudSelect T="string" Label="Suffix" Variant="Variant.Filled">
-                            
-                        </MudSelect>
-                    </MudItem>
-                    <MudItem xs="12" md="6">
-                        <MudTextField T="string" Label="Phone" Variant="Variant.Filled" />
-                    </MudItem>
-                    <MudItem xs="6" md="3">
-                        <MudTextField T="string" Label="Ext" Variant="Variant.Filled" />
-                    </MudItem>
-                    <MudItem xs="6" md="3">
-                        <MudTextField T="string" Label="Fax" Variant="Variant.Filled" />
-                    </MudItem>
-                        <MudItem xs="6" md="3">
-                        <MudTextField T="string" Label="Email" Variant="Variant.Filled" />
-                    </MudItem>
-                        <MudItem xs="12" md="6">
-                            <MudSelect T="string" Label="Client Contact" Variant="Variant.Filled">
-
-                            </MudSelect>
-                        </MudItem>
-
-                       
-                </MudGrid>
-                    <!-- Card Actions -->
-                    <MudCardActions>
-                        <MudSpacer /> <!-- Pushes the buttons to the right -->
-                        <MudButton Variant="Variant.Filled" Color="Color.Secondary" DropShadow="false">Cancel</MudButton>
-                        <MudButton Variant="Variant.Filled" Color="Color.Primary" Style="margin-left: 20px;">Submit</MudButton>
-                        @* <MudButton Variant="Variant.Filled" Color="Color.Primary" class="mt-5" OnClick="HandleSubmit" Size="Size.Large" FullWidth="true">Sign In</MudButton> *@
-
-                    </MudCardActions>
-            </MudCardContent>
-        </MudCard>
-    </MudItem>
-</MudGrid>
+                <!-- Contact Info Section -->
+                <MudItem xs="12" md="6">
+                    <MudCard>
+                        <MudCardHeader>
+                            <MudText Typo="Typo.h6">Contact Info</MudText>
+                        </MudCardHeader>
+                        <MudCardContent>
+                            <MudGrid>
+                                <MudItem xs="12" md="3">
+                                    <MudSelect T="int" @bind-Value="PrefixId" Label="Prefix" FullWidth="true" Variant="Variant.Filled">
+                                        @if (prefixList != null && prefixList.Any())
+                                        {
+                                            foreach (var item in prefixList)
+                                            {
+                                                <MudSelectItem T="int" Value="@item.PrefixID">@item.PrefixVal</MudSelectItem>
+                                            }
+                                        }
+                                    </MudSelect>
+                                </MudItem>
+                                <MudItem xs="12" md="9">
+                                    <MudTextField Label="Contact First Name" @bind-Value="clientInfo.FirstName" Variant="Variant.Filled" FullWidth="true" />
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudTextField Label="Middle Name" @bind-Value="clientInfo.MiddleName" Variant="Variant.Filled" FullWidth="true" />
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudTextField Label="Last Name" @bind-Value="clientInfo.LastName" Variant="Variant.Filled" FullWidth="true" />
+                                </MudItem>
+                                <MudItem xs="12" md="3">
+                                    <MudSelect T="int" @bind-Value="SuffixId" Label="Suffix" FullWidth="true" Variant="Variant.Filled">
+                                        @foreach (var item in sufixList)
+                                        {
+                                            <MudSelectItem T="int" Value="@item.SuffixID">@item.SuffixVAL</MudSelectItem>
+                                        }
+                                    </MudSelect>
+                                </MudItem>
+                                <MudItem xs="12" md="6">
+                                    <MudTextField Label="Phone" @bind-Value="clientInfo.Phone" Variant="Variant.Filled" FullWidth="true" />
+                                </MudItem>
+                                <MudItem xs="6" md="3">
+                                    <MudTextField Label="Ext" @bind-Value="clientInfo.Ext2" Variant="Variant.Filled" FullWidth="true" />
+                                </MudItem>
+                                <MudItem xs="6" md="3">
+                                    <MudTextField Label="Fax" @bind-Value="clientInfo.SecondaryFax" Variant="Variant.Filled" FullWidth="true" />
+                                </MudItem>
+                                <MudItem xs="6" md="3">
+                                    <MudTextField Label="Email" @bind-Value="clientInfo.SecondaryEmail" Variant="Variant.Filled" FullWidth="true" />
+                                </MudItem>
+                                <MudItem xs="12" md="6">
+                                    <MudSelect T="string" Label="Client Contact" Variant="Variant.Filled">
+                                    </MudSelect>
+                                </MudItem>
+                            </MudGrid>
+                            <!-- Card Actions -->
+                            <MudCardActions>
+                                <MudSpacer /> <!-- Pushes the buttons to the right -->
+                                <MudButton Variant="Variant.Filled" Color="Color.Secondary" DropShadow="false">Cancel</MudButton>
+                                <MudButton Variant="Variant.Filled" Color="Color.Primary" Style="margin-left: 20px;">Submit</MudButton>
+                            </MudCardActions>
+                        </MudCardContent>
+                    </MudCard>
+                </MudItem>
+            </MudGrid>
+        </MudForm>
+    </MudContainer>
 </fieldset>
+
+
+
+
+
+
+
+@code {
+
+
+    private MudForm form;
+    private CustomResponseDto response = new CustomResponseDto();
+    private int PrefixId = 0;
+    private int SuffixId = 0;
+    private string ZipCode = "";
+    UserClientDto clientInfo = new UserClientDto();
+
+    private List<PrefixDto> prefixList = new List<PrefixDto>();
+    private List<SufixDto> sufixList = new List<SufixDto>();
+    private List<StateDto> statesList = new List<StateDto>();
+    private List<ZipCodeDto> zipCodesList = new List<ZipCodeDto>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        prefixList = await _lookupRepo.GetPrefix();
+        sufixList = await _lookupRepo.GetSuffix();
+        statesList = await _lookupRepo.GetStates();
+    }
+}
 
 

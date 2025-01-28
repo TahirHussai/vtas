@@ -155,7 +155,81 @@ namespace Sample.Services.Implementations
                 return new CustomResponseDto { IsSuccess = false, Message = $"An unexpected error occurred during registration. Error {ex.ToString()}" };
             }
         }
+        public async Task<CustomResponseDto> RegisterClient(UserClientDto userDto)
+        {
+            var user = _mapper.Map<UserPofile>(userDto);
+            //user.SufixId = userDto.SuffixId;
+            //user.FaxID = userDto.Fax;
+            user.Email = userDto.PrimaryEmail;
+            user.UserName = userDto.ClientName ?? "NA";
+            user.DisplayName = userDto.DisplayName ?? "NA";
+            //user.ParentId = userDto.SuperAdminId;
+            //user.UserPassword = userDto.Password;
+            //user.CustomerId = "00";
+            user.ParentId = userDto.CreatedById;
+            user.PersonStatusID = 1;
+            user.ProfilePicture = string.Empty;
+            user.MiddleName = userDto.MiddleName ?? "NA";
+            user.OldVtasId = user.OldVtasId ?? "NA";
+            user.AltId = user.AltId ?? "NA";
+            user.FaxID = user.FaxID ?? "NA";
+            user.OldId = user.OldId ?? "NA";
+            user.IndustryID = user.IndustryID ?? "NA";
+            user.LOB_ID = user.LOB_ID ?? "NA";
+            user.Crid = user.Crid ?? "NA";
+            //user.LockoutEnd = DateTime.Now;
+            try
+            {
+                if (string.IsNullOrEmpty(userDto.PrimaryEmail))
+                {
+                    return new CustomResponseDto { IsSuccess = false, Message = "Email is required." };
+                }
+                if (user == null || string.IsNullOrEmpty(user.Email))
+                {
+                    _logger.LogError("User object is not populated correctly");
+                    return new CustomResponseDto { IsSuccess = false, Message = "User object is not populated correctly" };
+                }
 
+                var existingUser = await _userManager.FindByEmailAsync(userDto.PrimaryEmail);
+                if (existingUser != null)
+                {
+                    // Check other fields if needed
+                    var userName = existingUser.UserName ?? "Unknown"; // Handle possible null value
+                    _logger.LogWarning($"A user with the email {userDto.PrimaryEmail} and username {userName} is already registered.");
+
+                    return new CustomResponseDto
+                    {
+                        IsSuccess = false,
+                        Message = $"A user with the email {userDto.PrimaryEmail} is already registered. Please try with a different one."
+                    };
+                }
+
+
+                //var existingUserName = await _userManager.FindByEmailAsync(user.UserName);
+                //if (existingUserName != null)
+                //{
+                //    _logger.LogWarning($"A user with {user.UserName} is already registered");
+                //    return new CustomResponseDto { IsSuccess = false, Message = $"A user with {user.UserName} is already registered. Please try with a different one." };
+                //}
+                var result = await _userManager.CreateAsync(user, userDto.Password);
+                if (!result.Succeeded)
+                {
+                    var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                    _logger.LogError($"Failed to register user {userDto.PrimaryEmail}: {errors}");
+                    return new CustomResponseDto { IsSuccess = false, Message = $"Failed to register user: {errors}" };
+                }
+
+                // Assign Role
+                await AssignUserRoleAsync(user, userDto.RoleName);
+
+                return new CustomResponseDto { IsSuccess = true, Message = "Client Registration successful", Obj = user.Id };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An error occurred while registering the user {userDto.PrimaryEmail}");
+                return new CustomResponseDto { IsSuccess = false, Message = $"An unexpected error occurred during registration. Error {ex.ToString()}" };
+            }
+        }
         private async Task AssignUserRoleAsync(UserPofile user, string roleName)
         {
             // Check if the user is already in the role to avoid duplication
@@ -575,6 +649,6 @@ namespace Sample.Services.Implementations
             return response;
         }
 
-      
+     
     }
 }

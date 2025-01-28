@@ -280,6 +280,45 @@ namespace Sample.BlazorUI.Implementation
             }
             return obj;
         }
+        public async Task<CustomResponseDto> RegisterClient(UserClientDto dto)
+        {
+            var obj = new CustomResponseDto();
+            try
+            {
+
+
+                var request = new HttpRequestMessage(HttpMethod.Post, _baseUrl + StaticEndPoint.AuthRegisterClientEndpoint)
+                {
+                    Content = new StringContent(JsonConvert.SerializeObject(dto), Encoding.UTF8, "application/json")
+                };
+                var client = _httpClientFactory.CreateClient();
+
+                HttpResponseMessage response = await client.SendAsync(request);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+
+                    var jsonObject = JObject.Parse(content);
+                    var respnse = jsonObject["result"].ToObject<CustomResponseDto>();
+
+                    obj.IsSuccess = true;
+                    obj.Message = respnse.Message;
+                    obj.Obj = null;
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+
+                obj.IsSuccess = false;
+                obj.Message = ex.ToString();
+                obj.Obj = null;
+
+            }
+            return obj;
+        }
         public async Task Logout()
         {
             await _localStorageService.RemoveItemAsync("CustomerId");

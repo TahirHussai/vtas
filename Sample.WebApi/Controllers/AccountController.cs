@@ -15,12 +15,14 @@ namespace Sample.WebApi.Controllers
         private readonly IOtherDetailsService _otherDetailsService;
         private readonly IAddressService _addressService;
         private readonly IEmailAddressService _emailAddressService;
+        private readonly IPhoneService _phoneService;
 
 
         public AccountController(IAuthService authService, IUserService userService, ILogger<AccountController> logger
             , IOtherDetailsService otherDetailsService,
            IAddressService addressService,
-           IEmailAddressService emailAddressService)
+           IEmailAddressService emailAddressService,
+           IPhoneService phoneService)
         {
             _authService = authService;
             _userService = userService;
@@ -28,6 +30,7 @@ namespace Sample.WebApi.Controllers
             _otherDetailsService = otherDetailsService;
             _addressService = addressService;
             _emailAddressService = emailAddressService;
+            _phoneService = phoneService;
 
         }
 
@@ -135,18 +138,18 @@ namespace Sample.WebApi.Controllers
 
         [HttpPost]
         [Route("RegisterClient")]
-        public async Task<ActionResult<CustomResponseDto>> RegisterClient([FromBody] UserCustomerDto userDto)
+        public async Task<ActionResult<CustomResponseDto>> RegisterClient([FromBody] UserClientDto userDto)
         {
             if (userDto == null)
             {
                 return BadRequest(new CustomResponseDto { IsSuccess = false, Message = "Invalid data", Obj = null });
             }
 
-            _logger.LogInformation($"Attempting registration for {userDto.Email}");
+            _logger.LogInformation($"Attempting registration for {userDto.PrimaryEmail}");
 
             try
             {
-                var response = await _authService.RegisterCustomer(userDto);
+                var response = await _authService.RegisterClient(userDto);
                 if (!response.IsSuccess)
                 {
                     return BadRequest(response);
@@ -155,7 +158,7 @@ namespace Sample.WebApi.Controllers
                 var userId = Convert.ToString(response.Obj);
 
                 // Add Other Details
-                if (!await AddOrUpdateOtherDetailsAsync(CreateOtherDetails(userId), userDto.Email))
+                if (!await AddOrUpdateOtherDetailsAsync(CreateOtherDetails(userId), userDto.PrimaryEmail))
                 {
                     return BadRequest(new CustomResponseDto { IsSuccess = false, Message = "Failed to add other details." });
                 }
@@ -164,25 +167,74 @@ namespace Sample.WebApi.Controllers
                 if (userDto.AddressDto.AddressTypeId > 0)
                 {
 
+                    await AddOrUpdateAddressAsync(userDto.AddressDto, userDto.PrimaryEmail);
 
-                    if (!await AddOrUpdateAddressAsync(CreateAddress(userDto, userId), userDto.Email))
+                }
+                // Add Primary Email
+                if (!string.IsNullOrEmpty(userDto.PrimaryEmail))
+                {
+                    var emailObj = new EmailAddressDto
                     {
-                        return BadRequest(new CustomResponseDto { IsSuccess = false, Message = "Failed to add address details." });
+                        Active = true,
+                        CreatedById = userDto.CreatedById,
+                        Email = userDto.PrimaryEmail,
+                        EmailTypeId = 1, // Work Email
+                        UserId = userId,
+                    };
+                    await AddOrUpdateEmailAsync(emailObj, userDto.PrimaryEmail);
+                }
+
+                // Add Secondary Email
+                if (!string.IsNullOrEmpty(userDto.SecondaryEmail))
+                {
+                    var emailObj = new EmailAddressDto
+                    {
+                        Active = true,
+                        CreatedById = userDto.CreatedById,
+                        Email = userDto.SecondaryEmail,
+                        EmailTypeId = 2, // Contact Email
+                        UserId = userId,
+                    };
+                    await AddOrUpdateEmailAsync(emailObj, userDto.SecondaryEmail);
+                }
+                // Add Phone No
+                if (userDto.PhoneDtos.Count() > 0)
+                {
+                    foreach (var phoneDto in userDto.PhoneDtos)
+                    {
+                        if (phoneDto != null)
+                        {
+                            phoneDto.UserId = Convert.ToString(userId);
+                            await _phoneService.AddPhoneAsync(phoneDto);
+                        }
                     }
                 }
-                // Add Email
-                if (userDto.EmailAddressDto.EmailTypeId > 0)
+                // Add Fax No
+                if (userDto.FaxDtos.Count() > 0)
                 {
-                    if (!await AddOrUpdateEmailAsync(CreateEmail(userDto, userId), userDto.Email))
+                    foreach (var item in userDto.FaxDtos)
                     {
-                        return BadRequest(new CustomResponseDto { IsSuccess = false, Message = "Failed to add email details." });
+                        if (item != null)
+                        {
+                            var obj = new CreatePhoneDto
+                            {
+                                Active = item.Active,
+                                CreatedById = userDto.CreatedById,
+                                PhoneExt = item.Ext,
+                                PhoneNumber = item.Fax,
+                                PhoneTypeID = 5,
+                                UserId = Convert.ToString(userId),
+                            };
+                            await _phoneService.AddPhoneAsync(obj);
+
+                        }
                     }
                 }
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error during registration for {userDto.Email}");
+                _logger.LogError(ex, $"Error during registration for {userDto.PrimaryEmail}");
                 return BadRequest(new CustomResponseDto { IsSuccess = false, Message = ex.Message, Obj = null });
             }
         }
@@ -238,7 +290,19 @@ namespace Sample.WebApi.Controllers
                 CreatedById = userDto.CreatedById
             };
         }
-
+        private PhoneDto CreatePhone(PhoneDto userDto, string userId)
+        {
+            return new PhoneDto
+            {
+                PhoneExt = userDto.PhoneExt,
+                PhoneTypeID = userDto.PhoneTypeID,
+                UserId = userId,
+                Active = true,
+                CreateDate = DateTime.Now,
+                CreatedById = userDto.CreatedById,
+                PhoneNumber = userDto.PhoneNumber,
+            };
+        }
         private async Task<bool> AddOrUpdateOtherDetailsAsync(OtherDetailsDto otherDetail, string email)
         {
             var result = await _otherDetailsService.AddOrUpdateOtherDetailsAsync(otherDetail);

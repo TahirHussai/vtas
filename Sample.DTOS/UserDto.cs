@@ -80,4 +80,41 @@ namespace Sample.DTOS
         public AddressDto AddressDto { get; set; } = new AddressDto(); // Initialize here
         public EmailAddressDto EmailAddressDto { get; set; } = new EmailAddressDto(); // Initialize here
     }
+    public class UserClientDto
+    {
+        [Required(ErrorMessage = "First name is required.")]
+        public string FirstName { get; set; }
+        public string? DisplayName { get; set; }
+        [Required(ErrorMessage = "Email is required.")]
+        public string? LastName { get; set; }
+        public string? MiddleName { get; set; }
+        public string? ClientName { get; set; }
+        public string? InternalId { get; set; }
+
+        [Required(ErrorMessage = "Password is required.")]
+        public string Password { get; set; }
+        [Required(ErrorMessage = "CreatedBy Id is required.")]
+        public string? CreatedById { get; set; }
+        [Required(ErrorMessage = "Role Name is required.")]
+        public string RoleName { get; set; }
+        [Required(ErrorMessage = "Customer Id is required.")]
+        public string CustomerId { get; set; }
+        [Required(ErrorMessage = "SuperAdmin Id is required.")]
+        public string SuperAdminId { get; set; }
+        public string? Phone { get; set; }
+        public int? PrefixId { get; set; }
+        public string? Ext1 { get; set; }
+        public string? Ext2 { get; set; }
+        [Required(ErrorMessage = "Email is required.")]
+        [EmailAddress(ErrorMessage = "Invalid email address.")]
+        public string PrimaryEmail { get; set; }
+        public string SecondaryEmail { get; set; }
+        public string? PrimaryFax { get; set; }
+        public string? SecondaryFax { get; set; }
+        public int? SuffixId { get; set; }
+        public AddressDto AddressDto { get; set; } = new AddressDto(); // Initialize here
+       // public List<EmailAddressDto> EmailAddressDto { get; set; } = new List<EmailAddressDto>(); // Initialize here
+        public List<CreatePhoneDto> PhoneDtos { get; set; } = new List<CreatePhoneDto>();//Initialize here
+        public List<FaxDto> FaxDtos { get; set; } = new List<FaxDto>();//Initialize here
+    }
 }

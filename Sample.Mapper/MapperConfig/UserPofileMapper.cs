@@ -10,6 +10,7 @@ namespace Sample.Mapper.MaperConfig
             CreateMap<UserDto, UserPofile>().ReverseMap();
             CreateMap<UserPofile, UserDto>().ReverseMap();
             CreateMap<UserCustomerDto, UserPofile>().ReverseMap();
+            CreateMap<UserClientDto, UserPofile>().ReverseMap();
         }
     }
 }
