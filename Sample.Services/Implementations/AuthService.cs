@@ -109,7 +109,7 @@ namespace Sample.Services.Implementations
                 {
                     return new CustomResponseDto { IsSuccess = false, Message = "Email is required." };
                 }
-                if (user == null  || string.IsNullOrEmpty(user.Email))
+                if (user == null || string.IsNullOrEmpty(user.Email))
                 {
                     _logger.LogError("User object is not populated correctly");
                     return new CustomResponseDto { IsSuccess = false, Message = "User object is not populated correctly" };
@@ -220,7 +220,7 @@ namespace Sample.Services.Implementations
                 }
 
                 // Assign Role
-                await AssignUserRoleAsync(user, userDto.RoleName);
+                await AssignUserRoleAsync(user, "Client");
 
                 return new CustomResponseDto { IsSuccess = true, Message = "Client Registration successful", Obj = user.Id };
             }
@@ -580,7 +580,8 @@ namespace Sample.Services.Implementations
                             Id = user.Id,
                             UserName = $"{user.FirstName} {user.Lastname}",
                             Email = user.Email,
-                            Role = role
+                            Role = role,
+                            CustomerId = user.CustomerId
                         });
                     }
                 }
@@ -649,6 +650,6 @@ namespace Sample.Services.Implementations
             return response;
         }
 
-     
+
     }
 }

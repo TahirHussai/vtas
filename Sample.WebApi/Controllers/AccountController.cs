@@ -210,25 +210,33 @@ namespace Sample.WebApi.Controllers
                     }
                 }
                 // Add Fax No
-                if (userDto.FaxDtos.Count() > 0)
+                if (!string.IsNullOrEmpty(userDto.PrimaryFax))
                 {
-                    foreach (var item in userDto.FaxDtos)
-                    {
-                        if (item != null)
-                        {
+                   
                             var obj = new CreatePhoneDto
                             {
-                                Active = item.Active,
+                                Active = true,
                                 CreatedById = userDto.CreatedById,
-                                PhoneExt = item.Ext,
-                                PhoneNumber = item.Fax,
+                                PhoneExt = userDto.Ext1,
+                                PhoneNumber = userDto.PrimaryFax,
                                 PhoneTypeID = 5,
                                 UserId = Convert.ToString(userId),
                             };
                             await _phoneService.AddPhoneAsync(obj);
+                }
+                if (!string.IsNullOrEmpty(userDto.SecondaryFax))
+                {
 
-                        }
-                    }
+                    var obj = new CreatePhoneDto
+                    {
+                        Active = true,
+                        CreatedById = userDto.CreatedById,
+                        PhoneExt = userDto.Ext2,
+                        PhoneNumber = userDto.SecondaryFax,
+                        PhoneTypeID = 5,
+                        UserId = Convert.ToString(userId),
+                    };
+                    await _phoneService.AddPhoneAsync(obj);
                 }
                 return Ok(response);
             }
@@ -386,7 +394,6 @@ namespace Sample.WebApi.Controllers
             var users = await _authService.GetClientUsersWithRoles(clientId, customerId);
             return users;
         }
-
         [HttpGet("GetVendorsUsersWithRoles/{vendorId}/{customerId}")]
         public async Task<ActionResult<CustomResponseDto>> GetVendorsUsersWithRoles(string vendorId, string customerId)
         {

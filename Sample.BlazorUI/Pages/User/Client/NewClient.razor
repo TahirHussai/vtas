@@ -2,7 +2,6 @@
 @inject ISnackbar Snackbar
 @inject IAuthRepository _authRepo
 @inject ILookUpRepository _lookupRepo
-@inject ISnackbar Snackbar
 @inject NavigationManager _navManager
 @using Sample.DTOS
 @inject LocalStorageService _localStorage
@@ -67,10 +66,22 @@
                                     <MudTextField Label="City" @bind-Value="clientInfo.AddressDto.City" Variant="Variant.Filled" FullWidth="true" />
                                 </MudItem>
                                 <MudItem xs="12" md="3">
-                                    <MudTextField Label="State" @bind-Value="clientInfo.AddressDto.State" Variant="Variant.Filled" FullWidth="true" />
+                                    <MudSelect T="string" Label="State" Value="selectedState" ValueChanged="stateClicked" FullWidth="true" Variant="Variant.Filled">
+                                        @foreach (var item in statesList)
+                                        {
+                                            <MudSelectItem T="string" Value="@item.State">@item.State</MudSelectItem>
+                                        }
+                                    </MudSelect>
+                                    @* <MudTextField Label="State" @bind-Value="clientInfo.AddressDto.State" Variant="Variant.Filled" FullWidth="true" /> *@
                                 </MudItem>
                                 <MudItem xs="12" md="3">
-                                    <MudTextField Label="Postal Code" @bind-Value="clientInfo.AddressDto.PostalCode" Variant="Variant.Filled" FullWidth="true" />
+                                    <MudSelect T="string" Label="Postal Code" @bind-Value="ZipCode" FullWidth="true" Variant="Variant.Filled">
+                                        @foreach (var item in zipCodesList)
+                                        {
+                                            <MudSelectItem T="string" Value="@item.ZipCode">@item.ZipCode</MudSelectItem>
+                                        }
+                                    </MudSelect>
+                                    @* <MudTextField Label="Postal Code" @bind-Value="clientInfo.AddressDto.PostalCode" Variant="Variant.Filled" FullWidth="true" /> *@
                                 </MudItem>
                             </MudGrid>
                         </MudCardContent>
@@ -133,8 +144,8 @@
                             <!-- Card Actions -->
                             <MudCardActions>
                                 <MudSpacer /> <!-- Pushes the buttons to the right -->
-                                <MudButton Variant="Variant.Filled" Color="Color.Secondary" DropShadow="false">Cancel</MudButton>
-                                <MudButton Variant="Variant.Filled" Color="Color.Primary" Style="margin-left: 20px;">Submit</MudButton>
+                                <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="@(()=>form.ResetAsync())" DropShadow="false">Cancel</MudButton>
+                                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="HandleSubmit" Style="margin-left: 20px;">Submit</MudButton>
                             </MudCardActions>
                         </MudCardContent>
                     </MudCard>
@@ -165,11 +176,74 @@
     private List<StateDto> statesList = new List<StateDto>();
     private List<ZipCodeDto> zipCodesList = new List<ZipCodeDto>();
 
+    private string selectedState;
     protected override async Task OnInitializedAsync()
     {
         prefixList = await _lookupRepo.GetPrefix();
         sufixList = await _lookupRepo.GetSuffix();
         statesList = await _lookupRepo.GetStates();
+    }
+    private async Task HandleSubmit()
+    {
+        await form.Validate();
+        if (form.IsValid)
+        {
+            var CustomerId = await _localStorage.GetItemAsync("CustomerId");
+            var ParentId = await _localStorage.GetItemAsync("ParentId");
+            var LoginUserId = await _localStorage.GetItemAsync("LoginUserId");
+            clientInfo.DisplayName = string.IsNullOrEmpty(clientInfo.DisplayName) ? clientInfo.FirstName : clientInfo.DisplayName;
+            clientInfo.MiddleName = string.IsNullOrEmpty(clientInfo.MiddleName) ? "" : clientInfo.MiddleName;
+            clientInfo.PrimaryFax = string.IsNullOrEmpty(clientInfo.PrimaryFax) ? "" : clientInfo.PrimaryFax;
+            clientInfo.SecondaryFax = string.IsNullOrEmpty(clientInfo.SecondaryFax) ? "" : clientInfo.SecondaryFax;
+
+            clientInfo.Phone = string.IsNullOrEmpty(clientInfo.Phone) ? "" : clientInfo.Phone;
+            clientInfo.Ext1 = clientInfo.Ext1 == null ? "" : clientInfo.Ext1;
+
+            clientInfo.Password = Guid.NewGuid().ToString() + "Ads";
+            clientInfo.CreatedById = LoginUserId;
+            clientInfo.RoleName = "Customer";
+            clientInfo.CustomerId = CustomerId;
+            clientInfo.SuperAdminId = ParentId;
+            clientInfo.PrimaryEmail = clientInfo.PrimaryEmail;
+            clientInfo.SecondaryEmail = clientInfo.SecondaryEmail;
+            clientInfo.SuffixId = SuffixId;
+            clientInfo.PrefixId = PrefixId;
+
+
+            clientInfo.AddressDto.State = string.IsNullOrEmpty(selectedState) ? "" : selectedState;
+            clientInfo.AddressDto.PostalCode = string.IsNullOrEmpty(ZipCode) ? "" : ZipCode;
+            var response = await _authRepo.RegisterClient(clientInfo);
+
+            if (response.IsSuccess)
+            {
+                Snackbar.Add(response.Message, MudBlazor.Severity.Success);
+                _navManager.NavigateTo("/clientList");
+            }
+            else
+            {
+                Snackbar.Add(response.Message, MudBlazor.Severity.Warning);
+            }
+        }
+        else
+        {
+            Snackbar.Add("Validation errors occurred. Please check your input.", MudBlazor.Severity.Error);
+        }
+    }
+    protected async Task stateClicked(string selectedValue)
+    {
+        selectedState = selectedValue;
+
+        clientInfo.AddressDto.State = selectedState;
+
+        BindZonesDropdown(selectedState);
+    }
+    private async void BindZonesDropdown(string state)
+    {
+        zipCodesList = await GetZipCodesByState(state);
+    }
+    private async Task<List<ZipCodeDto>> GetZipCodesByState(string state)
+    {
+        return await _lookupRepo.GetZipCodes(state);
     }
 }
 
