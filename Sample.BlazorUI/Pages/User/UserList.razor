@@ -6,23 +6,23 @@
 @inject ILocalStorageService _localStorage
 <style>
     .card-header {
-        background-color: rgba(173, 216, 230, 0.8); /* Light blue with opacity */
-        border-bottom: 2px solid #5F9EA0; /* Light blue border */
-        color: #FF69B4; /* Hot pink for the text */
-        padding: 10px;
-        font-weight: bold;
-        text-align: center;
+    background-color: rgba(173, 216, 230, 0.8); /* Light blue with opacity */
+    border-bottom: 2px solid #5F9EA0; /* Light blue border */
+    color: #FF69B4; /* Hot pink for the text */
+    padding: 10px;
+    font-weight: bold;
+    text-align: center;
     }
 
     .card-content {
-        padding: 20px;
-        border: 1px solid #D3D3D3; /* Light grey border */
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    padding: 20px;
+    border: 1px solid #D3D3D3; /* Light grey border */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
     }
 
     .card {
-        margin: 15px;
+    margin: 15px;
     }
 </style>
 
@@ -32,7 +32,7 @@
     <MudGrid>
         @if (usersList.Any())
         {
-           
+
 
             foreach (var item in usersList)
             {
@@ -47,7 +47,7 @@
                         </MudCardContent>
                     </MudCard>
                 </MudItem>
-               
+
             }
         }
         else
@@ -78,10 +78,11 @@
     private async Task LoadUsersAsync()
     {
         var role = await _localStorage.GetItemAsync<string>("Role");
+       // var SelectedRole = await _localStorage.GetItemAsync<string>("SelectedRole");
         var CustomerId = await _localStorage.GetItemAsync<string>("CustomerId");
         var LoginUserId = await _localStorage.GetItemAsync<string>("LoginUserId");
         UserName = await _localStorage.GetItemAsync<string>("UserName");
-
+        //var userRole = !string.IsNullOrEmpty(SelectedRole) ? SelectedRole : role;
         if (!string.IsNullOrEmpty(role))
         {
             usersList = role switch
@@ -92,11 +93,13 @@
                 "Vendor" => await _authRepo.GetVendorsUsersWithRoles(LoginUserId, CustomerId),
                 _ => new List<UserWithRoleDto>()
             };
+           //await _localStorage.SetItemAsync<string>("SelectedRole","");
         }
     }
 
     private async Task OnCardClick(string LoginUserId, string CustomerId, string Role)
     {
+         await _localStorage.SetItemAsync<string>("SelectedRole", Role);
         var currentUserId = await _localStorage.GetItemAsync<string>("LoginUserId");
         var currentCustomerId = await _localStorage.GetItemAsync<string>("CustomerId");
         var currentRole = await _localStorage.GetItemAsync<string>("Role");

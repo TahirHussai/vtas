@@ -6,15 +6,13 @@
 @using Sample.DTOS
 @inject LocalStorageService _localStorage
 
-
 <fieldset class="fieldset" >
     <legend class="legend">  <MudText Align="Align.Center">New Customer</MudText></legend>
     <MudContainer MaxWidth="MaxWidth.Large" Class="pa-4">
         <!-- Outer fieldset -->
 
 
-        <MudForm Model="@customerInfo" @ref="form" ValidationDelay="0">
-
+        <MudForm Model="@customerInfo" @ref="form" ValidationDelay="0" >
             <!-- Customer Name -->
             <MudTextField Label="Customer Name" @bind-Value="customerInfo.DisplayName" Variant="Variant.Filled" FullWidth="true" Class="mb-4" />
 

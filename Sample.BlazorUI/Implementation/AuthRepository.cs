@@ -73,9 +73,11 @@ namespace Sample.BlazorUI.Implementation
             {
                 var content = await response.Content.ReadAsStringAsync();
                 await SetUserData(content);
+                return true;
             }
-            return true;
+            return false;
         }
+
         public async Task<List<UserWithRoleDto>> GetUsersListWithRole()
         {
             var list = new List<UserWithRoleDto>();
@@ -209,7 +211,8 @@ namespace Sample.BlazorUI.Implementation
           
             var jsonObject = JObject.Parse(content);
             var Apiresponse = jsonObject["result"]["obj"].ToObject<ResponseDto>();
-            await _localStorageService.SetItemAsync("CreatedById", Apiresponse.CreatedById);
+            //var CreatedById = Parse Apiresponse.CreatedById == null ? 0 : Apiresponse.CreatedById;
+            //await _localStorageService.SetItemAsync("CreatedById",  );
             await _localStorageService.SetItemAsync("CustomerId", Apiresponse.CustomerId);
             await _localStorageService.SetItemAsync("ParentId", Apiresponse.SuperAdminId);
             await _localStorageService.SetItemAsync("LoginUserId", Apiresponse.UserId);

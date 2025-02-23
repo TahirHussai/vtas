@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,6 +21,7 @@ namespace Sample.DTOS
     }
     public class CreatePhoneDto
     {
+        [RegularExpression("^[0-9]+$", ErrorMessage = "Only numbers are allowed in Contact Number")]
         public string PhoneNumber { get; set; }
         public string PhoneExt { get; set; }
         public int? PhoneTypeID { get; set; }

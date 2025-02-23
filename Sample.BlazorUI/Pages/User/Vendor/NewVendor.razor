@@ -1,4 +1,4 @@
-﻿@page "/new-client"
+﻿@page "/new-vendor"
 @inject ISnackbar Snackbar
 @inject IAuthRepository _authRepo
 @inject ILookUpRepository _lookupRepo
@@ -12,18 +12,18 @@
     padding: 20px;
     border-radius: 5px;
     margin-bottom: 20px;
-}
+    }
 
-.legend {
+    .legend {
     font-size: 1.2em;
     font-weight: bold;
     margin-bottom: 10px;
     color: #555;
-}
+    }
 </style>
 
 <fieldset class="fieldset">
-    <legend class="legend"><MudText Align="Align.Center">New Client</MudText></legend>
+    <legend class="legend"><MudText Align="Align.Center">New Vendor</MudText></legend>
     <MudContainer MaxWidth="MaxWidth.Large">
         <MudForm Model="@clientInfo" @ref="form" ValidationDelay="0" >
             <MudGrid>
@@ -31,12 +31,12 @@
                 <MudItem xs="12" md="6">
                     <MudCard>
                         <MudCardHeader>
-                            <MudText Typo="Typo.h6">Client Info</MudText>
+                            <MudText Typo="Typo.h6">Vendor Info</MudText>
                         </MudCardHeader>
                         <MudCardContent>
                             <MudGrid>
                                 <MudItem xs="12" md="6">
-                                    <MudTextField Label="Client Name" @bind-Value="clientInfo.ClientName" Variant="Variant.Filled" FullWidth="true" Required="true" />
+                                    <MudTextField Label="Vendor Name" @bind-Value="clientInfo.ClientName" Variant="Variant.Filled" FullWidth="true" Required="true" />
                                 </MudItem>
                                 <MudItem xs="12" md="6">
                                     <MudTextField Label="Display Name" @bind-Value="clientInfo.DisplayName" Variant="Variant.Filled" FullWidth="true" />
@@ -46,14 +46,14 @@
                                 </MudItem>
                                 <MudItem xs="12" md="6">
                                     <MudTextField Label="Phone" @bind-Value="clientInfo.Phone" Variant="Variant.Filled" FullWidth="true" Required="true" />
-                                
+
                                 </MudItem>
                                 <MudItem xs="6" md="2">
                                     <MudTextField Label="Ext" @bind-Value="clientInfo.Ext1" Variant="Variant.Filled" FullWidth="true" />
                                 </MudItem>
                                 <MudItem xs="6" md="6">
                                     <MudTextField Label="Fax" @bind-Value="clientInfo.PrimaryFax" Variant="Variant.Filled" FullWidth="true" />
-                               
+
                                 </MudItem>
                                 <MudItem xs="12" md="6">
                                     <MudTextField Label="Email" @bind-Value="clientInfo.PrimaryEmail" Variant="Variant.Filled" FullWidth="true" Required="true" />
@@ -167,6 +167,9 @@
 @code {
 
 
+
+
+
     private MudForm form;
     private CustomResponseDto response = new CustomResponseDto();
     private int PrefixId = 0;
@@ -195,7 +198,9 @@
             var ParentId = await _localStorage.GetItemAsync("ParentId");
             var LoginUserId = await _localStorage.GetItemAsync("LoginUserId");
 
-            clientInfo.RoleName = "Client";
+
+
+            clientInfo.RoleName = "Vendor";
             clientInfo.DisplayName = string.IsNullOrEmpty(clientInfo.DisplayName) ? clientInfo.FirstName : clientInfo.DisplayName;
             clientInfo.MiddleName = string.IsNullOrEmpty(clientInfo.MiddleName) ? "" : clientInfo.MiddleName;
             clientInfo.PrimaryFax = string.IsNullOrEmpty(clientInfo.PrimaryFax) ? "" : clientInfo.PrimaryFax;
@@ -206,7 +211,7 @@
 
             clientInfo.Password = Guid.NewGuid().ToString() + "Ads";
             clientInfo.CreatedById = LoginUserId;
-            clientInfo.RoleName = "Customer";
+            clientInfo.RoleName = "Vendor";
             clientInfo.CustomerId = CustomerId;
             clientInfo.SuperAdminId = ParentId;
             clientInfo.PrimaryEmail = clientInfo.PrimaryEmail;
@@ -222,7 +227,7 @@
             if (response.IsSuccess)
             {
                 Snackbar.Add(response.Message, MudBlazor.Severity.Success);
-                _navManager.NavigateTo("/clientList");
+                _navManager.NavigateTo("/vendorList");
             }
             else
             {

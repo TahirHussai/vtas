@@ -220,7 +220,7 @@ namespace Sample.Services.Implementations
                 }
 
                 // Assign Role
-                await AssignUserRoleAsync(user, "Client");
+                await AssignUserRoleAsync(user, userDto.RoleName);
 
                 return new CustomResponseDto { IsSuccess = true, Message = "Client Registration successful", Obj = user.Id };
             }
@@ -317,8 +317,28 @@ namespace Sample.Services.Implementations
         {
             try
             {
+                var obj = new ResponseDto();
                 var user = await _userManager.FindByIdAsync(userId);
-                return new CustomResponseDto { IsSuccess = true, Message = "User retrieved successfully", Obj = _mapper.Map<UserDto>(user) };
+                var roles = await _userManager.GetRolesAsync(user);
+
+                if (roles.Contains("SuperAdmin"))
+                {
+                    obj = await GetUser(user, "SuperAdmin");
+                }
+                if (roles.Contains("Customer"))
+                {
+                    obj = await GetUser(user, "Customer");
+                }
+                if (roles.Contains("Vendor"))
+                {
+                    obj = await GetUser(user, "Vendor");
+                }
+                if (roles.Contains("Client"))
+                {
+                    obj = await GetUser(user, "Client");
+                }
+
+                return new CustomResponseDto { IsSuccess = true, Message = "User retrieved successfully", Obj = obj };
             }
             catch (Exception ex)
             {
@@ -326,6 +346,7 @@ namespace Sample.Services.Implementations
                 return new CustomResponseDto { IsSuccess = false, Message = ex.Message };
             }
         }
+
 
         public async Task<CustomResponseDto> GetAllUsersWithRoles()
         {

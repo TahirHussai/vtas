@@ -1,0 +1,47 @@
+﻿@page "/vendorList"
+@using Newtonsoft.Json
+@using Sample.DTOS
+@using Sample.Common
+
+@inject IAuthRepository _authRepo
+@inject ISnackbar Snackbar
+@inject NavigationManager _navManager
+@inject LocalStorageService _localStorage
+@inject HttpClient httpClient
+@using System.Net.Http.Json
+
+<MudCardActions>
+    <MudButton ButtonType="ButtonType.Submit" StartIcon="@Icons.Material.Filled.VerifiedUser" OnClick="AddNewUser" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">New Vendor</MudButton>
+</MudCardActions>
+<MudTable Items="@vendorList.Where(a=>a.Role=="Vendor")">
+
+    <HeaderContent>
+        <MudTh>Vendor Id</MudTh>
+        <MudTh>Vendor Name</MudTh>
+        <MudTh>Vendor Email</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Id">@context.Id</MudTd>
+        <MudTd DataLabel="UserName">@context.UserName</MudTd>
+        <MudTd DataLabel="Email">@context.Email</MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+
+</MudTable>
+
+@code {
+    private CustomResponseDto responseDto = new CustomResponseDto();
+    private List<UserWithRoleDto> vendorList = new List<UserWithRoleDto>();
+    private void AddNewUser()
+    {
+        _navManager.NavigateTo("/new-vendor");
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        var CustomerId = await _localStorage.GetItemAsync("CustomerId");
+        vendorList = await _authRepo.GetCustomerUsersListWithRoles(CustomerId);
+    }
+}
+

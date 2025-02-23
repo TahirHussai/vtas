@@ -88,7 +88,10 @@ namespace Sample.DTOS
         [Required(ErrorMessage = "Email is required.")]
         public string? LastName { get; set; }
         public string? MiddleName { get; set; }
-        public string? ClientName { get; set; }
+
+        [Required(ErrorMessage = "Username is required")]
+        [RegularExpression("^[a-zA-Z0-9]*$", ErrorMessage = "Only letters and numbers are allowed, no spaces or special characters")]
+        public string ClientName { get; set; }
         public string? InternalId { get; set; }
 
         [Required(ErrorMessage = "Password is required.")]
@@ -101,6 +104,8 @@ namespace Sample.DTOS
         public string CustomerId { get; set; }
         [Required(ErrorMessage = "SuperAdmin Id is required.")]
         public string SuperAdminId { get; set; }
+        [RegularExpression("^[0-9]+$", ErrorMessage = "Only numbers are allowed in Contact Number")]
+
         public string? Phone { get; set; }
         public int? PrefixId { get; set; }
         public string? Ext1 { get; set; }
@@ -108,6 +113,7 @@ namespace Sample.DTOS
         [Required(ErrorMessage = "Email is required.")]
         [EmailAddress(ErrorMessage = "Invalid email address.")]
         public string PrimaryEmail { get; set; }
+        [EmailAddress(ErrorMessage = "Invalid email address.")]
         public string SecondaryEmail { get; set; }
         public string? PrimaryFax { get; set; }
         public string? SecondaryFax { get; set; }
