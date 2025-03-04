@@ -35,6 +35,9 @@
         public static string GetAllStatesEndpoint = "api/Lookup/states";
         public static string GetAllZipCodeEndpoint = "api/Lookup/zipCodes";
         #endregion
-
+        public static string RegionCreateEndpoint = "api/Region/Post/";
+        public static string RegionUpdateEndpoint = "api/Region/Update/";
+        public static string RegionGetByIdEndPoint = "api/Region/";
+        public static string RegionGetEndPoint = "api/Region/";
     }
 }

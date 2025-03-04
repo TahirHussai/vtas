@@ -1,0 +1,61 @@
+﻿@* @inject MudDialogInstance MudDialog *@
+
+<MudDialog>
+    <MudDialogTitle>Client Form</MudDialogTitle>
+
+    <MudDialogContent>
+        <MudGrid>
+            <!-- Regions Section -->
+            <MudItem xs="12" sm="6">
+                <MudPaper Class="p-4">
+                   
+                </MudPaper>
+            </MudItem>
+
+            <!-- Category Section -->
+            <MudItem xs="12" sm="6">
+                <MudPaper Class="p-4">
+                    
+                </MudPaper>
+            </MudItem>
+
+            <!-- Sector Section -->
+            <MudItem xs="12">
+                <MudPaper Class="p-4">
+               
+                </MudPaper>
+            </MudItem>
+
+            <!-- Add New Sector Section -->
+            <MudItem xs="12">
+                <MudTextField Label="New Sector Abbr" @bind-Value="NewSectorAbbr" />
+                <MudTextField Label="New Sector Full" @bind-Value="NewSectorFull" />
+                <MudButton OnClick="AddSector" Variant="Variant.Filled">Add</MudButton>
+            </MudItem>
+        </MudGrid>
+    </MudDialogContent>
+
+   @*  <MudDialogActions>
+        <MudButton OnClick="CloseDialog" Color="Color.Secondary">Close</MudButton>
+    </MudDialogActions> *@
+</MudDialog>
+
+@code {
+    private bool GovMilitaryHistory;
+    private bool[] SelectedRegions = new bool[10];
+    private bool[] SelectedCategories = new bool[10];
+    private bool[] SelectedSectors = new bool[10];
+
+    private string NewSectorAbbr;
+    private string NewSectorFull;
+
+    private void AddSector()
+    {
+        // Logic to add a new sector
+    }
+
+    // private void CloseDialog()
+    // {
+    //     MudDialog?.Close();
+    // }
+}

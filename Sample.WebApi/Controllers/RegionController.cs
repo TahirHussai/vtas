@@ -1,0 +1,72 @@
+﻿using Azure;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Sample.DTOS;
+using Sample.Services.Interfaces;
+
+namespace Sample.WebApi.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class RegionController : ControllerBase
+    {
+        private readonly IRegionRepository _regionRepository;
+        private readonly ILogger<AccountController> _logger;
+        public RegionController(IRegionRepository regionRepository, ILogger<AccountController> logger)
+        {
+            _regionRepository = regionRepository;
+            _logger = logger;
+        }
+        [HttpGet]
+        public async Task<ActionResult<CustomResponseDto>> Get()
+        {
+            var response = new CustomResponseDto();
+          
+            _logger.LogInformation("Attempted Get All  Region");
+
+            response = await _regionRepository.Get();
+            _logger.LogInformation("Successfully got All  Region");
+
+            return response;
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<CustomResponseDto>> GetById(int id)
+        {
+            var response = new CustomResponseDto();
+            _logger.LogInformation("Attempted Get   Region");
+            response = await _regionRepository.GetById(id);
+            _logger.LogInformation("Successfully got   Region");
+
+            return response;
+        }
+        [Route("Post")]
+        [HttpPost]
+        public async Task<ActionResult<CustomResponseDto>> Post([FromBody] RegionDTO dto)
+        {
+            CustomResponseDto response = new CustomResponseDto();
+
+            _logger.LogInformation(" Region  Attempt");
+            response = await _regionRepository.Add(dto);
+            _logger.LogInformation(" Region  Attempted");
+            return response;
+        }
+        [Route("Update")]
+        [HttpPut]
+        public async Task<ActionResult<CustomResponseDto>> Update([FromBody] RegionDTO dto)
+        {
+            CustomResponseDto response = new CustomResponseDto();
+
+            _logger.LogInformation("Update ub Region  Attempt");
+            response = await _regionRepository.Upate(dto);
+            _logger.LogInformation("Update  Region  Attempted");
+            return response;
+        }
+
+        // DELETE api/<RegionController>/5
+        [HttpDelete("{id}")]
+        public void Delete(int id)
+        {
+        }
+    }
+}

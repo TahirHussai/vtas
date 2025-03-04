@@ -2,7 +2,7 @@
 @using Newtonsoft.Json
 @using Sample.DTOS
 @using Sample.Common
-
+@inject IDialogService DialogService
 @inject IAuthRepository _authRepo
 @inject ISnackbar Snackbar
 @inject NavigationManager _navManager
@@ -11,6 +11,7 @@
 @using System.Net.Http.Json
 
 <MudCardActions>
+    <MudButton OnClick="OpenDialog" Variant="Variant.Filled">Open Form</MudButton>
     <MudButton ButtonType="ButtonType.Submit" StartIcon="@Icons.Material.Filled.VerifiedUser" OnClick="AddNewUser" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">New Client</MudButton>
 </MudCardActions>
 <MudTable Items="@clientList.Where(a=>a.Role=="Client")">
@@ -41,6 +42,11 @@
     {
         var CustomerId = await _localStorage.GetItemAsync("CustomerId");
         clientList = await _authRepo.GetCustomerUsersListWithRoles(CustomerId);
+    }
+    private async Task OpenDialog()
+    {
+        var options = new DialogOptions { MaxWidth = MaxWidth.Large, FullWidth = true };
+        await DialogService.ShowAsync<ClientFormDialog>("Client Form", options);
     }
 }
 

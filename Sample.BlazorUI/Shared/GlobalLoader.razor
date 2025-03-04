@@ -1,0 +1,28 @@
+﻿@inject LoaderService LoaderService
+
+@if (IsLoading)
+{
+    <MudOverlay Visible="true" Class="fullscreen-overlay">
+        <MudProgressCircular Indeterminate="true" Size="Size.Medium" Color="Color.Primary" />
+    </MudOverlay>
+}
+
+@code {
+    private bool IsLoading;
+
+    protected override void OnInitialized()
+    {
+        LoaderService.OnLoaderChanged += StateHasChangedLoader;
+    }
+
+    private void StateHasChangedLoader(bool state)
+    {
+        IsLoading = state;
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        LoaderService.OnLoaderChanged -= StateHasChangedLoader;
+    }
+}

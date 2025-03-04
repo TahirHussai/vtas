@@ -18,9 +18,11 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddTransient<IAuthRepository, AuthRepository>();
 builder.Services.AddTransient<ILookUpRepository, LookUpRepository>();
+builder.Services.AddTransient<IRegionRepository, Sample.BlazorUI.Implementation.RegionRepository>();
 builder.Services.AddMudServices();
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<LocalStorageService>();
+builder.Services.AddSingleton<LoaderService>();
 builder.Services.AddScoped<AuthenticationProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(p =>
 p.GetRequiredService<AuthenticationProvider>());
