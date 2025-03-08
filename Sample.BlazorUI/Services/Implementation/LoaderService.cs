@@ -1,4 +1,4 @@
-﻿namespace Sample.BlazorUI.Service
+﻿namespace Sample.BlazorUI.Services.Implementation
 {
     public class LoaderService
     {

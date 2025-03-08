@@ -2,14 +2,14 @@
 using Blazored.LocalStorage;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Sample.BlazorUI.Service;
+using Sample.BlazorUI.Repository.Interface;
 using Sample.Common.EndPoint;
 using Sample.DTOS;
 using System.Collections.Generic;
 using System.Net.Http.Headers;
 using System.Security.Policy;
 
-namespace Sample.BlazorUI.Implementation
+namespace Sample.BlazorUI.Repository.Implementation
 {
     public class LookUpRepository : ILookUpRepository
     {
@@ -165,7 +165,7 @@ namespace Sample.BlazorUI.Implementation
         public async Task<List<ZipCodeDto>> GetZipCodes(string State)
         {
             var list = new List<ZipCodeDto>();
-            var request = new HttpRequestMessage(HttpMethod.Get, _baseUrl + StaticEndPoint.GetAllZipCodeEndpoint + "?state=" +State);
+            var request = new HttpRequestMessage(HttpMethod.Get, _baseUrl + StaticEndPoint.GetAllZipCodeEndpoint + "?state=" + State);
             try
             {
                 var client = _httpClientFactory.CreateClient();
@@ -196,7 +196,7 @@ namespace Sample.BlazorUI.Implementation
             return client.BaseAddress.ToString();
         }
 
-      
+
     }
 
 }

@@ -1,8 +1,10 @@
 ﻿@page "/Region/create"
 @using Sample.DTOS
+@using System.Text.Json;
 
 @using System.ComponentModel.DataAnnotations
-@inject IRegionRepository _regionRepo
+@using Sample.Services.Interfaces
+@inject Sample.BlazorUI.Services.Interface.IRegionService _regionRepo
 @inject NavigationManager _navManager
 @inject ISnackbar Snackbar
 
@@ -21,7 +23,7 @@
                                         <MudTextField T="string" @bind-Value="model.Abv" Label="Abv" Margin="Margin.Normal"></MudTextField>
                                     </MudItem>
                                     <MudItem xs="6" md="6">
-                                        <MudTextField T="string" @bind-Value="model.Desc" Label="Description" Margin="Margin.Normal"></MudTextField>
+                                        <MudTextField T="string" @bind-Value="model.Description" Label="Description" Margin="Margin.Normal"></MudTextField>
                                     </MudItem>
                                 </MudGrid>
                             </MudCardContent>
@@ -51,7 +53,7 @@
                         <RowTemplate>
                             <MudTd DataLabel="Id">@context.RegionID</MudTd>
                             <MudTd DataLabel="FirstName">@context.Abv</MudTd>
-                            <MudTd DataLabel="LastName">@context.Desc</MudTd>
+                            <MudTd DataLabel="LastName">@context.Description</MudTd>
                             <MudTd DataLabel="">
                                 <MudFab @onclick="@(()=>Edit(@context.RegionID))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
                                 @*<MudFab @onclick="@(()=>Delete(@context.ID))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />*@
@@ -77,7 +79,14 @@
     }
     private async Task RegionList()
     {
-        regionList = await _regionRepo.Get();
+        var response = await _regionRepo.Get();
+        if (response.IsSuccess)
+        {
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+            regionList = JsonSerializer.Deserialize<List<RegionDTO>>(response.Obj.ToString(), options);
+
+        }
 
     }
     private bool Search(RegionDTO cat)
@@ -85,7 +94,7 @@
 
         if (string.IsNullOrWhiteSpace(searchString)) return true;
         if (cat.Abv.Contains(searchString, StringComparison.OrdinalIgnoreCase)
-            || cat.Desc.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            || cat.Description.Contains(searchString, StringComparison.OrdinalIgnoreCase))
         {
             return true;
         }
@@ -114,8 +123,6 @@
         }
         else
         {
-
-
             responseModel = await _regionRepo.Add(model);
             if (responseModel.IsSuccess == true)
             {
@@ -128,14 +135,18 @@
                 await RegionList();
                 isField = true;
                 Snackbar.Add("Something went wrong!.", MudBlazor.Severity.Warning);
-
-
             }
         }
     }
     private async Task Edit(int id)
     {
-        model = await _regionRepo.GetById(id);
+        var response = await _regionRepo.GetById(id);
+        if (response.IsSuccess)
+        {
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+            model = JsonSerializer.Deserialize<RegionDTO>(response.Obj.ToString(), options);
+        }
     }
     private void Delete(int id)
     {

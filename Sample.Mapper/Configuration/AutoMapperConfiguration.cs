@@ -18,6 +18,8 @@ namespace Sample.Mapper.Configuration
                 a.AddProfile(new IdentityRoleMapper());
                 a.AddProfile(new UserPofileMapper());
                 a.AddProfile(new OtherDetailsMapper());
+                a.AddProfile(new RegionMapper());
+                a.AddProfile(new SectorMapper());
             });
             IMapper mapper = mapperConfig.CreateMapper();
             services.AddSingleton(mapper);

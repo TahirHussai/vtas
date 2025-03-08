@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Sample.Data;
 using Sample.DTOS;
 using Sample.Services.Interfaces;
@@ -10,12 +11,14 @@ using System.Threading.Tasks;
 
 namespace Sample.Services.Implementations
 {
-    public class RegionRepository : IRegionRepository
+    public class RegionService : IRegionService
     {
         private readonly App_BlazorDBContext _dbContext;
-        public RegionRepository(App_BlazorDBContext dbContext)
+        private readonly IMapper _mapper;
+        public RegionService(App_BlazorDBContext dbContext, IMapper mapper)
         {
             _dbContext = dbContext;
+            _mapper = mapper;
         }
         public async Task<CustomResponseDto> Add(RegionDTO dto)
         {
@@ -49,17 +52,11 @@ namespace Sample.Services.Implementations
                 var list = _dbContext.LuRegions.ToList();
                 if (list != null && list.Count() > 0)
                 {
-                    foreach (var item in list)
-                    {
-                        var obj = new RegionDTO();
-                        obj.RegionID = item.RegionID;
-                        obj.Abv = item.Abv;
-                        obj.Description = item.Description;
-                        listdto.Add(obj);
-                    }
+                    listdto = _mapper.Map<List<RegionDTO>>(list);
                     response.IsSuccess = true;
                     response.Message = "success";
                     response.Obj = listdto;
+                    return response;
                 }
                 response.IsSuccess = false;
                 response.Message = "No Record Found!";
@@ -84,13 +81,11 @@ namespace Sample.Services.Implementations
                 var model = await _dbContext.LuRegions.Where(a => a.RegionID == id).FirstOrDefaultAsync();
                 if (model != null)
                 {
-                    dto.RegionID = model.RegionID;
-                    dto.Abv = model.Abv;
-                    dto.Description = model.Description;
-
+                    dto= _mapper.Map<RegionDTO>(model);
                     response.IsSuccess = true;
                     response.Message = "success";
                     response.Obj = dto;
+                    return response;
                 }
                 response.IsSuccess = false;
                 response.Message = "No Record Found!";

@@ -20,6 +20,7 @@ namespace Sample.Data
         }
         public DbSet<AspNetUserRole> AspNetUserRoles { get; set; }
         public DbSet<LuRegion> LuRegions { get; set; }
+        public DbSet<LuSector>  LuSectors { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)

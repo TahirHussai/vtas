@@ -1,6 +1,6 @@
 ﻿using Sample.DTOS;
 
-namespace Sample.BlazorUI.Service
+namespace Sample.BlazorUI.Repository.Interface
 {
     public interface IAuthRepository
     {

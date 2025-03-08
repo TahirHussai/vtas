@@ -3,8 +3,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Http.Metadata;
-using Sample.BlazorUI.Service;
-using System.IdentityModel.Tokens.Jwt;
+using Sample.BlazorUI.Repository.Interface;
 
 namespace Sample.BlazorUI.Middleware
 {

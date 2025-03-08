@@ -25,6 +25,7 @@ namespace Sample.Services.Configuration
             services.AddScoped<IPhoneService, PhoneService>();
             services.AddScoped<ILookupService, LookupService>();
             services.AddScoped<IOtherDetailsService, OtherDetailsService>();
+            services.AddScoped<IRegionService, RegionService>();
 
            
         }

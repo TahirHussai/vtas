@@ -10,14 +10,16 @@ namespace Sample.WebApi.Controllers
     [ApiController]
     public class RegionController : ControllerBase
     {
-        private readonly IRegionRepository _regionRepository;
+        private readonly IRegionService _regionRepository;
         private readonly ILogger<AccountController> _logger;
-        public RegionController(IRegionRepository regionRepository, ILogger<AccountController> logger)
+        public RegionController(IRegionService regionRepository, ILogger<AccountController> logger)
         {
             _regionRepository = regionRepository;
             _logger = logger;
         }
+       
         [HttpGet]
+        [Route("GetRegions")]
         public async Task<ActionResult<CustomResponseDto>> Get()
         {
             var response = new CustomResponseDto();
@@ -30,7 +32,7 @@ namespace Sample.WebApi.Controllers
             return response;
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("GetRegionById/{id}")]
         public async Task<ActionResult<CustomResponseDto>> GetById(int id)
         {
             var response = new CustomResponseDto();
@@ -40,8 +42,9 @@ namespace Sample.WebApi.Controllers
 
             return response;
         }
-        [Route("Post")]
+        [Route("AddRegion")]
         [HttpPost]
+
         public async Task<ActionResult<CustomResponseDto>> Post([FromBody] RegionDTO dto)
         {
             CustomResponseDto response = new CustomResponseDto();
@@ -51,7 +54,7 @@ namespace Sample.WebApi.Controllers
             _logger.LogInformation(" Region  Attempted");
             return response;
         }
-        [Route("Update")]
+        [Route("UpdateRegion")]
         [HttpPut]
         public async Task<ActionResult<CustomResponseDto>> Update([FromBody] RegionDTO dto)
         {
@@ -64,7 +67,7 @@ namespace Sample.WebApi.Controllers
         }
 
         // DELETE api/<RegionController>/5
-        [HttpDelete("{id}")]
+        [HttpDelete("DeleteRegionById/{id}")]
         public void Delete(int id)
         {
         }

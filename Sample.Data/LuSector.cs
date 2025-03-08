@@ -8,13 +8,12 @@ using System.Threading.Tasks;
 
 namespace Sample.Data
 {
-    [Table("LuRegion")]
-    public class LuRegion
+    [Table("LuSector")]
+    public class LuSector
     {
         [Key]
-        public int RegionID { get; set; }
+        public int SectorID { get; set; }
         public string Abv { get; set; }
-        public string Description { get; set; }
+        public string Desc { get; set; }
     }
-
 }

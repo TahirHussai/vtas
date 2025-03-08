@@ -4,16 +4,15 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sample.BlazorUI.AuthProvider;
 using Sample.DTOS;
-
-using Sample.BlazorUI.Service;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using System.Text;
 using Sample.Common.EndPoint;
 using Sample.Services.Implementations;
 using Azure;
+using Sample.BlazorUI.Repository.Interface;
 
-namespace Sample.BlazorUI.Implementation
+namespace Sample.BlazorUI.Repository.Implementation
 {
     public class AuthRepository : IAuthRepository
     {
@@ -45,7 +44,7 @@ namespace Sample.BlazorUI.Implementation
             var client = _httpClientFactory.CreateClient();
 
             HttpResponseMessage response = await client.SendAsync(request);
-           
+
             var content = await response.Content.ReadAsStringAsync();
             var jsonObject = JObject.Parse(content);
             ApiResponse = jsonObject["result"].ToObject<CustomResponseDto>();
@@ -53,7 +52,7 @@ namespace Sample.BlazorUI.Implementation
             {
                 await SetUserData(content);
             }
-         
+
             //await StoreTokensAndUserData(Apiresponse);
 
             //// Change auth state of app
@@ -208,7 +207,7 @@ namespace Sample.BlazorUI.Implementation
 
         private async Task SetUserData(string content)
         {
-          
+
             var jsonObject = JObject.Parse(content);
             var Apiresponse = jsonObject["result"]["obj"].ToObject<ResponseDto>();
             //var CreatedById = Parse Apiresponse.CreatedById == null ? 0 : Apiresponse.CreatedById;
@@ -258,7 +257,7 @@ namespace Sample.BlazorUI.Implementation
                 var client = _httpClientFactory.CreateClient();
 
                 HttpResponseMessage response = await client.SendAsync(request);
-              
+
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync();
@@ -270,16 +269,16 @@ namespace Sample.BlazorUI.Implementation
                     obj.Message = respnse.Message;
                     obj.Obj = null;
                 }
-                
+
             }
             catch (Exception ex)
             {
 
-              
-                    obj.IsSuccess = false;
-                    obj.Message =ex.ToString();
-                    obj.Obj = null;
-               
+
+                obj.IsSuccess = false;
+                obj.Message = ex.ToString();
+                obj.Obj = null;
+
             }
             return obj;
         }
@@ -333,7 +332,7 @@ namespace Sample.BlazorUI.Implementation
             //await _localStorageService.RemoveItemAsync("AuthJwtToken");
             await _localStorageService.RemoveItemAsync("Email");
             await _localStorageService.RemoveItemAsync("UserStack");
-            await ((AuthenticationProvider)_authenticationProvider).LoggedOut();
+            await _authenticationProvider.LoggedOut();
         }
         public async Task<List<UsersWithRolesDto>> GetUsersWithRolesAsync()
         {
@@ -364,7 +363,7 @@ namespace Sample.BlazorUI.Implementation
 
         public async Task<CustomResponseDto> GetCustomers()
         {
-             var obj = new CustomResponseDto();
+            var obj = new CustomResponseDto();
 
             try
             {
@@ -378,9 +377,9 @@ namespace Sample.BlazorUI.Implementation
 
                     var jsonObject = JObject.Parse(content);
                     obj = jsonObject["result"].ToObject<CustomResponseDto>();
-                  
 
-                   
+
+
                 }
             }
             catch (Exception ex)
@@ -426,7 +425,7 @@ namespace Sample.BlazorUI.Implementation
             return IsSuccess;
         }
 
-     
+
 
 
 
