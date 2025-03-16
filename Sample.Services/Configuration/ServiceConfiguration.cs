@@ -26,6 +26,7 @@ namespace Sample.Services.Configuration
             services.AddScoped<ILookupService, LookupService>();
             services.AddScoped<IOtherDetailsService, OtherDetailsService>();
             services.AddScoped<IRegionService, RegionService>();
+            services.AddScoped<ISectorsServices, SectorsService>();
 
            
         }

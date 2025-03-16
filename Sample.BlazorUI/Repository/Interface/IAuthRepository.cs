@@ -7,7 +7,8 @@ namespace Sample.BlazorUI.Repository.Interface
         Task<CustomResponseDto> Login(LoginDTO dto);
         public Task<bool> Register(UserDto dto);
         public Task<CustomResponseDto> RegisterCustomer(UserCustomerDto dto);
-        public Task<CustomResponseDto> RegisterClient(UserClientDto dto);
+        public Task<CustomResponseDto> RegisterClient(CreateClientDto dto);
+        public Task<CustomResponseDto> GetClientById(string Id);
         public Task<CustomResponseDto> GetCustomers();
         public Task Logout();
         public Task<List<UsersWithRolesDto>> GetUsersWithRolesAsync();

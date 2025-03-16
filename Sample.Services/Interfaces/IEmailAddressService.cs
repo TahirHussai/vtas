@@ -9,9 +9,10 @@ namespace Sample.Services.Interfaces
 {
     public interface IEmailAddressService
     {
-        Task<CustomResponseDto> GetEmailAddressByIdAsync(int emailId);
+        Task<CustomResponseDto> GetEmailAddressByIdAsync(string emailId);
+        Task<List<EmailAddressDto>> GetEmailAddressByUserIdAsync(string UserId);
         Task<CustomResponseDto> AddOrUpdateEmailAddressAsync(EmailAddressDto emailAddressDto);
-        Task<CustomResponseDto> DeleteEmailAddressAsync(int emailId);
+        Task<CustomResponseDto> DeleteEmailAddressAsync(string emailId);
     }
 
 }

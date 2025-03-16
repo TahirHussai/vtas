@@ -1,0 +1,434 @@
+﻿@page "/updateClient"
+@using Sample.BlazorUI.Repository.Interface
+@using Sample.DTOS
+@using System.Text.Json
+@inject ISnackbar Snackbar
+@inject IAuthRepository _authRepo
+@inject ILookUpRepository _lookupRepo
+@inject Sample.BlazorUI.Services.Interface.IRegionService _regionRepo
+@inject ISectorServices _sectorService
+@inject NavigationManager _navManager
+@inject LocalStorageService _localStorage
+@inject IJSRuntime JS
+
+<MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-4">
+    <MudTabPanel Text="Update Client">
+        <MudContainer MaxWidth="MaxWidth.Large">
+            <MudForm Model="@clientInfo" @ref="form" ValidationDelay="0">
+                <MudGrid>
+                    <!-- Client Info Section -->
+                    <MudItem xs="12" md="6">
+                        <MudCard>
+                            <MudCardHeader>
+                                <MudText Typo="Typo.h6">Client Info</MudText>
+                            </MudCardHeader>
+                            <MudCardContent>
+                                <MudGrid>
+                                    <MudItem xs="12" md="6">
+                                        <MudTextField Label="Client Name" @bind-Value="clientInfo.UserName" Variant="Variant.Filled" FullWidth="true" Required="true" />
+                                    </MudItem>
+                                    <MudItem xs="12" md="6">
+                                        <MudTextField Label="Display Name" @bind-Value="clientInfo.DisplayName" Variant="Variant.Filled" FullWidth="true" />
+                                    </MudItem>
+                                    <MudItem xs="12" md="4">
+                                        <MudTextField Label="Internal ID" @bind-Value="clientInfo.InternalId" Variant="Variant.Filled" FullWidth="true" />
+                                    </MudItem>
+                                    <MudItem xs="12" md="6">
+                                        <MudTextField Label="Phone" @bind-Value="clientInfo.PhonePrimary" Variant="Variant.Filled" FullWidth="true" Required="true" />
+
+                                    </MudItem>
+                                    <MudItem xs="6" md="2">
+                                        <MudTextField Label="Ext" @bind-Value="clientInfo.Ext1" Variant="Variant.Filled" FullWidth="true" />
+                                    </MudItem>
+                                    <MudItem xs="6" md="6">
+                                        <MudTextField Label="Fax" @bind-Value="clientInfo.PrimaryFax" Variant="Variant.Filled" FullWidth="true" />
+
+                                    </MudItem>
+                                    <MudItem xs="12" md="6">
+                                        <MudTextField Label="Email" @bind-Value="clientInfo.PrimaryEmail" Variant="Variant.Filled" FullWidth="true" Required="true" />
+                                    </MudItem>
+                                    <MudItem xs="12">
+                                        <MudTextField Label="Mailing Address" @bind-Value="clientInfo.AddressDto.Address1" Variant="Variant.Filled" FullWidth="true" />
+                                    </MudItem>
+                                    <MudItem xs="12">
+                                        <MudTextField Label="Address 2" @bind-Value="clientInfo.AddressDto.Address2" Variant="Variant.Filled" FullWidth="true" />
+                                    </MudItem>
+                                    <MudItem xs="12" md="6">
+                                        <MudTextField Label="City" @bind-Value="clientInfo.AddressDto.City" Variant="Variant.Filled" FullWidth="true" />
+                                    </MudItem>
+                                    <MudItem xs="12" md="3">
+                                        <MudSelect T="string" Label="State" Value="selectedState" ValueChanged="stateClicked" FullWidth="true" Variant="Variant.Filled">
+                                            @foreach (var item in statesList)
+                                            {
+                                                <MudSelectItem T="string" Value="@item.State">@item.State</MudSelectItem>
+                                            }
+                                        </MudSelect>
+                                        @* <MudTextField Label="State" @bind-Value="clientInfo.AddressDto.State" Variant="Variant.Filled" FullWidth="true" /> *@
+                                    </MudItem>
+                                    <MudItem xs="12" md="3">
+                                        <MudSelect T="string" Label="Postal Code" @bind-Value="ZipCode" FullWidth="true" Variant="Variant.Filled">
+                                            @foreach (var item in zipCodesList)
+                                            {
+                                                <MudSelectItem T="string" Value="@item.ZipCode">@item.ZipCode</MudSelectItem>
+                                            }
+                                        </MudSelect>
+                                        @* <MudTextField Label="Postal Code" @bind-Value="clientInfo.AddressDto.PostalCode" Variant="Variant.Filled" FullWidth="true" /> *@
+                                    </MudItem>
+                                </MudGrid>
+                            </MudCardContent>
+                        </MudCard>
+                    </MudItem>
+
+                    <!-- Contact Info Section -->
+                    <MudItem xs="12" md="6">
+                        <MudCard>
+                            <MudCardHeader>
+                                <MudText Typo="Typo.h6">Contact Info</MudText>
+                            </MudCardHeader>
+                            <MudCardContent>
+                                <MudGrid>
+                                    <MudItem xs="12" md="3">
+                                        <MudSelect T="int" @bind-Value="PrefixId" Label="Prefix" FullWidth="true" Variant="Variant.Filled">
+                                            @if (prefixList != null && prefixList.Any())
+                                            {
+                                                foreach (var item in prefixList)
+                                                {
+                                                    <MudSelectItem T="int" Value="@item.PrefixID">@item.PrefixVal</MudSelectItem>
+                                                }
+                                            }
+                                        </MudSelect>
+                                    </MudItem>
+                                    <MudItem xs="12" md="9">
+                                        <MudTextField Label="Contact First Name" @bind-Value="clientInfo.FirstName" Variant="Variant.Filled" FullWidth="true" />
+                                    </MudItem>
+                                    <MudItem xs="12">
+                                        <MudTextField Label="Middle Name" @bind-Value="clientInfo.MiddleName" Variant="Variant.Filled" FullWidth="true" />
+                                    </MudItem>
+                                    <MudItem xs="12">
+                                        <MudTextField Label="Last Name" @bind-Value="clientInfo.LastName" Variant="Variant.Filled" FullWidth="true" />
+                                    </MudItem>
+                                    <MudItem xs="12" md="3">
+                                        <MudSelect T="int" @bind-Value="SuffixId" Label="Suffix" FullWidth="true" Variant="Variant.Filled">
+                                            @foreach (var item in sufixList)
+                                            {
+                                                <MudSelectItem T="int" Value="@item.SuffixID">@item.SuffixVAL</MudSelectItem>
+                                            }
+                                        </MudSelect>
+                                    </MudItem>
+                                    <MudItem xs="12" md="6">
+                                        <MudTextField Label="Phone" @bind-Value="clientInfo.PhoneSecondary" Variant="Variant.Filled" FullWidth="true" />
+                                    </MudItem>
+                                    <MudItem xs="6" md="3">
+                                        <MudTextField Label="Ext" @bind-Value="clientInfo.Ext2" Variant="Variant.Filled" FullWidth="true" />
+                                    </MudItem>
+                                    <MudItem xs="6" md="3">
+                                        <MudTextField Label="Fax" @bind-Value="clientInfo.SecondaryFax" Variant="Variant.Filled" FullWidth="true" />
+                                    </MudItem>
+                                    <MudItem xs="6" md="9">
+                                        <MudTextField Label="Email" @bind-Value="clientInfo.SecondaryEmail" Variant="Variant.Filled" FullWidth="true" />
+                                    </MudItem>
+                                    <MudItem xs="12" md="6">
+                                        <MudSelect T="string" Label="Client Contact" Variant="Variant.Filled">
+                                        </MudSelect>
+                                    </MudItem>
+                                </MudGrid>
+                                <!-- Card Actions -->
+                                <MudCardActions>
+                                    <MudSpacer /> <!-- Pushes the buttons to the right -->
+                                    <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="@(()=>form.ResetAsync())" DropShadow="false">Cancel</MudButton>
+                                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="HandleSubmit" Style="margin-left: 20px;">Submit</MudButton>
+                                </MudCardActions>
+                            </MudCardContent>
+                        </MudCard>
+                    </MudItem>
+                </MudGrid>
+
+            </MudForm>
+        </MudContainer>
+    </MudTabPanel>
+    <MudTabPanel Text="Profile">
+        <MudContainer MaxWidth="MaxWidth.Large" Style="display:flex">
+            <MudItem xs="12" md="3">
+                <MudCard>
+                    <MudCardHeader>
+                        <MudText Typo="Typo.h6" Class=" ml-8">Regions </MudText>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        @foreach (var item in regionList)
+                        {
+                            <MudCheckBox T="bool" @bind-Checked="@item.IsChecked"
+                            ValueChanged="@(e => UpdateList(item.RegionID,e))">
+                                @item.Abv
+                            </MudCheckBox>
+                        }
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="12" md="3" Class="ml-10">
+                <MudCard>
+                    <MudCardHeader>
+                        <MudText Typo="Typo.h6" Class=" ml-8">Sectors </MudText>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        @foreach (var item in sectorList)
+                        {
+                            <MudCheckBox T="int" Unchecked @bind-value="@item.SectorID"
+                            @onclick="@(()=>SaveToLocalStorageS(item.SectorID))">@item.Abv</MudCheckBox>
+                        }
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        </MudContainer>
+    </MudTabPanel>
+    <MudTabPanel Text="Contacts">
+        <MudContainer MaxWidth="MaxWidth.Large" Style="display:flex">
+            <MudItem xs="12" md="5">
+                <MudText>Contacts Comming Soon</MudText>
+            </MudItem>
+        </MudContainer>
+    </MudTabPanel>
+</MudTabs>
+
+
+
+
+
+
+@code {
+
+    private MudForm form;
+    private CustomResponseDto response = new CustomResponseDto();
+    private int PrefixId = 0;
+    private int SuffixId = 0;
+    private string ZipCode = "";
+    CreateClientDto clientInfo = new CreateClientDto();
+    ClientDto clientdto = new ClientDto();
+
+    private List<PrefixDto> prefixList = new List<PrefixDto>();
+    private List<SufixDto> sufixList = new List<SufixDto>();
+    private List<StateDto> statesList = new List<StateDto>();
+    private List<ZipCodeDto> zipCodesList = new List<ZipCodeDto>();
+    List<RegionDTO> regionList = new List<RegionDTO>();
+    List<SectorDto> sectorList = new List<SectorDto>();
+
+    private string selectedState;
+    private bool isInitialized = false;
+    private List<bool> BooleanList = new();
+
+    // This method is called after the component is rendered
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !isInitialized)
+        {
+            isInitialized = true;
+
+            // Ensure JS calls are only made once after initial render
+            await JS.InvokeVoidAsync("console.log", "JS Interop Initialized");
+        }
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        prefixList = await _lookupRepo.GetPrefix();
+        sufixList = await _lookupRepo.GetSuffix();
+        statesList = await _lookupRepo.GetStates();
+        var clientId = await _localStorage.GetItemAsync("ClientId");
+        if (!string.IsNullOrEmpty(clientId))
+        {
+            var clientResponse = await  _authRepo.GetClientById(clientId);
+            if (clientResponse.IsSuccess)
+            {
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+                clientInfo = JsonSerializer.Deserialize<CreateClientDto>(clientResponse.Obj.ToString(), options);
+                // if (clientdto!=null)
+                // {
+                //     clientInfo.UserName = clientdto.userClientdto.UserName;
+                //     clientInfo.FirstName = clientdto.userClientdto.FirstName;
+                //     clientInfo.LastName = clientdto.userClientdto.LastName;
+                //     clientInfo.DisplayName = clientdto.userClientdto.DisplayName;
+                //     clientInfo.Ext1 = clientdto.userClientdto.Ext1;
+                //     clientInfo.Ext2 = clientdto.userClientdto.Ext2;
+                //     clientInfo.PrefixId = clientdto.userClientdto.PrefixId;
+                //     clientInfo.InternalId = clientdto.userClientdto.InternalId;
+                //     clientInfo.SuffixId = clientdto.userClientdto.SuffixId;
+                //     if (clientdto.AddressDto !=null)
+                //     {
+                //         clientInfo.AddressDto = clientdto.AddressDto;
+                //     }
+                //     if (clientdto.PhoneDtos.Count()>0)
+                //     {
+                //         var primaryPhone = clientdto.PhoneDtos.FirstOrDefault();
+                //         if (primaryPhone!=null)
+                //         {
+                //             clientInfo.PhonePrimary = primaryPhone.PhoneNumber;
+                //             clientInfo.Ext1 = primaryPhone.PhoneExt;
+                //         }
+                //         var secondaryPhone = clientdto.PhoneDtos.LastOrDefault();
+                //         if (secondaryPhone != null)
+                //         {
+                //             clientInfo.PhonePrimary = secondaryPhone.PhoneNumber;
+                //             clientInfo.Ext1 = secondaryPhone.PhoneExt;
+                //         }
+                //     }
+                //     if (clientdto.emailAddressDtos.Count() > 0)
+                //     {
+                //         var primaryEmail = clientdto.emailAddressDtos.FirstOrDefault();
+                //         if (primaryEmail !=null)
+                //         {
+                //             clientInfo.PrimaryEmail = primaryEmail.EmailAddress;
+                //         }
+                //         var secondaryEmail = clientdto.emailAddressDtos.LastOrDefault();
+                //         if (secondaryEmail != null)
+                //         {
+                //             clientInfo.SecondaryEmail = secondaryEmail.EmailAddress;
+                //         }
+                //     }
+                // }
+            }
+        }
+        var response = await _regionRepo.Get();
+        if (response.IsSuccess)
+        {
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+            regionList = JsonSerializer.Deserialize<List<RegionDTO>>(response.Obj.ToString(), options);
+
+        }
+        var sectorResponse = await _sectorService.Get();
+        if (sectorResponse.IsSuccess)
+        {
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+            sectorList = JsonSerializer.Deserialize<List<SectorDto>>(sectorResponse.Obj.ToString(), options);
+
+        }
+       
+    }
+    private async Task HandleSubmit()
+    {
+        await form.Validate();
+        if (form.IsValid)
+        {
+            var CustomerId = await _localStorage.GetItemAsync("CustomerId");
+            var ParentId = await _localStorage.GetItemAsync("ParentId");
+            var LoginUserId = await _localStorage.GetItemAsync("LoginUserId");
+
+            clientInfo.RoleName = "Client";
+            clientInfo.DisplayName = string.IsNullOrEmpty(clientInfo.DisplayName) ? clientInfo.FirstName : clientInfo.DisplayName;
+            clientInfo.MiddleName = string.IsNullOrEmpty(clientInfo.MiddleName) ? "" : clientInfo.MiddleName;
+            clientInfo.PrimaryFax = string.IsNullOrEmpty(clientInfo.PrimaryFax) ? "" : clientInfo.PrimaryFax;
+            clientInfo.SecondaryFax = string.IsNullOrEmpty(clientInfo.SecondaryFax) ? "" : clientInfo.SecondaryFax;
+
+            clientInfo.PhonePrimary = string.IsNullOrEmpty(clientInfo.PhonePrimary) ? "" : clientInfo.PhonePrimary;
+            clientInfo.PhoneSecondary = string.IsNullOrEmpty(clientInfo.PhoneSecondary) ? "" : clientInfo.PhoneSecondary;
+            clientInfo.Ext1 = clientInfo.Ext1 == null ? "" : clientInfo.Ext1;
+
+            clientInfo.Password = Guid.NewGuid().ToString() + "Ads";
+            clientInfo.CreatedById = LoginUserId;
+            clientInfo.RoleName = "Client";
+            clientInfo.CustomerId = CustomerId;
+            clientInfo.SuperAdminId = ParentId;
+            clientInfo.PrimaryEmail = clientInfo.PrimaryEmail;
+            clientInfo.SecondaryEmail = clientInfo.SecondaryEmail;
+            clientInfo.SuffixId = SuffixId;
+            clientInfo.PrefixId = PrefixId;
+
+
+            clientInfo.AddressDto.State = string.IsNullOrEmpty(selectedState) ? "" : selectedState;
+            clientInfo.AddressDto.PostalCode = string.IsNullOrEmpty(ZipCode) ? "" : ZipCode;
+            var response = await _authRepo.RegisterClient(clientInfo);
+
+            if (response.IsSuccess)
+            {
+                Snackbar.Add(response.Message, MudBlazor.Severity.Success);
+                _navManager.NavigateTo("/clientList");
+            }
+            else
+            {
+                Snackbar.Add(response.Message, MudBlazor.Severity.Warning);
+            }
+        }
+        else
+        {
+            Snackbar.Add("Validation errors occurred. Please check your input.", MudBlazor.Severity.Error);
+        }
+    }
+    protected async Task stateClicked(string selectedValue)
+    {
+        selectedState = selectedValue;
+
+        // clientInfo.sta = selectedState;
+
+        BindZonesDropdown(selectedState);
+    }
+
+
+    // private async Task OnValueChangedR()
+    // {
+    //     // SelectAll = Convert.ToBoolean(e.Value);
+    //     BooleanList = Enumerable.Repeat(SelectAllR, 5).ToList();
+    //     await SaveToLocalStorage();
+    // }
+
+    // private async Task OnValueChangedS()
+    // {
+    //     // SelectAll = Convert.ToBoolean(e.Value);
+    //     Label_CheckBox4 = SelectAllS;
+    //     Label_CheckBox5 = SelectAllS;
+    //     Label_CheckBox6 = SelectAllS;
+
+    //     await SaveToLocalStorage();
+    // }
+    private void OnValueChangedRSingle(int index, bool value)
+    {
+        BooleanList[index] = value;
+
+    }
+    private async Task SaveToLocalStorageR(int Id)
+    {
+
+
+        // Update Select All status
+        //  SelectAllR = Label_CheckBox1 && Label_CheckBox2 && Label_CheckBox3;
+    }
+    private async Task SaveToLocalStorageS(int Id)
+    {
+
+
+        // Update Select All status
+        //  SelectAllR = Label_CheckBox1 && Label_CheckBox2 && Label_CheckBox3;
+    }
+    List<RegionStatusDTO> RegionUpdatedList = new List<RegionStatusDTO>();
+    private void UpdateList(int id, bool isChecked)
+    {
+        if (id>0 && isChecked)
+        {
+            var obj = new RegionStatusDTO();
+            obj.IsChecked=isChecked;
+            obj.RegionID = id;
+            RegionUpdatedList.Add(obj);
+        }
+        if (id>0 && !isChecked)
+        {
+            var obj = RegionUpdatedList.Find(a => a.RegionID == id);
+            if (obj !=null)
+            {
+                RegionUpdatedList.Remove(obj);
+            }
+        }
+    }
+    private async Task<bool> GetLocalStorage(string key)
+    {
+        var result = await JS.InvokeAsync<string>("localStorage.getItem", key);
+        return result == "true";
+    }
+    private async void BindZonesDropdown(string state)
+    {
+        zipCodesList = await GetZipCodesByState(state);
+    }
+    private async Task<List<ZipCodeDto>> GetZipCodesByState(string state)
+    {
+        return await _lookupRepo.GetZipCodes(state);
+    }
+}

@@ -37,7 +37,7 @@
                         <MudCardContent>
                             <MudGrid>
                                 <MudItem xs="12" md="6">
-                                    <MudTextField Label="Vendor Name" @bind-Value="clientInfo.ClientName" Variant="Variant.Filled" FullWidth="true" Required="true" />
+                                    <MudTextField Label="Vendor Name" @bind-Value="clientInfo.UserName" Variant="Variant.Filled" FullWidth="true" Required="true" />
                                 </MudItem>
                                 <MudItem xs="12" md="6">
                                     <MudTextField Label="Display Name" @bind-Value="clientInfo.DisplayName" Variant="Variant.Filled" FullWidth="true" />
@@ -46,7 +46,7 @@
                                     <MudTextField Label="Internal ID" @bind-Value="clientInfo.InternalId" Variant="Variant.Filled" FullWidth="true" />
                                 </MudItem>
                                 <MudItem xs="12" md="6">
-                                    <MudTextField Label="Phone" @bind-Value="clientInfo.Phone" Variant="Variant.Filled" FullWidth="true" Required="true" />
+                                    <MudTextField Label="Phone" @bind-Value="clientInfo.PhonePrimary" Variant="Variant.Filled" FullWidth="true" Required="true" />
 
                                 </MudItem>
                                 <MudItem xs="6" md="2">
@@ -128,7 +128,7 @@
                                     </MudSelect>
                                 </MudItem>
                                 <MudItem xs="12" md="6">
-                                    <MudTextField Label="Phone" @bind-Value="clientInfo.Phone" Variant="Variant.Filled" FullWidth="true" />
+                                    <MudTextField Label="Phone" @bind-Value="clientInfo.PhoneSecondary" Variant="Variant.Filled" FullWidth="true" />
                                 </MudItem>
                                 <MudItem xs="6" md="3">
                                     <MudTextField Label="Ext" @bind-Value="clientInfo.Ext2" Variant="Variant.Filled" FullWidth="true" />
@@ -176,7 +176,7 @@
     private int PrefixId = 0;
     private int SuffixId = 0;
     private string ZipCode = "";
-    UserClientDto clientInfo = new UserClientDto();
+    CreateClientDto clientInfo = new CreateClientDto();
 
     private List<PrefixDto> prefixList = new List<PrefixDto>();
     private List<SufixDto> sufixList = new List<SufixDto>();
@@ -207,7 +207,8 @@
             clientInfo.PrimaryFax = string.IsNullOrEmpty(clientInfo.PrimaryFax) ? "" : clientInfo.PrimaryFax;
             clientInfo.SecondaryFax = string.IsNullOrEmpty(clientInfo.SecondaryFax) ? "" : clientInfo.SecondaryFax;
 
-            clientInfo.Phone = string.IsNullOrEmpty(clientInfo.Phone) ? "" : clientInfo.Phone;
+            clientInfo.PhonePrimary = string.IsNullOrEmpty(clientInfo.PhonePrimary) ? "" : clientInfo.PhonePrimary;
+            clientInfo.PhoneSecondary = string.IsNullOrEmpty(clientInfo.PhoneSecondary) ? "" : clientInfo.PhoneSecondary;
             clientInfo.Ext1 = clientInfo.Ext1 == null ? "" : clientInfo.Ext1;
 
             clientInfo.Password = Guid.NewGuid().ToString() + "Ads";

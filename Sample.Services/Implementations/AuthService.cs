@@ -103,6 +103,7 @@ namespace Sample.Services.Implementations
             user.LOB_ID = user.LOB_ID ?? "NA";
             user.Crid = user.Crid ?? "NA";
             //user.LockoutEnd = DateTime.Now;
+            user.CreatedDate = DateTime.Now;
             try
             {
                 if (string.IsNullOrEmpty(userDto.Email))
@@ -155,13 +156,13 @@ namespace Sample.Services.Implementations
                 return new CustomResponseDto { IsSuccess = false, Message = $"An unexpected error occurred during registration. Error {ex.ToString()}" };
             }
         }
-        public async Task<CustomResponseDto> RegisterClient(UserClientDto userDto)
+        public async Task<CustomResponseDto> RegisterClient(CreateClientDto userDto)
         {
             var user = _mapper.Map<UserPofile>(userDto);
             //user.SufixId = userDto.SuffixId;
             //user.FaxID = userDto.Fax;
             user.Email = userDto.PrimaryEmail;
-            user.UserName = userDto.ClientName ?? "NA";
+            user.UserName = userDto.UserName ?? "NA";
             user.DisplayName = userDto.DisplayName ?? "NA";
             //user.ParentId = userDto.SuperAdminId;
             //user.UserPassword = userDto.Password;
@@ -177,6 +178,7 @@ namespace Sample.Services.Implementations
             user.IndustryID = user.IndustryID ?? "NA";
             user.LOB_ID = user.LOB_ID ?? "NA";
             user.Crid = user.Crid ?? "NA";
+            user.CreatedDate = DateTime.Now;
             //user.LockoutEnd = DateTime.Now;
             try
             {
@@ -269,6 +271,7 @@ namespace Sample.Services.Implementations
             user.UserName = userDto.Email;
             user.ParentId = userDto.SuperAdminId;
             user.ProfilePicture = "";
+            user.CreatedDate = DateTime.Now;
             var UserExist = await _userManager.FindByEmailAsync(userDto.Email);
             try
             {
@@ -347,7 +350,17 @@ namespace Sample.Services.Implementations
             }
         }
 
+        public async Task<GetClientDto> GetClientById(string userId)
+        {
+            var obj = new ResponseDto();
+            var user = await _userManager.FindByIdAsync(userId);
+            var roles = await _userManager.GetRolesAsync(user);
+            ClientDto dto = new ClientDto();
+            dto.userClientdto = _mapper.Map<GetClientDto>(user);
+            return dto.userClientdto;
 
+
+        }
         public async Task<CustomResponseDto> GetAllUsersWithRoles()
         {
             try
@@ -671,6 +684,6 @@ namespace Sample.Services.Implementations
             return response;
         }
 
-
+       
     }
 }

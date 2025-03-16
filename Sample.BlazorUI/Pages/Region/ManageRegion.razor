@@ -1,4 +1,4 @@
-﻿@page "/Region/create"
+﻿@page "/region/create"
 @using Sample.DTOS
 @using System.Text.Json;
 
@@ -55,10 +55,14 @@
                             <MudTd DataLabel="FirstName">@context.Abv</MudTd>
                             <MudTd DataLabel="LastName">@context.Description</MudTd>
                             <MudTd DataLabel="">
-                                <MudFab @onclick="@(()=>Edit(@context.RegionID))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
+                                <MudFab Color="Color.Primary" @onclick="@(()=>Edit(@context.RegionID))" StartIcon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
+
                                 @*<MudFab @onclick="@(()=>Delete(@context.ID))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />*@
                             </MudTd>
                         </RowTemplate>
+                        <PagerContent>
+                            <MudTablePager />
+                        </PagerContent>
                     </MudTable>
                 </fieldset>
             </MudItem>

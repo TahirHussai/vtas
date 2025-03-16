@@ -22,7 +22,7 @@
         <MudTh>Client Email</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Id">@context.Id</MudTd>
+        <MudTd DataLabel="Id" @onclick="@(()=>UpdateClient(@context.Id))">@context.Id</MudTd>
         <MudTd DataLabel="UserName">@context.UserName</MudTd>
         <MudTd DataLabel="Email">@context.Email</MudTd>
     </RowTemplate>
@@ -32,11 +32,17 @@
 </MudTable>
 
 @code {
+
     private CustomResponseDto responseDto = new CustomResponseDto();
     private List<UserWithRoleDto> clientList = new List<UserWithRoleDto>();
     private void AddNewUser()
     {
         _navManager.NavigateTo("/new-client");
+    }
+    private async Task UpdateClient(string Id)
+    {
+        await _localStorage.SetItemAsync("ClientId", Id);
+        _navManager.NavigateTo("/updateClient");
     }
     protected override async Task OnInitializedAsync()
     {

@@ -21,6 +21,7 @@ builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddTransient<IAuthRepository, AuthRepository>();
 builder.Services.AddTransient<ILookUpRepository, LookUpRepository>();
 builder.Services.AddTransient<IRegionService, Sample.BlazorUI.Services.Implementation.RegionService>();
+builder.Services.AddTransient<ISectorServices, SectorServices>();
 builder.Services.AddMudServices();
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<LocalStorageService>();

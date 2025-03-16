@@ -12,7 +12,7 @@ namespace Sample.Services.Interfaces
         Task<CustomResponseDto> GetAddressByIdAsync(int addressId);
         Task<CustomResponseDto> AddOrUpdateAddressAsync(AddressDto addressDto);
         Task<CustomResponseDto> DeleteAddressAsync(int addressId);
-        Task<CustomResponseDto> GetAddressByUserIdAsync(string userId);  // New method
+        Task<AddressDto> GetAddressByUserIdAsync(string userId);  // New method
     }
 
 }

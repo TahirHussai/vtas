@@ -1,0 +1,167 @@
+﻿@page "/sector/create"
+
+@using System.ComponentModel.DataAnnotations
+@using System.Text.Json
+
+@inject ISectorServices _sectorRepo
+@inject NavigationManager _navManager
+@inject ISnackbar Snackbar
+
+<MudTabs Elevation="1" Rounded="true" PanelClass="mt-6">
+    <MudTabPanel Text="Sector">
+        <MudGrid>
+            <MudItem xs="12" sm="12" md="12">
+                <MudForm Model="@model" @ref="@form" ValidationDelay="0">
+                    <fieldset class="fieldSet">
+                        <legend class="lengend">Add New Sector</legend>
+                        <MudCard>
+
+                            <MudCardContent>
+                                <MudGrid>
+                                    <MudItem xs="6" md="6">
+                                        <MudTextField T="string" @bind-Value="model.Abv" Label="Abv" Margin="Margin.Normal"></MudTextField>
+                                    </MudItem>
+                                    <MudItem xs="6" md="6">
+                                        <MudTextField T="string" @bind-Value="model.Desc" Label="Description" Margin="Margin.Normal"></MudTextField>
+                                    </MudItem>
+                                </MudGrid>
+                            </MudCardContent>
+                            <MudCardActions Class="pb-4 pl-4">
+                                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@( () =>  Save())">Save</MudButton>
+                                <MudButton Variant="Variant.Filled" Color="Color.Secondary" DisableElevation="true" OnClick="@(()=>form.ResetAsync())" Class="mx-2">Reset</MudButton>
+                                <MudButton Variant="Variant.Filled" DisableElevation="true" OnClick="@(()=> SecList())">Cancel</MudButton>
+                            </MudCardActions>
+                        </MudCard>
+                    </fieldset>
+                </MudForm>
+            </MudItem>
+            <MudItem xs="12" sm="12" md="12">
+                <fieldset class="fieldSet">
+                    <legend class="lengend">Sector List</legend>
+                    <MudTable Elevation="25" Items="sectorslist" Filter="new Func<SectorDto, bool>(Search)" @bind-model="model">
+                        <ToolBarContent>
+
+                            <MudTextField @bind-Value="searchString" Placeholder="Search for Categories..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                        </ToolBarContent>
+                        <HeaderContent>
+                            <MudTh>Id</MudTh>
+                            <MudTh>Abv</MudTh>
+                            <MudTh>Description</MudTh>
+                            <MudTh>Actions</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="Id">@context.SectorID</MudTd>
+                            <MudTd DataLabel="FirstName">@context.Abv</MudTd>
+                            <MudTd DataLabel="LastName">@context.Desc</MudTd>
+                            <MudTd DataLabel="">
+                                <MudFab Color="Color.Primary" @onclick="@(()=>Edit(@context.SectorID))" Size="Size.Small" IconSize="Size.Small" StartIcon="@Icons.Material.Filled.Edit" />
+                                @*<MudFab @onclick="@(()=>Delete(@context.ID))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />*@
+                            </MudTd>
+                        </RowTemplate>
+                        <PagerContent>
+                            <MudTablePager />
+                        </PagerContent>
+                    </MudTable>
+                </fieldset>
+            </MudItem>
+        </MudGrid>
+    </MudTabPanel>
+
+</MudTabs>
+
+@code {
+    MudForm form;
+    private string searchString = "";
+    SectorDto model = new SectorDto();
+    List<SectorDto> sectorslist = new List<SectorDto>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await SecList();
+    }
+    private async Task SecList()
+    {
+        var response = await _sectorRepo.Get();
+        if (response.IsSuccess)
+        {
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+            sectorslist = JsonSerializer.Deserialize<List<SectorDto>>(response.Obj.ToString(), options);
+
+        }
+
+    }
+    private bool Search(SectorDto cat)
+    {
+
+        if (string.IsNullOrWhiteSpace(searchString)) return true;
+        if (cat.Abv.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+            || cat.Desc.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+        return false;
+
+    }
+    bool isField = false;
+    private async Task Save()
+    {
+        CustomResponseDto responseModel = new CustomResponseDto();
+        if (model.SectorID > 0)
+        {
+            responseModel = await _sectorRepo.Upate(model);
+            if (responseModel.IsSuccess)
+            {
+                Snackbar.Add("Operation Performed Successfully!.", MudBlazor.Severity.Success);
+                sectorslist = new List<SectorDto>();
+                await SecList();
+            }
+            else
+            {
+                await SecList();
+                isField = true;
+                Snackbar.Add("Something went wrong!.", MudBlazor.Severity.Warning);
+            }
+        }
+        else
+        {
+
+
+            responseModel = await _sectorRepo.Add(model);
+            if (responseModel.IsSuccess)
+            {
+                Snackbar.Add("Operation Performed Successfully!.", MudBlazor.Severity.Success);
+                sectorslist = new List<SectorDto>();
+                await SecList();
+            }
+            else
+            {
+                await SecList();
+                isField = true;
+                Snackbar.Add("Something went wrong!.", MudBlazor.Severity.Warning);
+
+
+            }
+        }
+    }
+    private async Task Edit(int id)
+    {
+        var response = await _sectorRepo.GetById(id);
+        if (response.IsSuccess)
+        {
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+            model = JsonSerializer.Deserialize<SectorDto>(response.Obj.ToString(), options);
+        }
+    }
+    private void Delete(int id)
+    {
+        //customerService.DeleteCustomer(id);
+        //snackBar.Add("Customer Deleted.", Severity.Success);
+        //GetCustomers();
+    }
+
+
+
+
+} 

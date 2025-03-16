@@ -16,7 +16,7 @@ namespace Sample.WebApi.Controllers
             _sectorsServices = sectorRepository;
             _logger = logger;
         }
-        [HttpGet]
+        [HttpGet("GetSectors")]
         public async Task<ActionResult<CustomResponseDto>> Get()
         {
             var response = new CustomResponseDto();
@@ -28,7 +28,7 @@ namespace Sample.WebApi.Controllers
             return response;
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("GetSectorById/{id}")]
         public async Task<ActionResult<CustomResponseDto>> GetById(int id)
         {
             var response = new CustomResponseDto();
@@ -38,7 +38,7 @@ namespace Sample.WebApi.Controllers
 
             return response;
         }
-        [Route("Post")]
+        [Route("AddSector")]
         [HttpPost]
         public async Task<ActionResult<CustomResponseDto>> Post([FromBody] SectorDto dto)
         {
@@ -49,7 +49,7 @@ namespace Sample.WebApi.Controllers
             _logger.LogInformation("Sector  Attempted");
             return response;
         }
-        [Route("Update")]
+        [Route("UpdateSector")]
         [HttpPut]
         public async Task<ActionResult<CustomResponseDto>> Update([FromBody] SectorDto dto)
         {

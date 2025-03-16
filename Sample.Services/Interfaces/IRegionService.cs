@@ -14,5 +14,10 @@ namespace Sample.Services.Interfaces
         public Task<CustomResponseDto> Add(RegionDTO dto);
         public Task<CustomResponseDto> Upate(RegionDTO dto);
         void Save();
+
+        public Task<CustomResponseDto> GetAssignedRegionById(int Id);
+        public Task<CustomResponseDto> GetAssignedRegionByUserId(string UserId);
+        public Task<CustomResponseDto> AddAssignedRegion(UserAssignedRegionDto dto);
+        public Task<CustomResponseDto> UpdateAssignedRegion(UserAssignedRegionDto dto);
     }
 }

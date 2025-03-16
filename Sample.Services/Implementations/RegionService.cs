@@ -3,11 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Sample.Data;
 using Sample.DTOS;
 using Sample.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Sample.Services.Implementations
 {
@@ -127,6 +122,111 @@ namespace Sample.Services.Implementations
             {
                 response.IsSuccess = false;
                 response.Message = ex.ToString();
+            }
+            return response;
+        }
+        public async Task<CustomResponseDto> AddAssignedRegion(UserAssignedRegionDto dto)
+        {
+            CustomResponseDto response = new CustomResponseDto();
+            try
+            {
+                UserAssignedRegion model = new UserAssignedRegion
+                {
+                    CreatedDate = DateTime.Now,
+                    UpdatedById = dto.UpdatedById,
+                    CreatedById = dto.CreatedById,
+                    UserId = dto.UserId,
+                    AssignedRegionId = dto.AssignedRegionId,
+                };
+                await _dbContext.UserAssignedRegions.AddAsync(model);
+                Save();
+                response.IsSuccess = true;
+                response.Message = "success";
+            }
+            catch (Exception ex)
+            {
+                response.IsSuccess = false;
+                response.Message = ex.ToString();
+            }
+            return response;
+        }
+        public async Task<CustomResponseDto> UpdateAssignedRegion(UserAssignedRegionDto dto)
+        {
+            CustomResponseDto response = new CustomResponseDto();
+            try
+            {
+                var model = await _dbContext.UserAssignedRegions.FindAsync(dto.Id);
+                if (model == null)
+                    return response;
+
+                model.UpdatedById = dto.UpdatedById;
+                model.CreatedById = dto.CreatedById;
+                model.UserId = dto.UserId;
+                model.AssignedRegionId = dto.AssignedRegionId;
+                model.UpdatedDate = DateTime.Now;
+                Save();
+                response.IsSuccess = true;
+                response.Message = "success";
+            }
+            catch (Exception ex)
+            {
+                response.IsSuccess = false;
+                response.Message = ex.ToString();
+            }
+            return response;
+        }
+        public async Task<CustomResponseDto> GetAssignedRegionById(int Id)
+        {
+            var response = new CustomResponseDto();
+            var dto = new UserAssignedRegionDto();
+            try
+            {
+                var model = await _dbContext.UserAssignedRegions.Where(a => a.ID == Id).FirstOrDefaultAsync();
+                if (model != null)
+                {
+                    dto = _mapper.Map<UserAssignedRegionDto>(model);
+                    response.IsSuccess = true;
+                    response.Message = "success";
+                    response.Obj = dto;
+                }
+                response.IsSuccess = false;
+                response.Message = "No Record Found!";
+                response.Obj = dto;
+            }
+            catch (Exception ex)
+            {
+
+                response.IsSuccess = false;
+                response.Message = ex.ToString();
+                response.Obj = dto;
+            }
+            return response;
+        }
+
+        public async Task<CustomResponseDto> GetAssignedRegionByUserId(string UserId)
+        {
+            var response = new CustomResponseDto();
+            var dto = new UserAssignedRegionDto();
+            try
+            {
+                var model = await _dbContext.UserAssignedRegions.Where(a => a.UserId == UserId).FirstOrDefaultAsync();
+                if (model != null)
+                {
+                    dto = _mapper.Map<UserAssignedRegionDto>(model);
+                    response.IsSuccess = true;
+                    response.Message = "success";
+                    response.Obj = dto;
+                }
+                response.IsSuccess = false;
+                response.Message = "No Record Found!";
+                response.Obj = dto;
+            }
+            catch (Exception ex)
+            {
+
+                response.IsSuccess = false;
+                response.Message = ex.ToString();
+                response.Obj = dto;
             }
             return response;
         }

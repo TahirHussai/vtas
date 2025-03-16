@@ -39,7 +39,7 @@ namespace Sample.BlazorUI.Repository.Implementation
                 //client.DefaultRequestHeaders.Add("RefreshToken", await GetRefreshToken());
                 //client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", await GetBearerToken());
                 HttpResponseMessage response = await client.SendAsync(request);
-                if (response.StatusCode == System.Net.HttpStatusCode.Created)
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     var content = await response.Content.ReadAsStringAsync();
 

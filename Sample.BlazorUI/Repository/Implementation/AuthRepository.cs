@@ -282,7 +282,7 @@ namespace Sample.BlazorUI.Repository.Implementation
             }
             return obj;
         }
-        public async Task<CustomResponseDto> RegisterClient(UserClientDto dto)
+        public async Task<CustomResponseDto> RegisterClient(CreateClientDto dto)
         {
             var obj = new CustomResponseDto();
             try
@@ -423,6 +423,37 @@ namespace Sample.BlazorUI.Repository.Implementation
                 IsSuccess = false;
             }
             return IsSuccess;
+        }
+
+        public async Task<CustomResponseDto> GetClientById(string Id)
+        {
+            var obj = new CustomResponseDto();
+
+            try
+            {
+                var request = new HttpRequestMessage(HttpMethod.Get, $"{_baseUrl}{StaticEndPoint.GetClientByIdEndpoint}{Id}");
+                var client = _httpClientFactory.CreateClient();
+                var response = await client.SendAsync(request);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+
+                    var jsonObject = JObject.Parse(content);
+                    obj = jsonObject["result"].ToObject<CustomResponseDto>();
+
+
+
+                }
+            }
+            catch (Exception ex)
+            {
+                obj.IsSuccess = false;
+                obj.Message = ex.ToString();
+                obj.Obj = null;
+            }
+
+            return obj;
         }
 
 

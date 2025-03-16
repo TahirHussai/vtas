@@ -104,32 +104,22 @@ namespace Sample.Services.Implementations
                 return new CustomResponseDto { IsSuccess = false, Message = ex.Message };
             }
         }
-        public async Task<CustomResponseDto> GetAddressByUserIdAsync(string userId)
+        public async Task<AddressDto> GetAddressByUserIdAsync(string userId)
         {
-            try
-            {
+           
                 var parameters = new DynamicParameters();
                 parameters.Add("@UserId", userId);
                 using (var connection = _context.CreateConnection())
                 {
-                    var address = await connection.QueryFirstOrDefaultAsync<Address>(
+                    var address = await connection.QueryFirstOrDefaultAsync<AddressDto>(
                     "sp_GetAddressByUserId",
                     parameters,
                     commandType: CommandType.StoredProcedure);
+                return address;
 
-                    if (address == null)
-                    {
-                        return new CustomResponseDto { IsSuccess = false, Message = "Address not found for the given UserId" };
-                    }
 
-                    return new CustomResponseDto { IsSuccess = true, Message = "Address retrieved successfully", Obj = address };
                 }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error retrieving address for UserId: {UserId}", userId);
-                return new CustomResponseDto { IsSuccess = false, Message = ex.Message };
-            }
+         
         }
 
 

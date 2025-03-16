@@ -15,7 +15,7 @@ namespace Sample.DTOS
         //[Required(ErrorMessage = "Email address is required")]
         //[MaxLength(100, ErrorMessage = "Email address cannot exceed 100 characters")]
        // [EmailAddress(ErrorMessage = "Invalid email address format")]
-        public string? Email { get; set; }
+        public string? EmailAddress { get; set; }
 
        // [Required(ErrorMessage = "Email type ID is required")]
         public int? EmailTypeId { get; set; }

@@ -71,5 +71,40 @@ namespace Sample.WebApi.Controllers
         public void Delete(int id)
         {
         }
+        #region Assigned region
+        [Route("AddAssignedRegion")]
+        [HttpPost]
+
+        public async Task<ActionResult<CustomResponseDto>> AssignedRegion([FromBody] UserAssignedRegionDto dto)
+        {
+            CustomResponseDto response = new CustomResponseDto();
+
+            _logger.LogInformation("Assigned Region  Attempt");
+            response = await _regionRepository.AddAssignedRegion(dto);
+            _logger.LogInformation("Assigned Region  Attempted");
+            return response;
+        }
+        [Route("UpdateAssignedRegion")]
+        [HttpPut]
+        public async Task<ActionResult<CustomResponseDto>> UpdateAssignedRegion([FromBody] UserAssignedRegionDto dto)
+        {
+            CustomResponseDto response = new CustomResponseDto();
+
+            _logger.LogInformation("Update Assigned Region  Attempt");
+            response = await _regionRepository.UpdateAssignedRegion(dto);
+            _logger.LogInformation("Update  Assigned Region  Attempted");
+            return response;
+        }
+        [HttpGet("GetAssignedRegionByUserId{UserId}")]
+        public async Task<ActionResult<CustomResponseDto>> GetAssignedById(string UserId)
+        {
+            var response = new CustomResponseDto();
+            _logger.LogInformation("Attempted Assigned Get   Region");
+            response = await _regionRepository.GetAssignedRegionByUserId(UserId);
+            _logger.LogInformation("Successfully got Assigned  Region");
+
+            return response;
+        }
+        #endregion
     }
 }

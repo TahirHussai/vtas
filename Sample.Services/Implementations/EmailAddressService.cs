@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -24,7 +25,7 @@ namespace Sample.Services.Implementations
             _logger = logger;
         }
 
-        public async Task<CustomResponseDto> GetEmailAddressByIdAsync(int emailId)
+        public async Task<CustomResponseDto> GetEmailAddressByIdAsync(string emailId)
         {
             try
             {
@@ -51,14 +52,30 @@ namespace Sample.Services.Implementations
                 return new CustomResponseDto { IsSuccess = false, Message = ex.Message };
             }
         }
+        public async Task<List<EmailAddressDto>> GetEmailAddressByUserIdAsync(string UserId)
+        {
+            var obj = new List<EmailAddressDto>();
+           
+                var parameters = new DynamicParameters();
+                parameters.Add("@UserId", UserId);
+                using (var connection = _context.CreateConnection())
+                {
+                    var emailAddress = await connection.QueryAsync<EmailAddressDto>(
+                    "sp_GetEmailAddressByUserId",
+                    parameters,
+                    commandType: CommandType.StoredProcedure);
 
+                    return (List<EmailAddressDto>)emailAddress;
+                }
+            
+        }
         public async Task<CustomResponseDto> AddOrUpdateEmailAddressAsync(EmailAddressDto emailAddressDto)
         {
             try
             {
                 var parameters = new DynamicParameters();
                 parameters.Add("@EmailId", emailAddressDto.EmailId);
-                parameters.Add("@Email", emailAddressDto.Email);
+                parameters.Add("@Email", emailAddressDto.EmailAddress);
                 parameters.Add("@EmailTypeId", emailAddressDto.EmailTypeId);
                 parameters.Add("@IsActive", emailAddressDto.Active);
                 parameters.Add("@CreatedById", emailAddressDto.CreatedById);
@@ -80,7 +97,7 @@ namespace Sample.Services.Implementations
             }
         }
 
-        public async Task<CustomResponseDto> DeleteEmailAddressAsync(int emailId)
+        public async Task<CustomResponseDto> DeleteEmailAddressAsync(string emailId)
         {
             try
             {

@@ -17,6 +17,7 @@
         public static string GetVendorsUsersEndpoint = $"api/Account/GetVendorsUsersWithRoles?VendorId=";
         public static string UpdateUserRolesEndpoint = $"api/Account/assign-roles";
         public static string GetAllCustomersEndpoint = $"api/Account/GetAllCustomers";
+        public static string GetClientByIdEndpoint = $"api/Account/GetClientUserById/";
         #endregion
 
         #region Lookups Api
@@ -39,5 +40,11 @@
         public static string RegionUpdateEndpoint = "api/Region/UpdateRegion";
         public static string RegionGetByIdEndPoint = "api/Region/GetRegionById/";
         public static string RegionGetEndPoint = "api/Region/GetRegions";
+
+
+        public static string SectorCreateEndpoint = "api/Sectors/AddSector";
+        public static string SectorUpdateEndpoint = "api/Sectors/UpdateSector";
+        public static string SectorGetByIdEndPoint = "api/Sectors/GetSectorById/";
+        public static string SectorGetEndPoint = "api/Sectors/GetSectors";
     }
 }

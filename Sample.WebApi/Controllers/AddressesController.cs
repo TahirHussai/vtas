@@ -23,10 +23,18 @@ namespace Sample.WebApi.Controllers
         public async Task<ActionResult<CustomResponseDto>> GetAddressesByUserId(string userId)
         {
             _logger.LogInformation($"GetAddressesByUserId endpoint called with UserId: {userId}.");
+                var obj = new CustomResponseDto();
+
             try
             {
                 var addresses = await _addressesService.GetAddressByUserIdAsync(userId);
-                return addresses;
+                if (addresses!=null)
+                {
+                    obj.IsSuccess = true;
+                    obj.Message = "Success";
+                    obj.Obj = addresses;
+                }
+                return obj;
                    
             }
             catch (Exception ex)

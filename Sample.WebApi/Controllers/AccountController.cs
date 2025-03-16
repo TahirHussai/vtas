@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Azure;
+using Microsoft.AspNetCore.Mvc;
 using Sample.DTOS;
 using Sample.Services.Interfaces;
+using System.Text.Json;
 using System.Xml.Schema;
 
 namespace Sample.WebApi.Controllers
@@ -138,7 +140,7 @@ namespace Sample.WebApi.Controllers
 
         [HttpPost]
         [Route("RegisterClient")]
-        public async Task<ActionResult<CustomResponseDto>> RegisterClient([FromBody] UserClientDto userDto)
+        public async Task<ActionResult<CustomResponseDto>> RegisterClient([FromBody] CreateClientDto userDto)
         {
             if (userDto == null)
             {
@@ -177,7 +179,7 @@ namespace Sample.WebApi.Controllers
                     {
                         Active = true,
                         CreatedById = userDto.CreatedById,
-                        Email = userDto.PrimaryEmail,
+                        EmailAddress = userDto.PrimaryEmail,
                         EmailTypeId = 1, // Work Email
                         UserId = userId,
                     };
@@ -191,38 +193,55 @@ namespace Sample.WebApi.Controllers
                     {
                         Active = true,
                         CreatedById = userDto.CreatedById,
-                        Email = userDto.SecondaryEmail,
+                        EmailAddress = userDto.SecondaryEmail,
                         EmailTypeId = 2, // Contact Email
                         UserId = userId,
                     };
                     await AddOrUpdateEmailAsync(emailObj, userDto.SecondaryEmail);
                 }
                 // Add Phone No
-                if (userDto.PhoneDtos.Count() > 0)
+                if (!string.IsNullOrEmpty(userDto.PhonePrimary))
                 {
-                    foreach (var phoneDto in userDto.PhoneDtos)
+
+                    var obj = new CreatePhoneDto
                     {
-                        if (phoneDto != null)
-                        {
-                            phoneDto.UserId = Convert.ToString(userId);
-                            await _phoneService.AddPhoneAsync(phoneDto);
-                        }
-                    }
+                        Active = true,
+                        CreatedById = Convert.ToString(userId),
+                        PhoneExt = userDto.Ext1,
+                        PhoneNumber = userDto.PhonePrimary,
+                        PhoneTypeID = 2,//Phone Type 2 show this is work phone
+                        UserId = userId
+                    };
+                    await _phoneService.AddPhoneAsync(obj);
+                }
+                if (!string.IsNullOrEmpty(userDto.PhoneSecondary))
+                {
+
+                    var obj = new CreatePhoneDto
+                    {
+                        Active = true,
+                        CreatedById = Convert.ToString(userId),
+                        PhoneExt = userDto.Ext2,
+                        PhoneNumber = userDto.PhoneSecondary,
+                        PhoneTypeID = 3,//Phone Type 3 show this is home phone
+                        UserId = userId
+                    };
+                    await _phoneService.AddPhoneAsync(obj);
                 }
                 // Add Fax No
                 if (!string.IsNullOrEmpty(userDto.PrimaryFax))
                 {
-                   
-                            var obj = new CreatePhoneDto
-                            {
-                                Active = true,
-                                CreatedById = userDto.CreatedById,
-                                PhoneExt = userDto.Ext1,
-                                PhoneNumber = userDto.PrimaryFax,
-                                PhoneTypeID = 5,
-                                UserId = Convert.ToString(userId),
-                            };
-                            await _phoneService.AddPhoneAsync(obj);
+
+                    var obj = new CreatePhoneDto
+                    {
+                        Active = true,
+                        CreatedById = userDto.CreatedById,
+                        PhoneExt = userDto.Ext1,
+                        PhoneNumber = userDto.PrimaryFax,
+                        PhoneTypeID = 5,
+                        UserId = Convert.ToString(userId),
+                    };
+                    await _phoneService.AddPhoneAsync(obj);
                 }
                 if (!string.IsNullOrEmpty(userDto.SecondaryFax))
                 {
@@ -248,109 +267,75 @@ namespace Sample.WebApi.Controllers
         }
 
 
-        private OtherDetailsDto CreateOtherDetails(string userId)
-        {
-            return new OtherDetailsDto
-            {
-                JobNotes = string.Empty,
-                BlockBGScreen = false,
-                BlockDrugScreen = false,
-                Parent_VendorID = "0",
-                ReferenceByID = -1,
-                UserId = userId,
-                BlockAutoQBR = false,
-                FlagSubVendor = false,
-                Flag_Virtual = false,
-                IsAllow = false,
-                IsAllowDup = false,
-                IsInSOLDB = false,
-                SpouseId = -1,
-                SubmittalClientComp = false
-            };
-        }
 
-        private AddressDto CreateAddress(UserCustomerDto userDto, string userId)
-        {
-            return new AddressDto
-            {
-                Address1 = userDto.AddressDto.Address1,
-                Address2 = userDto.AddressDto.Address2,
-                UserId = userId,
-                CreatedById = userDto.CreatedById,
-                CreateDate = DateTime.Now,
-                PostalCode = userDto.AddressDto.PostalCode,
-                City = userDto.AddressDto.City,
-                CountryId = userDto.AddressDto.CountryId,
-                AddressTypeId = userDto.AddressDto.AddressTypeId,
-                State = userDto.AddressDto.State
-            };
-        }
-
-        private EmailAddressDto CreateEmail(UserCustomerDto userDto, string userId)
-        {
-            return new EmailAddressDto
-            {
-                Email = userDto.Email,
-                EmailTypeId = userDto.EmailAddressDto.EmailTypeId,
-                UserId = userId,
-                Active = true,
-                CreateDate = DateTime.Now,
-                CreatedById = userDto.CreatedById
-            };
-        }
-        private PhoneDto CreatePhone(PhoneDto userDto, string userId)
-        {
-            return new PhoneDto
-            {
-                PhoneExt = userDto.PhoneExt,
-                PhoneTypeID = userDto.PhoneTypeID,
-                UserId = userId,
-                Active = true,
-                CreateDate = DateTime.Now,
-                CreatedById = userDto.CreatedById,
-                PhoneNumber = userDto.PhoneNumber,
-            };
-        }
-        private async Task<bool> AddOrUpdateOtherDetailsAsync(OtherDetailsDto otherDetail, string email)
-        {
-            var result = await _otherDetailsService.AddOrUpdateOtherDetailsAsync(otherDetail);
-            if (!result.IsSuccess)
-            {
-                _logger.LogError($"Failed to register user {email}: {string.Join(", ", result.Message)}");
-                return false;
-            }
-            return true;
-        }
-
-        private async Task<bool> AddOrUpdateAddressAsync(AddressDto address, string email)
-        {
-            //address.State = "";
-            address.CountryId = 0;
-            var result = await _addressService.AddOrUpdateAddressAsync(address);
-            if (!result.IsSuccess)
-            {
-                _logger.LogError($"Failed to register user {email}: {string.Join(", ", result.Message)}");
-                return false;
-            }
-            return true;
-        }
-
-        private async Task<bool> AddOrUpdateEmailAsync(EmailAddressDto email, string userEmail)
-        {
-            var result = await _emailAddressService.AddOrUpdateEmailAddressAsync(email);
-            if (!result.IsSuccess)
-            {
-                _logger.LogError($"Failed to register user {userEmail}: {string.Join(", ", result.Message)}");
-                return false;
-            }
-            return true;
-        }
 
         [HttpGet("GetUserById/{userId}")]
         public async Task<ActionResult<CustomResponseDto>> GetUserById(string userId)
         {
             var user = await _authService.GetUserById(userId);
             return user;
+        }
+        [HttpGet("GetClientUserById/{userId}")]
+        public async Task<ActionResult<CustomResponseDto>> GetClientById(string userId)
+        {
+            CreateClientDto dto = new CreateClientDto();
+            var obj = new CustomResponseDto();
+            try
+            {
+
+
+                var emailAddressDtos = await _emailAddressService.GetEmailAddressByUserIdAsync(userId);
+                if (emailAddressDtos.Count() > 0)
+                {
+                    var primaryEmail = emailAddressDtos.FirstOrDefault();
+                    if (primaryEmail != null)
+                    {
+                        dto.PrimaryEmail = primaryEmail.EmailAddress;
+                    }
+                    var secondaryEmail = emailAddressDtos.LastOrDefault();
+                    if (secondaryEmail != null)
+                    {
+                        dto.SecondaryEmail = secondaryEmail.EmailAddress;
+                    }
+                }
+                var userDto = await _authService.GetClientById(userId);
+                if (userDto != null)
+                {
+                    dto.UserName = userDto.UserName;
+                    dto.FirstName = userDto.FirstName;
+                    dto.LastName = userDto.LastName;
+                    dto.DisplayName = userDto.DisplayName;
+                    dto.PrefixId = userDto.PrefixId;
+                    dto.InternalId = userDto.InternalId;
+                    dto.SuffixId = userDto.SuffixId;
+                }
+                    dto.AddressDto = await _addressService.GetAddressByUserIdAsync(userId);
+                var PhoneDtos = await _phoneService.GetPhonesByUserIdAsync(userId);
+                if (PhoneDtos.Count() > 0)
+                {
+                    var primaryPhone = PhoneDtos.FirstOrDefault();
+                    if (primaryPhone != null)
+                    {
+                        dto.PhonePrimary = primaryPhone.PhoneNumber;
+                        dto.Ext1 = primaryPhone.PhoneExt;
+                    }
+                    var secondaryPhone = PhoneDtos.LastOrDefault();
+                    if (secondaryPhone != null)
+                    {
+                        dto.PhonePrimary = secondaryPhone.PhoneNumber;
+                        dto.Ext1 = secondaryPhone.PhoneExt;
+                    }
+                }
+                obj.IsSuccess = true;
+                obj.Message = "Success";
+                obj.Obj = dto;
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+            return obj;
         }
 
         [HttpGet("users-with-roles")]
@@ -406,6 +391,90 @@ namespace Sample.WebApi.Controllers
         {
             var user = await _authService.GetRecruiterUsersWithRoles(recruiterId, customerId);
             return user;
+        }
+        private OtherDetailsDto CreateOtherDetails(string userId)
+        {
+            return new OtherDetailsDto
+            {
+                JobNotes = string.Empty,
+                BlockBGScreen = false,
+                BlockDrugScreen = false,
+                Parent_VendorID = "0",
+                ReferenceByID = -1,
+                UserId = userId,
+                BlockAutoQBR = false,
+                FlagSubVendor = false,
+                Flag_Virtual = false,
+                IsAllow = false,
+                IsAllowDup = false,
+                IsInSOLDB = false,
+                SpouseId = -1,
+                SubmittalClientComp = false
+            };
+        }
+
+        private AddressDto CreateAddress(UserCustomerDto userDto, string userId)
+        {
+            return new AddressDto
+            {
+                Address1 = userDto.AddressDto.Address1,
+                Address2 = userDto.AddressDto.Address2,
+                UserId = userId,
+                CreatedById = userDto.CreatedById,
+                CreateDate = DateTime.Now,
+                PostalCode = userDto.AddressDto.PostalCode,
+                City = userDto.AddressDto.City,
+                CountryId = userDto.AddressDto.CountryId,
+                AddressTypeId = userDto.AddressDto.AddressTypeId,
+                State = userDto.AddressDto.State
+            };
+        }
+
+        private EmailAddressDto CreateEmail(UserCustomerDto userDto, string userId)
+        {
+            return new EmailAddressDto
+            {
+                EmailAddress = userDto.Email,
+                EmailTypeId = userDto.EmailAddressDto.EmailTypeId,
+                UserId = userId,
+                Active = true,
+                CreateDate = DateTime.Now,
+                CreatedById = userDto.CreatedById
+            };
+        }
+        private async Task<bool> AddOrUpdateOtherDetailsAsync(OtherDetailsDto otherDetail, string email)
+        {
+            var result = await _otherDetailsService.AddOrUpdateOtherDetailsAsync(otherDetail);
+            if (!result.IsSuccess)
+            {
+                _logger.LogError($"Failed to register user {email}: {string.Join(", ", result.Message)}");
+                return false;
+            }
+            return true;
+        }
+
+        private async Task<bool> AddOrUpdateAddressAsync(AddressDto address, string email)
+        {
+            //address.State = "";
+            address.CountryId = 0;
+            var result = await _addressService.AddOrUpdateAddressAsync(address);
+            if (!result.IsSuccess)
+            {
+                _logger.LogError($"Failed to register user {email}: {string.Join(", ", result.Message)}");
+                return false;
+            }
+            return true;
+        }
+
+        private async Task<bool> AddOrUpdateEmailAsync(EmailAddressDto email, string userEmail)
+        {
+            var result = await _emailAddressService.AddOrUpdateEmailAddressAsync(email);
+            if (!result.IsSuccess)
+            {
+                _logger.LogError($"Failed to register user {userEmail}: {string.Join(", ", result.Message)}");
+                return false;
+            }
+            return true;
         }
     }
 
