@@ -171,7 +171,7 @@ namespace Sample.Services.Implementations
             user.PersonStatusID = 1;
             user.ProfilePicture = string.Empty;
             user.MiddleName = userDto.MiddleName ?? "NA";
-            user.OldVtasId = user.OldVtasId ?? "NA";
+            user.OldVtasId = userDto.InternalId ?? "NA";
             user.AltId = user.AltId ?? "NA";
             user.FaxID = user.FaxID ?? "NA";
             user.OldId = user.OldId ?? "NA";

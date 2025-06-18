@@ -54,8 +54,8 @@ namespace Sample.Services.Implementations
             {
                 var parameters = new DynamicParameters();
                 parameters.Add("@AddressId", addressDto.AddressId);
-                parameters.Add("@AddressLine1", addressDto.Address1);
-                parameters.Add("@AddressLine2", addressDto.Address2);
+                parameters.Add("@Address1", addressDto.Address1);
+                parameters.Add("@Address2", addressDto.Address2);
                 parameters.Add("@City", addressDto.City);
                 parameters.Add("@State", addressDto.State);
                 parameters.Add("@PostalCode", addressDto.PostalCode);
@@ -106,20 +106,30 @@ namespace Sample.Services.Implementations
         }
         public async Task<AddressDto> GetAddressByUserIdAsync(string userId)
         {
-           
-                var parameters = new DynamicParameters();
-                parameters.Add("@UserId", userId);
-                using (var connection = _context.CreateConnection())
+            var address = new AddressDto();
+
+            var parameters = new DynamicParameters();
+            parameters.Add("@UserId", userId);
+            using (var connection = _context.CreateConnection())
+            {
+                 address = await connection.QueryFirstOrDefaultAsync<AddressDto>(
+                "sp_GetAddressByUserId",
+                parameters,
+                commandType: CommandType.StoredProcedure);
+                if (address==null)
                 {
-                    var address = await connection.QueryFirstOrDefaultAsync<AddressDto>(
-                    "sp_GetAddressByUserId",
-                    parameters,
-                    commandType: CommandType.StoredProcedure);
+                    address = new AddressDto();
+                    address.Address1 = string.Empty;
+                        address.Address2 = string.Empty;
+                        address.City = string.Empty;
+                        address.PostalCode = string.Empty;
+                        address.State = string.Empty;
+                }
                 return address;
 
 
-                }
-         
+            }
+
         }
 
 

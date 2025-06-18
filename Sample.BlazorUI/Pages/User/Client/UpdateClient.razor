@@ -229,9 +229,7 @@
     }
     protected override async Task OnInitializedAsync()
     {
-        prefixList = await _lookupRepo.GetPrefix();
-        sufixList = await _lookupRepo.GetSuffix();
-        statesList = await _lookupRepo.GetStates();
+       
         var clientId = await _localStorage.GetItemAsync("ClientId");
         if (!string.IsNullOrEmpty(clientId))
         {
@@ -241,51 +239,10 @@
                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
                 clientInfo = JsonSerializer.Deserialize<CreateClientDto>(clientResponse.Obj.ToString(), options);
-                // if (clientdto!=null)
-                // {
-                //     clientInfo.UserName = clientdto.userClientdto.UserName;
-                //     clientInfo.FirstName = clientdto.userClientdto.FirstName;
-                //     clientInfo.LastName = clientdto.userClientdto.LastName;
-                //     clientInfo.DisplayName = clientdto.userClientdto.DisplayName;
-                //     clientInfo.Ext1 = clientdto.userClientdto.Ext1;
-                //     clientInfo.Ext2 = clientdto.userClientdto.Ext2;
-                //     clientInfo.PrefixId = clientdto.userClientdto.PrefixId;
-                //     clientInfo.InternalId = clientdto.userClientdto.InternalId;
-                //     clientInfo.SuffixId = clientdto.userClientdto.SuffixId;
-                //     if (clientdto.AddressDto !=null)
-                //     {
-                //         clientInfo.AddressDto = clientdto.AddressDto;
-                //     }
-                //     if (clientdto.PhoneDtos.Count()>0)
-                //     {
-                //         var primaryPhone = clientdto.PhoneDtos.FirstOrDefault();
-                //         if (primaryPhone!=null)
-                //         {
-                //             clientInfo.PhonePrimary = primaryPhone.PhoneNumber;
-                //             clientInfo.Ext1 = primaryPhone.PhoneExt;
-                //         }
-                //         var secondaryPhone = clientdto.PhoneDtos.LastOrDefault();
-                //         if (secondaryPhone != null)
-                //         {
-                //             clientInfo.PhonePrimary = secondaryPhone.PhoneNumber;
-                //             clientInfo.Ext1 = secondaryPhone.PhoneExt;
-                //         }
-                //     }
-                //     if (clientdto.emailAddressDtos.Count() > 0)
-                //     {
-                //         var primaryEmail = clientdto.emailAddressDtos.FirstOrDefault();
-                //         if (primaryEmail !=null)
-                //         {
-                //             clientInfo.PrimaryEmail = primaryEmail.EmailAddress;
-                //         }
-                //         var secondaryEmail = clientdto.emailAddressDtos.LastOrDefault();
-                //         if (secondaryEmail != null)
-                //         {
-                //             clientInfo.SecondaryEmail = secondaryEmail.EmailAddress;
-                //         }
-                //     }
-                // }
             }
+            prefixList = await _lookupRepo.GetPrefix();
+            sufixList = await _lookupRepo.GetSuffix();
+            statesList = await _lookupRepo.GetStates();
         }
         var response = await _regionRepo.Get();
         if (response.IsSuccess)
@@ -335,6 +292,7 @@
             clientInfo.PrefixId = PrefixId;
 
 
+            clientInfo.AddressDto.AddressTypeId =1;// Address Type 1= Mailing Address
             clientInfo.AddressDto.State = string.IsNullOrEmpty(selectedState) ? "" : selectedState;
             clientInfo.AddressDto.PostalCode = string.IsNullOrEmpty(ZipCode) ? "" : ZipCode;
             var response = await _authRepo.RegisterClient(clientInfo);

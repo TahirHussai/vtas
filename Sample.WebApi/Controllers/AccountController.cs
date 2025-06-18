@@ -166,9 +166,10 @@ namespace Sample.WebApi.Controllers
                 }
 
                 // Add Address
-                if (userDto.AddressDto.AddressTypeId > 0)
+                if (userDto.AddressDto!=null)
                 {
-
+                    userDto.AddressDto.CreatedById = userDto.CreatedById;
+                    userDto.AddressDto.UserId = (string?)response.Obj;
                     await AddOrUpdateAddressAsync(userDto.AddressDto, userDto.PrimaryEmail);
 
                 }
@@ -309,22 +310,41 @@ namespace Sample.WebApi.Controllers
                     dto.InternalId = userDto.InternalId;
                     dto.SuffixId = userDto.SuffixId;
                 }
-                    dto.AddressDto = await _addressService.GetAddressByUserIdAsync(userId);
+                dto.AddressDto = await _addressService.GetAddressByUserIdAsync(userId);
+                
                 var PhoneDtos = await _phoneService.GetPhonesByUserIdAsync(userId);
                 if (PhoneDtos.Count() > 0)
                 {
-                    var primaryPhone = PhoneDtos.FirstOrDefault();
-                    if (primaryPhone != null)
+                    foreach (var item in PhoneDtos)
                     {
-                        dto.PhonePrimary = primaryPhone.PhoneNumber;
-                        dto.Ext1 = primaryPhone.PhoneExt;
+                        if (item.PhoneTypeID ==2)
+                        {
+                            dto.PhonePrimary = item.PhoneNumber;
+                            dto.Ext1 = item.PhoneExt;
+                        }
+                        if (item.PhoneTypeID == 3)
+                        {
+                            dto.PhoneSecondary = item.PhoneNumber;
+                            dto.Ext1 = item.PhoneExt;
+                        }
+                        if (item.PhoneTypeID ==5)
+                        {
+                            if (string.IsNullOrEmpty(dto.PrimaryFax))
+                            {
+                                dto.PrimaryFax = item.PhoneNumber;
+                                dto.Ext1 = item.PhoneExt;
+
+                            }
+                            else
+                            {
+                                dto.SecondaryFax = item.PhoneNumber;
+                                dto.Ext2 = item.PhoneExt;
+                            }
+
+                        }
                     }
-                    var secondaryPhone = PhoneDtos.LastOrDefault();
-                    if (secondaryPhone != null)
-                    {
-                        dto.PhonePrimary = secondaryPhone.PhoneNumber;
-                        dto.Ext1 = secondaryPhone.PhoneExt;
-                    }
+                    
+                    
                 }
                 obj.IsSuccess = true;
                 obj.Message = "Success";
